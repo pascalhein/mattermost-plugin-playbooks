@@ -44,7 +44,7 @@ interface Props {
 const Participants = (props: Props) => {
     const profilesInChannel = useProfilesInChannel(props.incident.channel_id);
 
-    const profilesExceptTwoMains = profilesInChannel.filter((u) => u.id !== props.incident.commander_user_id && u.id !== props.incident.reporter_user_id);
+    const profilesExceptComamnder = profilesInChannel.filter((u) => u.id !== props.incident.commander_user_id);
 
     return (
         <TabPageContainer>
@@ -55,13 +55,11 @@ const Participants = (props: Props) => {
                     userId={props.incident.commander_user_id}
                     isCommander={true}
                 />
-                <Heading>{'Reporter'}</Heading>
-                <Participant userId={props.incident.reporter_user_id}/>
                 {
-                    profilesExceptTwoMains.length > 0 &&
+                    profilesExceptComamnder.length > 0 &&
                     <>
                         <Heading>{'Channel Members'}</Heading>
-                        {profilesExceptTwoMains.map((o) => (
+                        {profilesExceptComamnder.map((o) => (
                             <Participant
                                 key={o.id}
                                 userId={o.id}
