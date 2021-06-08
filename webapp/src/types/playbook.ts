@@ -176,7 +176,7 @@ export function isChecklistItem(arg: any): arg is ChecklistItem {
         typeof arg.command_last_run === 'number';
 }
 
-export const defaultMessageOnJoin = 'Welcome! This channel was automatically created as part of a playbook run. You can [learn more about playbooks here](https://docs.mattermost.com/administration/devops-command-center.html?highlight=playbook#playbooks). To see information about this run, such as current owner and checklist of tasks, select the shield icon in the channel header.\n' +
+export const defaultMessageOnJoin = 'Welcome! This channel was automatically created as part of a playbook run. You can [learn more about playbooks here](https://docs.mattermost.com/administration/devops-command-center.html?highlight=playbook#playbooks). To see information about this run, such as current owner and checklists, select the shield icon in the channel header.\n' +
     '\n' +
     'You may also find the following resources helpful:\n' +
     '\n' +

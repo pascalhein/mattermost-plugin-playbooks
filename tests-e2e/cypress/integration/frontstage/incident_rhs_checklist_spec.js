@@ -122,8 +122,8 @@ describe('incident rhs checklist', () => {
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText(incidentName).should('exist');
 
-                // # Select the tasks tab
-                cy.findByTestId('tasks').click();
+                // # Select the checklists tab
+                cy.findByTestId('checklists').click();
             });
         });
 
@@ -164,8 +164,8 @@ describe('incident rhs checklist', () => {
             cy.visit('/ad-1/channels/' + incidentChannelName);
 
             cy.get('#rhsContainer').should('exist').within(() => {
-                // # Select the tasks tab
-                cy.findByTestId('tasks').click();
+                // # Select the checklists tab
+                cy.findByTestId('checklists').click();
 
                 // * Verify the invalid command still has not yet been run.
                 cy.findAllByTestId('run').eq(0).should('have.text', 'Run');

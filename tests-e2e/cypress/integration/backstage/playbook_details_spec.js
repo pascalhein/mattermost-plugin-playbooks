@@ -20,7 +20,7 @@ describe('backstage playbook details', () => {
         cy.url().should('include', '/ad-1/com.mattermost.plugin-incident-management/error?type=playbooks');
     });
 
-    describe('tasks', () => {
+    describe('checklists', () => {
         describe('slash command', () => {
             it('autocompletes after clicking Add a Slash Command', () => {
                 // # Visit the playbook backstage

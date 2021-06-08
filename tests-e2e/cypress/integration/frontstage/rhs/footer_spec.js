@@ -57,8 +57,8 @@ describe('incident rhs > footer', () => {
                 // # Navigate directly to the application and the incident channel
                 cy.visit('/ad-1/channels/' + incidentChannelName);
 
-                // # Select the tasks tab
-                cy.findByTestId('tasks').click();
+                // # Select the checklists tab
+                cy.findByTestId('checklists').click();
             });
 
             it('should always say update status', () => {

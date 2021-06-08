@@ -447,7 +447,7 @@ const PlaybookEdit = (props: Props) => {
                             currentTab={currentTab}
                             setCurrentTab={setCurrentTab}
                         >
-                            {'Tasks'}
+                            {'Checklists'}
                             {'Preferences'}
                             {'Automation'}
                             {'Permissions'}

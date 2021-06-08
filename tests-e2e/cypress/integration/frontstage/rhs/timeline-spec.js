@@ -127,8 +127,8 @@ describe('timeline', () => {
             // * Verify we can see the change commander in the timeline
             verifyTimelineEvent('commander_changed', 2, 1, 'Commander changed from @aaron.peterson to @user-1');
 
-            // # Select the tasks tab
-            cy.findByTestId('tasks').click();
+            // # Select the checklists tab
+            cy.findByTestId('checklists').click();
 
             // # Click the first task
             cy.get('[type="checkbox"]').first().check();
@@ -314,8 +314,8 @@ describe('timeline', () => {
             // # Change commander
             cy.executeSlashCommand('/incident commander @user-1');
 
-            // # Select the tasks tab
-            cy.findByTestId('tasks').click();
+            // # Select the checklists tab
+            cy.findByTestId('checklists').click();
 
             // # Click the first task
             cy.get('[type="checkbox"]').first().check();

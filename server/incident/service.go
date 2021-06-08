@@ -206,7 +206,7 @@ func (s *ServiceImpl) CreateIncident(incdnt *Incident, pb *playbook.Playbook, us
 	overviewURL := ""
 	playbookURL := ""
 
-	header := "This channel was created as part of a playbook. To view more information, select the shield icon then select *Tasks* or *Overview*."
+	header := "This channel was created as part of a playbook. To view more information, select the shield icon then select *Checklists* or *Overview*."
 	if siteURL != "" && pb != nil {
 		overviewURL = fmt.Sprintf("%s/%s/%s/runs/%s", siteURL, team.Name, s.configService.GetManifest().Id, incdnt.ID)
 		playbookURL = fmt.Sprintf("%s/%s/%s/playbooks/%s", siteURL, team.Name, s.configService.GetManifest().Id, pb.ID)
