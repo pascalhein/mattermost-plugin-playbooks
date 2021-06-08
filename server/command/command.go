@@ -124,10 +124,10 @@ func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
 	if addTestCommands {
 		test := model.NewAutocompleteData("test", "", "Commands for testing and debugging.")
 
-		testCreate := model.NewAutocompleteData("create-incident", "[playbook ID] [timestamp] [incident name]", "Create an incident with a specific creation date")
+		testCreate := model.NewAutocompleteData("create-run", "[playbook ID] [timestamp] [run name]", "Create a playbook run with a specific creation date")
 		testCreate.AddDynamicListArgument("List of playbooks is downloading from your incident response plugin", "api/v0/playbooks/autocomplete", true)
 		testCreate.AddTextArgument("Date in format 2020-01-31", "Creation timestamp", `/[0-9]{4}-[0-9]{2}-[0-9]{2}/`)
-		testCreate.AddTextArgument("Name of the incident", "Incident name", "")
+		testCreate.AddTextArgument("Name of the run", "run name", "")
 		test.AddCommand(testCreate)
 
 		testData := model.NewAutocompleteData("bulk-data", "[ongoing] [ended] [days] [seed]", "Generate random test data in bulk")
@@ -610,7 +610,7 @@ func (r *Runner) actionInfo() {
 	}
 	attachment := &model.SlackAttachment{
 		Fields: []*model.SlackAttachmentField{
-			{Title: "Incident Name:", Value: fmt.Sprintf("**%s**", strings.Trim(theIncident.Name, " "))},
+			{Title: "Run Name:", Value: fmt.Sprintf("**%s**", strings.Trim(theIncident.Name, " "))},
 			{Title: "Duration:", Value: timeutils.DurationString(timeutils.GetTimeForMillis(theIncident.CreateAt), time.Now())},
 			{Title: "Commander:", Value: fmt.Sprintf("@%s", commander.Username)},
 			{Title: "Tasks:", Value: tasks},
@@ -1064,7 +1064,7 @@ func (r *Runner) actionTest(args []string) {
 
 func (r *Runner) actionTestCreate(params []string) {
 	if len(params) < 3 {
-		r.postCommandResponse("The command expects three parameters: <playbook_id> <timestamp> <incident name>")
+		r.postCommandResponse("The command expects three parameters: <playbook_id> <timestamp> <run name>")
 		return
 	}
 
@@ -1301,7 +1301,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 		playbooks = append(playbooks, wholePlaybook)
 	}
 
-	tableMsg := "| Incident name | Created at | Status |\n|-	|-	|-	|\n"
+	tableMsg := "| Run name | Created at | Status |\n|-	|-	|-	|\n"
 	incidents := make([]*incident.Incident, 0, numIncidents)
 	for i := 0; i < numIncidents; i++ {
 		thePlaybook := playbooks[rand.Intn(len(playbooks))]

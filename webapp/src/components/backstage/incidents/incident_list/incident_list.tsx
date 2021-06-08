@@ -262,7 +262,7 @@ const BackstageIncidentList = () => {
     }
 
     function openIncidentDetails(incident: Incident) {
-        navigateToTeamPluginUrl(currentTeam.name, `/incidents/${incident.id}`);
+        navigateToTeamPluginUrl(currentTeam.name, `/runs/${incident.id}`);
     }
 
     const [profileSelectorToggle, setProfileSelectorToggle] = useState(false);
@@ -299,7 +299,7 @@ const BackstageIncidentList = () => {
                     className='title'
                     data-testid='titleIncident'
                 >
-                    {'Incidents'}
+                    {'Runs'}
                     <div className='light'>
                         {'(' + currentTeam.display_name + ')'}
                     </div>
@@ -375,7 +375,7 @@ const BackstageIncidentList = () => {
 
                 {incidents.length === 0 &&
                     <div className='text-center pt-8'>
-                        {'There are no incidents for '}
+                        {'There are no results for '}
                         <i>{currentTeam.display_name}</i>
                         {' matching those filters.'}
                     </div>

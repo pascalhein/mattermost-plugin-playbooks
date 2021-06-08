@@ -54,7 +54,7 @@ export const AutomationSettings = (props: Props) => {
             </BackstageSubheaderDescription>
             <Section>
                 <SectionTitle>
-                    {'When an incident starts'}
+                    {'When a run starts'}
                 </SectionTitle>
                 <Setting id={'invite-users'}>
                     <InviteUsers

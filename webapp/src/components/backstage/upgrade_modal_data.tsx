@@ -138,20 +138,20 @@ export const getUpgradeModalCopy = (
         switch (messageType) {
         case AdminNotificationType.PLAYBOOK:
             titleText = 'Playbook limit reached';
-            helpText = 'Every incident is different. With multiple playbooks each incident\'s workflow can be refined over time to improve time to resolution.';
+            helpText = 'Create multiple playbooks to prescribe different workflows for your teams.';
             break;
         case AdminNotificationType.VIEW_TIMELINE:
         case AdminNotificationType.MESSAGE_TO_TIMELINE:
             titleText = 'Add more to your timeline';
-            helpText = 'Add important messages from the incident channel to the timeline and improve context in your retrospective.';
+            helpText = 'Save important messages for a complete picture that streamlines retrospectives.';
             break;
         case AdminNotificationType.PLAYBOOK_GRANULAR_ACCESS:
             titleText = 'Put your team in control';
-            helpText = 'Use permissions to manage who can view, modify, and create incidents from this playbook.';
+            helpText = 'Manage permission for who can view, modify, and run this playbook.';
             break;
         case AdminNotificationType.PLAYBOOK_CREATION_RESTRICTION:
             titleText = 'Put your team in control';
-            helpText = 'Every team\'s structure is different. You can manage which users in the team can create playbooks.';
+            helpText = 'Manage permission for who can create new playbooks to set your teams up for success.';
             break;
         }
 

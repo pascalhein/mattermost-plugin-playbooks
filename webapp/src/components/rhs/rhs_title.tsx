@@ -47,7 +47,7 @@ const RHSTitle = () => {
                     data-testid='back-button'
                 >
                     <LeftChevron/>
-                </Button><RHSTitleText data-testid='rhs-title'>{incident?.name || 'Incidents'}</RHSTitleText>
+                </Button><RHSTitleText data-testid='rhs-title'>{incident?.name}</RHSTitleText>
                 {incident && (
                     <StatusBadge
                         status={incidentCurrentStatus(incident)}
@@ -60,7 +60,7 @@ const RHSTitle = () => {
 
     return (
         <RHSTitleText>
-            {'Your Ongoing Incidents'}
+            {'Runs In Progress'}
         </RHSTitleText>
     );
 };

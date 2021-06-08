@@ -83,7 +83,7 @@ const RHSListView = () => {
     };
 
     const viewBackstageIncidentList = () => {
-        navigateToUrl(`/${currentTeam.name}/${pluginId}/incidents`);
+        navigateToUrl(`/${currentTeam.name}/${pluginId}/runs`);
     };
 
     if (incidentList.length === 0) {
@@ -105,13 +105,13 @@ const RHSListView = () => {
                     <Header>
                         <CenterCell>
                             <Link onClick={() => dispatch(startIncident())}>
-                                <PlusIcon/>{'Start Incident'}
+                                <PlusIcon/>{'Run Playbook'}
                             </Link>
                         </CenterCell>
                         <RightCell>
                             <ThreeDotMenu
                                 onCreatePlaybook={() => navigateToTeamPluginUrl(currentTeam.name, '/playbooks')}
-                                onSeeAllIncidents={() => navigateToTeamPluginUrl(currentTeam.name, '/incidents')}
+                                onSeeAllIncidents={() => navigateToTeamPluginUrl(currentTeam.name, '/runs')}
                             />
                         </RightCell>
                     </Header>
@@ -128,9 +128,8 @@ const RHSListView = () => {
                     })}
 
                     <Footer>
-                        {'Looking for closed incidents? '}
                         <a onClick={viewBackstageIncidentList}>{'Click here'}</a>
-                        {' to see all incidents.'}
+                        {' to see all activities in the workspace.'}
                     </Footer>
                 </Scrollbars>
             </RHSContent>
@@ -153,7 +152,7 @@ const ThreeDotMenu = (props: ThreeDotMenuProps) => (
             onClick={props.onCreatePlaybook}
         />
         <DropdownMenuItem
-            text='See all Incidents'
+            text='See all activities'
             onClick={props.onSeeAllIncidents}
         />
     </DotMenu>

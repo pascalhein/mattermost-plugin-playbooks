@@ -106,7 +106,7 @@ func (s *ServiceImpl) broadcastIncidentCreation(theIncident *Incident, commander
 		return err
 	}
 
-	announcementMsg := fmt.Sprintf("#### New Incident: ~%s\n", incidentChannel.Name)
+	announcementMsg := fmt.Sprintf("#### New Playbook Run: ~%s\n", incidentChannel.Name)
 	announcementMsg += fmt.Sprintf("**Owner**: @%s\n", commander.Username)
 
 	if _, err := s.poster.PostMessage(theIncident.AnnouncementChannelID, announcementMsg); err != nil {
@@ -137,7 +137,7 @@ func (s *ServiceImpl) sendWebhookOnCreation(theIncident Incident) error {
 		channel.Name,
 	)
 
-	detailsURL := fmt.Sprintf("%s/%s/%s/incidents/%s",
+	detailsURL := fmt.Sprintf("%s/%s/%s/runs/%s",
 		*siteURL,
 		team.Name,
 		s.configService.GetManifest().Id,
@@ -206,9 +206,9 @@ func (s *ServiceImpl) CreateIncident(incdnt *Incident, pb *playbook.Playbook, us
 	overviewURL := ""
 	playbookURL := ""
 
-	header := "This is an incident channel. To view more information, select the shield icon then select *Tasks* or *Overview*."
+	header := "This channel was created as part of a playbook. To view more information, select the shield icon then select *Tasks* or *Overview*."
 	if siteURL != "" && pb != nil {
-		overviewURL = fmt.Sprintf("%s/%s/%s/incidents/%s", siteURL, team.Name, s.configService.GetManifest().Id, incdnt.ID)
+		overviewURL = fmt.Sprintf("%s/%s/%s/runs/%s", siteURL, team.Name, s.configService.GetManifest().Id, incdnt.ID)
 		playbookURL = fmt.Sprintf("%s/%s/%s/playbooks/%s", siteURL, team.Name, s.configService.GetManifest().Id, pb.ID)
 		header = fmt.Sprintf("This channel was created as part of the [%s](%s) playbook. Visit [the overview page](%s) for more information.",
 			pb.Title, playbookURL, overviewURL)
@@ -324,9 +324,9 @@ func (s *ServiceImpl) CreateIncident(incdnt *Incident, pb *playbook.Playbook, us
 		return nil, errors.Wrapf(err, "failed to resolve user %s", incdnt.CommanderUserID)
 	}
 
-	startMessage := fmt.Sprintf("This incident has been started and is commanded by @%s.", reporter.Username)
+	startMessage := fmt.Sprintf("Run started by @%s.", reporter.Username)
 	if incdnt.CommanderUserID != incdnt.ReporterUserID {
-		startMessage = fmt.Sprintf("This incident has been started by @%s and is commanded by @%s.", reporter.Username, commander.Username)
+		startMessage = fmt.Sprintf("Run started by @%s and is owned by @%s.", reporter.Username, commander.Username)
 	}
 
 	newPost, err := s.poster.PostMessage(channel.Id, startMessage)
@@ -338,7 +338,7 @@ func (s *ServiceImpl) CreateIncident(incdnt *Incident, pb *playbook.Playbook, us
 		if err2 := s.broadcastIncidentCreation(incdnt, commander); err2 != nil {
 			s.pluginAPI.Log.Warn("failed to broadcast the incident creation to channel", "ChannelID", incdnt.AnnouncementChannelID)
 
-			if _, err = s.poster.PostMessage(channel.Id, "Failed to announce the creation of this incident in the configured channel."); err != nil {
+			if _, err = s.poster.PostMessage(channel.Id, "Failed to announce this playbook run in the configured channel."); err != nil {
 				return nil, errors.Wrapf(err, "failed to post to incident channel")
 			}
 		}
@@ -362,7 +362,7 @@ func (s *ServiceImpl) CreateIncident(incdnt *Incident, pb *playbook.Playbook, us
 		go func() {
 			if err = s.sendWebhookOnCreation(*incdnt); err != nil {
 				s.pluginAPI.Log.Warn("failed to send a POST request to the creation webhook URL", "webhook URL", incdnt.WebhookOnCreationURL, "error", err)
-				_, _ = s.poster.PostMessage(channel.Id, "Incident creation announcement through the outgoing webhook failed. Contact your System Admin for more information.")
+				_, _ = s.poster.PostMessage(channel.Id, "Playbook run announcement through the outgoing webhook failed. Contact your System Admin for more information.")
 			}
 		}()
 	}
@@ -598,7 +598,7 @@ func (s *ServiceImpl) broadcastStatusUpdate(statusUpdate string, theIncident *In
 
 	duration := timeutils.DurationString(timeutils.GetTimeForMillis(theIncident.CreateAt), time.Now())
 
-	broadcastedMsg := fmt.Sprintf("# Incident Update: [%s](/%s/pl/%s)\n", incidentChannel.DisplayName, incidentTeam.Name, originalPostID)
+	broadcastedMsg := fmt.Sprintf("# Run Update: [%s](/%s/pl/%s)\n", incidentChannel.DisplayName, incidentTeam.Name, originalPostID)
 	broadcastedMsg += fmt.Sprintf("By @%s | Duration: %s | Status: %s\n", author.Username, duration, theIncident.CurrentStatus)
 	broadcastedMsg += "***\n"
 	broadcastedMsg += statusUpdate
@@ -722,7 +722,7 @@ func (s *ServiceImpl) postRetrospectiveReminder(incident *Incident, isInitial bo
 		return err
 	}
 
-	retrospectiveURL := fmt.Sprintf("/%s/%s/incidents/%s/retrospective",
+	retrospectiveURL := fmt.Sprintf("/%s/%s/runs/%s/retrospective",
 		team.Name,
 		s.configService.GetManifest().Id,
 		incident.ID,
@@ -843,7 +843,7 @@ func (s *ServiceImpl) ChangeCommander(incidentID, userID, commanderID string) er
 	}
 
 	mainChannelID := incidentToModify.ChannelID
-	modifyMessage := fmt.Sprintf("changed the incident commander from **@%s** to **@%s**.",
+	modifyMessage := fmt.Sprintf("changed the owner from **@%s** to **@%s**.",
 		oldCommander.Username, newCommander.Username)
 	post, err := s.modificationMessage(userID, mainChannelID, modifyMessage)
 	if err != nil {
@@ -1536,13 +1536,13 @@ func (s *ServiceImpl) newIncidentDialog(teamID, commanderID, postID, clientID st
 	newPlaybookMarkdown := ""
 	if siteURL != "" && !isMobileApp {
 		url := fmt.Sprintf("%s/%s/%s/playbooks/new", siteURL, team.Name, s.configService.GetManifest().Id)
-		newPlaybookMarkdown = fmt.Sprintf(" [Create a playbook.](%s)", url)
+		newPlaybookMarkdown = fmt.Sprintf("[Click here](%s) to create your own playbook.", url)
 	}
 
-	introText := fmt.Sprintf("**Owner:** %v\n\nPlaybooks are necessary to start an incident.%s", getUserDisplayName(user), newPlaybookMarkdown)
+	introText := fmt.Sprintf("**Owner:** %v\n\n%s", getUserDisplayName(user), newPlaybookMarkdown)
 
 	return &model.Dialog{
-		Title:            "Incident Details",
+		Title:            "Run Details",
 		IntroductionText: introText,
 		Elements: []model.DialogElement{
 			{
@@ -1552,21 +1552,21 @@ func (s *ServiceImpl) newIncidentDialog(teamID, commanderID, postID, clientID st
 				Options:     options,
 			},
 			{
-				DisplayName: "Incident Name",
+				DisplayName: "Run Name",
 				Name:        DialogFieldNameKey,
 				Type:        "text",
 				MinLength:   2,
 				MaxLength:   64,
 			},
 		},
-		SubmitLabel:    "Start Incident",
+		SubmitLabel:    "Run Playbook",
 		NotifyOnCancel: false,
 		State:          string(state),
 	}, nil
 }
 
 func (s *ServiceImpl) newUpdateIncidentDialog(description, message, broadcastChannelID, status string, reminderTimer time.Duration) (*model.Dialog, error) {
-	introductionText := "Update your incident status."
+	introductionText := "Post a status update."
 
 	broadcastChannel, err := s.pluginAPI.Channel.Get(broadcastChannelID)
 	if err == nil {
@@ -1639,7 +1639,7 @@ func (s *ServiceImpl) newUpdateIncidentDialog(description, message, broadcastCha
 	}
 
 	return &model.Dialog{
-		Title:            "Update Incident Status",
+		Title:            "Post Status Update",
 		IntroductionText: introductionText,
 		Elements: []model.DialogElement{
 			{
@@ -1711,10 +1711,10 @@ func (s *ServiceImpl) newAddToTimelineDialog(incidents []Incident, postID string
 	}
 
 	return &model.Dialog{
-		Title: "Add to Incident Timeline",
+		Title: "Add to Run Timeline",
 		Elements: []model.DialogElement{
 			{
-				DisplayName: "Incident",
+				DisplayName: "Run",
 				Name:        DialogFieldIncidentKey,
 				Type:        "select",
 				Options:     options,
@@ -1791,7 +1791,7 @@ func (s *ServiceImpl) PublishRetrospective(incidentID, text, publisherID string)
 		return err
 	}
 
-	retrospectiveURL := fmt.Sprintf("/%s/%s/incidents/%s/retrospective",
+	retrospectiveURL := fmt.Sprintf("/%s/%s/runs/%s/retrospective",
 		team.Name,
 		s.configService.GetManifest().Id,
 		incidentToPublish.ID,

@@ -124,6 +124,7 @@ func (b *Bot) NotifyAdmins(messageType, authorUserID string, isTeamEdition bool)
 		footer = "[Learn more](https://mattermost.com/pricing-self-managed/).\n\n[Convert to Mattermost Starter](https://docs.mattermost.com/install/ee-install.html#converting-team-edition-to-enterprise-edition) to unlock this feature. Then, start a trial or upgrade to Mattermost Professional or Enterprise."
 	}
 
+	// TODO
 	switch messageType {
 	case "start_trial_to_create_playbook":
 		message = fmt.Sprintf("@%s requested access to create more playbooks in Incident Collaboration.", author.Username)

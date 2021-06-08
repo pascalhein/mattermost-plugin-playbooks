@@ -47,7 +47,7 @@ export const StartIncidentPostMenu = (props: Props) => {
                     role='presentation'
                 >
                     <IncidentPostMenuIcon/>
-                    {'Start incident'}
+                    {'Run playbook'}
                 </button>
             </li>
         </React.Fragment>
@@ -84,7 +84,7 @@ export const AttachToIncidentPostMenu = (props: Props) => {
                     role='presentation'
                 >
                     <IncidentPostMenuIcon/>
-                    {'Add to incident timeline'}
+                    {'Add to run timeline'}
                     {!allowMessage && <PositionedUpgradeBadge/>}
                 </button>
             </li>

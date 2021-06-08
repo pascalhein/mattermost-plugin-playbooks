@@ -477,7 +477,7 @@ export const ChecklistItemDetails = (props: ChecklistItemDetailsProps): React.Re
             <ConfirmModal
                 show={showDeleteConfirm}
                 title={'Confirm Task Delete'}
-                message={'Are you sure you want to delete this task? Deleted tasks will be removed from this incident\'s task list.'}
+                message={'Are you sure you want to delete this task? Deleted tasks will be removed from this run\'s task list.'}
                 confirmButtonText={'Delete Task'}
                 onConfirm={() =>
                     clientRemoveChecklistItem(props.incidentId, props.checklistNum, props.itemNum)

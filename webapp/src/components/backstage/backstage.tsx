@@ -147,14 +147,14 @@ const Backstage = () => {
                         </BackstageTitlebarItem>
                     }
                     <BackstageTitlebarItem
-                        to={`${match.url}/incidents`}
+                        to={`${match.url}/runs`}
                         activeClassName={'active'}
                         data-testid='incidentsLHSButton'
                     >
                         <span className='mr-3 d-flex items-center'>
                             <IncidentIcon/>
                         </span>
-                        {'Incidents'}
+                        {'Activities'}
                     </BackstageTitlebarItem>
                     <BackstageTitlebarItem
                         to={`${match.url}/playbooks`}
@@ -198,12 +198,11 @@ const Backstage = () => {
                     <Route path={`${match.url}/playbooks`}>
                         <PlaybookList/>
                     </Route>
-                    <Route path={`${match.url}/incidents/:incidentId`}>
+                    <Route path={`${match.url}/runs/:incidentId`}>
                         <IncidentBackstage/>
                     </Route>
-                    <Route path={`${match.url}/incidents`}>
+                    <Route path={`${match.url}/runs`}>
                         <BackstageIncidentList/>
-                        {/*<Dashboard/>*/}
                     </Route>
                     <Route path={`${match.url}/stats`}>
                         <StatsView/>
@@ -215,7 +214,7 @@ const Backstage = () => {
                         exact={true}
                         path={`${match.url}/`}
                     >
-                        <Redirect to={experimentalFeaturesEnabled ? `${match.url}/stats` : `${match.url}/incidents`}/>
+                        <Redirect to={experimentalFeaturesEnabled ? `${match.url}/stats` : `${match.url}/runs`}/>
                     </Route>
                     <Route>
                         <Redirect to={teamPluginErrorUrl(currentTeam.name, ErrorPageTypes.DEFAULT)}/>

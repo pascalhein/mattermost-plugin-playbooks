@@ -36,10 +36,10 @@ const ErrorPage = () => {
 
     switch (params.type) {
     case ErrorPageTypes.INCIDENTS:
-        title = 'Incident Not Found';
-        message = "The incident you're requesting is private or does not exist. Please contact an Administrator to be added to the incident.";
-        returnTo = teamPluginUrl(currentTeam.name, '/incidents');
-        returnToMsg = 'Back to Incidents';
+        title = 'Run Not Found';
+        message = "The run you're requesting is private or does not exist.";
+        returnTo = teamPluginUrl(currentTeam.name, '/runs');
+        returnToMsg = 'Back to Runs';
         break;
     case ErrorPageTypes.PLAYBOOKS:
         title = 'Playbook Not Found';

@@ -200,17 +200,17 @@ const StatsView = () => {
             <StatsContainers>
                 <StatisticCount
                     id={'TotalReportedIncidents'}
-                    title={'Total Reported Incidents'}
+                    title={'Total Reported'}
                     icon={'fa-exclamation-triangle'}
                     count={stats?.total_reported_incidents}
-                    to={'incidents?status=Reported'}
+                    to={'runs?status=Reported'}
                 />
                 <StatisticCount
                     id={'TotalActiveIncidents'}
-                    title={'Total Active Incidents'}
+                    title={'Total Active'}
                     icon={'fa-exclamation-circle'}
                     count={stats?.total_active_incidents}
-                    to={'incidents?status=Active'}
+                    to={'runs?status=Active'}
                 />
                 <StatisticCount
                     id={'TotalActiveParticipants'}
@@ -227,7 +227,7 @@ const StatsView = () => {
             </StatsContainers>
             <div>
                 <GraphBox
-                    title={'Total incidents by day'}
+                    title={'Total by day'}
                     xlabel={'Days ago'}
                     labels={stats?.active_incidents.map((_: number, index: number) => String(index + 1)).reverse()}
                     data={stats?.active_incidents.slice().reverse()}

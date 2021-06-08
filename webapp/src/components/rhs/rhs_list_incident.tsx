@@ -128,7 +128,7 @@ const RHSListIncident = (props: Props) => {
                 onClick={() => props.viewIncident(props.incident.channel_id)}
                 data-testid='go-to-channel'
             >
-                {'Go to Incident Channel'}
+                {'Go to Channel'}
             </Button>
         </IncidentContainer>
     );

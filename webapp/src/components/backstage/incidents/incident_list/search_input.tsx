@@ -22,7 +22,7 @@ export default function SearchInput(props: Props) {
         <div className='IncidentList-search'>
             <input
                 type='text'
-                placeholder='Search by Incident name'
+                placeholder='Search by run name'
                 onChange={onChange}
                 value={term}
             />

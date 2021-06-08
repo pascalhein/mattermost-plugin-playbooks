@@ -128,7 +128,7 @@ func TestCreateIncident(t *testing.T) {
 		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
-		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
+		poster.EXPECT().PostMessage("channel_id", "Run started by @username.").
 			Return(&model.Post{Id: "testId"}, nil)
 
 		s := incident.NewService(client, store, poster, logger, configService, scheduler, telemetryService)
@@ -202,7 +202,7 @@ func TestCreateIncident(t *testing.T) {
 		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
-		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
+		poster.EXPECT().PostMessage("channel_id", "Run started by @username.").
 			Return(&model.Post{Id: "testid"}, nil)
 
 		s := incident.NewService(client, store, poster, logger, configService, scheduler, telemetryService)
@@ -247,7 +247,7 @@ func TestCreateIncident(t *testing.T) {
 		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
-		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
+		poster.EXPECT().PostMessage("channel_id", "Run started by @username.").
 			Return(&model.Post{Id: "testId"}, nil)
 
 		s := incident.NewService(client, store, poster, logger, configService, scheduler, telemetryService)
@@ -332,7 +332,7 @@ func TestCreateIncident(t *testing.T) {
 				"http://example.com/ad-1/channels/incident-channel-name",
 				payload.ChannelURL)
 			require.Equal(t,
-				"http://example.com/ad-1/com.mattermost.plugin-incident-management/incidents/"+createdIncident.ID,
+				"http://example.com/ad-1/com.mattermost.plugin-incident-management/runs/"+createdIncident.ID,
 				payload.DetailsURL)
 
 		case <-time.After(time.Second * 5):
@@ -382,7 +382,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 				configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "pluginId"}).Times(2)
 				api.On("OpenInteractiveDialog", mock.AnythingOfType("model.OpenDialogRequest")).Return(nil).Run(func(args mock.Arguments) {
 					dialogRequest := args.Get(0).(model.OpenDialogRequest)
-					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "Create a playbook")
+					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "to create your own playbook")
 				})
 			},
 			wantErr: false,
@@ -412,7 +412,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 				configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "pluginId"}).Times(2)
 				api.On("OpenInteractiveDialog", mock.AnythingOfType("model.OpenDialogRequest")).Return(nil).Run(func(args mock.Arguments) {
 					dialogRequest := args.Get(0).(model.OpenDialogRequest)
-					assert.Contains(t, dialogRequest.Dialog.IntroductionText, "Create a playbook")
+					assert.Contains(t, dialogRequest.Dialog.IntroductionText, "to create your own playbook")
 				})
 			},
 			wantErr: false,
@@ -442,7 +442,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 				configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "pluginId"}).Times(2)
 				api.On("OpenInteractiveDialog", mock.AnythingOfType("model.OpenDialogRequest")).Return(nil).Run(func(args mock.Arguments) {
 					dialogRequest := args.Get(0).(model.OpenDialogRequest)
-					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "Create a playbook")
+					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "to create your own playbook")
 				})
 			},
 			wantErr: false,

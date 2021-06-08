@@ -29,14 +29,14 @@ const RHSFooter = (props: Props) => {
 
     let text = 'Update Status';
     if (incidentCurrentStatus(props.incident) === 'Archived') {
-        text = 'Reopen Incident';
+        text = 'Reopen Run';
     }
 
     return (
         <Footer id='incidentRHSFooter'>
             <StyledFooterButton
                 primary={false}
-                onClick={() => navigateToUrl(`/${currentTeam.name}/${pluginId}/incidents/${incident?.id}`)}
+                onClick={() => navigateToUrl(`/${currentTeam.name}/${pluginId}/runs/${incident?.id}`)}
             >
                 {'Overview'}
             </StyledFooterButton>

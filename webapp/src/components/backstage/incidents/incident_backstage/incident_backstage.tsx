@@ -159,7 +159,7 @@ const IncidentBackstage = () => {
     }
 
     const closeIncidentDetails = () => {
-        navigateToTeamPluginUrl(currentTeam.name, '/incidents');
+        navigateToTeamPluginUrl(currentTeam.name, '/runs');
     };
 
     return (

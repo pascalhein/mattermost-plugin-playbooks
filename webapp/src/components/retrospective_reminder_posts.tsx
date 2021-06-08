@@ -94,7 +94,7 @@ const ReminderCommon = (props: ReminderCommonProps) => {
                 </Header>
                 <ButtonRow>
                     <PrimaryButton
-                        onClick={() => navigateToUrl(`/${currentTeam.name}/${pluginId}/incidents/${incident?.id}/retrospective`)}
+                        onClick={() => navigateToUrl(`/${currentTeam.name}/${pluginId}/runs/${incident?.id}/retrospective`)}
                     >
                         {props.primary}
                     </PrimaryButton>
