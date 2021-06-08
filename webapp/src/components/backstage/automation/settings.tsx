@@ -97,7 +97,7 @@ export const AutomationSettings = (props: Props) => {
             </Section>
             <Section>
                 <SectionTitle>
-                    {'When a new member joins'}
+                    {'When a new member joins the channel'}
                 </SectionTitle>
                 <Setting id={'user-joins-message'}>
                     <MessageOnJoin

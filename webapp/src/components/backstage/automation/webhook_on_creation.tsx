@@ -22,7 +22,7 @@ export const WebhookOnCreation = (props: Props) => (
                 isChecked={props.enabled}
                 onChange={props.onToggle}
             />
-            <div>{'Send a webhook'}</div>
+            <div>{'Send outgoing webhook'}</div>
         </AutomationTitle>
         <SelectorWrapper>
             <TextBox
