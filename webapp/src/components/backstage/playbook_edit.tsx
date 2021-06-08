@@ -483,7 +483,7 @@ const PlaybookEdit = (props: Props) => {
                                     <BackstageSubheader>
                                         {'Reminder Timer'}
                                         <BackstageSubheaderDescription>
-                                            {'Prompts the commander at a specified interval to update the status of the Incident.'}
+                                            {'Prompts the owner at a specified interval to update the status of the Incident.'}
                                         </BackstageSubheaderDescription>
                                     </BackstageSubheader>
                                     <StyledSelect

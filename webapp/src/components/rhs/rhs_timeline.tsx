@@ -159,7 +159,7 @@ const RHSTimeline = (props: Props) => {
             value: 'divider',
         } as CheckboxOption,
         {
-            display: 'Commander changes',
+            display: 'Role changes',
             value: TimelineEventType.CommanderChanged,
             selected: eventsFilter.commander_changed,
             disabled: eventsFilter.all,

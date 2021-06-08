@@ -65,7 +65,7 @@ const Followups = (props: { incident: Incident }) => {
                         <a href={''}>{'MM-42843'}</a>
                     </Cell>
 
-                    <Cell>{'Notify affected customers sooner by collecting related Pagerduty events and DMing commander automatically.'}</Cell>
+                    <Cell>{'Notify affected customers sooner by collecting related Pagerduty events and DMing owner automatically.'}</Cell>
                     <Cell>
                         <SmallProfile userId={props.incident.reporter_user_id}/>
                     </Cell>

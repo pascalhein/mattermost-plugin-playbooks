@@ -50,7 +50,7 @@ const Participants = (props: Props) => {
         <TabPageContainer>
             <Title>{`Participants (${profilesInChannel.length})`}</Title>
             <StyledContent>
-                <Heading>{'Commander'}</Heading>
+                <Heading>{'Owner'}</Heading>
                 <Participant
                     userId={props.incident.commander_user_id}
                     isCommander={true}

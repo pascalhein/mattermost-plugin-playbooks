@@ -89,10 +89,10 @@ const RHSAbout = (props: Props) => {
                 <Row>
                     <div className='side-by-side'>
                         <div className='inner-container first-container'>
-                            <div className='first-title'>{'Commander'}</div>
+                            <div className='first-title'>{'Owner'}</div>
                             <ProfileSelector
                                 selectedUserId={props.incident.commander_user_id}
-                                placeholder={'Assign Commander'}
+                                placeholder={'Assign the owner role'}
                                 placeholderButtonClass={'NoAssignee-button'}
                                 profileButtonClass={'Assigned-button'}
                                 enableEdit={true}

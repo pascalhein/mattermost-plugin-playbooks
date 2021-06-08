@@ -53,7 +53,7 @@ const ControlComponent = (ownProps: ControlProps<any>) => (
                 className='IncidentFilter-reset'
                 onClick={ownProps.selectProps.onCustomReset}
             >
-                {'Reset to all commanders'}
+                {'Reset to all owners'}
             </a>
         )}
     </div>
@@ -317,7 +317,7 @@ const BackstageIncidentList = () => {
                     <ProfileSelector
                         testId={'commander-filter'}
                         selectedUserId={fetchParams.commander_user_id}
-                        placeholder={'Commander'}
+                        placeholder={'Owner'}
                         enableEdit={true}
                         isClearable={true}
                         customControl={ControlComponent}
@@ -369,7 +369,7 @@ const BackstageIncidentList = () => {
                                 onClick={() => colHeaderClicked('end_at')}
                             />
                         </div>
-                        <div className='col-sm-3'> {'Commander'} </div>
+                        <div className='col-sm-3'> {'Owner'} </div>
                     </div>
                 </BackstageListHeader>
 

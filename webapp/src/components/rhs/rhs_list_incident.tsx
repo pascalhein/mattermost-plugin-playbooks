@@ -119,7 +119,7 @@ const RHSListIncident = (props: Props) => {
                 </Col2>
             </Row>
             <Row>
-                <Col1>{'Commander:'}</Col1>
+                <Col1>{'Owner:'}</Col1>
                 <Col2>
                     <SmallerProfile userId={props.incident.commander_user_id}/>
                 </Col2>

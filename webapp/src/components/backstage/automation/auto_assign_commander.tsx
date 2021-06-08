@@ -32,7 +32,7 @@ export const AutoAssignCommander = (props: Props) => {
                         isChecked={props.enabled}
                         onChange={props.onToggle}
                     />
-                    <div>{'Assign commander'}</div>
+                    <div>{'Assign the owner role'}</div>
                 </AutomationTitle>
                 <SelectorWrapper>
                     <AssignCommanderSelector

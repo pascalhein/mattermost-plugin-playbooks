@@ -107,7 +107,7 @@ func (s *ServiceImpl) broadcastIncidentCreation(theIncident *Incident, commander
 	}
 
 	announcementMsg := fmt.Sprintf("#### New Incident: ~%s\n", incidentChannel.Name)
-	announcementMsg += fmt.Sprintf("**Commander**: @%s\n", commander.Username)
+	announcementMsg += fmt.Sprintf("**Owner**: @%s\n", commander.Username)
 
 	if _, err := s.poster.PostMessage(theIncident.AnnouncementChannelID, announcementMsg); err != nil {
 		return err
@@ -1539,7 +1539,7 @@ func (s *ServiceImpl) newIncidentDialog(teamID, commanderID, postID, clientID st
 		newPlaybookMarkdown = fmt.Sprintf(" [Create a playbook.](%s)", url)
 	}
 
-	introText := fmt.Sprintf("**Commander:** %v\n\nPlaybooks are necessary to start an incident.%s", getUserDisplayName(user), newPlaybookMarkdown)
+	introText := fmt.Sprintf("**Owner:** %v\n\nPlaybooks are necessary to start an incident.%s", getUserDisplayName(user), newPlaybookMarkdown)
 
 	return &model.Dialog{
 		Title:            "Incident Details",
