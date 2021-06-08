@@ -43,9 +43,9 @@ const ErrorPage = () => {
         break;
     case ErrorPageTypes.PLAYBOOKS:
         title = 'Playbook Not Found';
-        message = "The playbook you're requesting is private or does not exist. Please contact an Administrator to access the playbook.";
+        message = "The playbook you're requesting is private or does not exist.";
         returnTo = teamPluginUrl(currentTeam.name, '/playbooks');
-        returnToMsg = 'Back to Playbooks';
+        returnToMsg = 'Back to Library';
         break;
     }
 
