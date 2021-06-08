@@ -242,8 +242,7 @@ const PlaybookList = () => {
                                         onClick={() => newPlaybook()}
                                         allowPlaybookCreation={allowPlaybookCreation}
                                     >
-                                        <i className='icon-plus mr-2'/>
-                                        {'Create a Playbook'}
+                                        {'Create Playbook'}
                                     </UpgradeOrPrimaryButton>
                                 </div>
                             }
@@ -395,12 +394,11 @@ const NoContentPage = (props: { onNewPlaybook: () => void, canCreatePlaybooks: b
                     onClick={() => props.onNewPlaybook()}
                     allowPlaybookCreation={props.allowPlaybookCreation}
                 >
-                    <i className='icon-plus mr-2'/>
-                    {'New Playbook'}
+                    {'Create Playbook'}
                 </UpgradeOrPrimaryButton>
             }
             { !props.canCreatePlaybooks &&
-            <DescriptionWarn>{"There are no playbooks to view. You don't have permission to create playbooks on this server."}</DescriptionWarn>
+            <DescriptionWarn>{"There are no playbooks to view. You don't have permission to create playbooks in this workspace."}</DescriptionWarn>
             }
         </Container>
     );

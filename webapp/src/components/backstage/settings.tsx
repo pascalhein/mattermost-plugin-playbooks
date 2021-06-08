@@ -158,7 +158,7 @@ const PlaybookCreators = (props: PlaybookCreatorsProps) => {
                         checked={!enabled}
                         onChange={handleDisabled}
                     />
-                    {'Everyone on the server can create playbooks.'}
+                    {'Everyone in this workspace can create playbooks.'}
                 </RadioLabel>
                 <RadioLabel>
                     <RadioInput

@@ -19,7 +19,7 @@ export interface PresetTemplate {
 
 export const PresetTemplates: PresetTemplate[] = [
     {
-        title: 'Blank Playbook',
+        title: 'Blank',
         icon: <FileIcon/>,
         template: emptyPlaybook(),
     },
@@ -141,7 +141,7 @@ const TemplateSelector = ({templates = PresetTemplates, onSelect}: Props) => {
             <RootContainer>
                 <InnerContainer>
                     <Title>
-                        {'Start a new playbook'}
+                        {'Create a new playbook'}
                         {!allowPlaybookCreation && <PositionedUpgradeBadge/>}
                     </Title>
                     <TemplateItemDiv>
