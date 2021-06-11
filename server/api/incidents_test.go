@@ -35,7 +35,7 @@ func TestIncidents(t *testing.T) {
 	var logger *mock_poster.MockLogger
 	var configService *mock_config.MockService
 	var playbookService *mock_app.MockPlaybookService
-	var incidentService *mock_app.MockIncidentService
+	var playbookRunService *mock_app.MockPlaybookRunService
 	var pluginAPI *plugintest.API
 	var client *pluginapi.Client
 
@@ -64,8 +64,8 @@ func TestIncidents(t *testing.T) {
 		logger = mock_poster.NewMockLogger(mockCtrl)
 		handler = NewHandler(client, configService, logger)
 		playbookService = mock_app.NewMockPlaybookService(mockCtrl)
-		incidentService = mock_app.NewMockIncidentService(mockCtrl)
-		NewIncidentHandler(handler.APIRouter, incidentService, playbookService, client, poster, logger, configService)
+		playbookRunService = mock_app.NewMockPlaybookRunService(mockCtrl)
+		NewIncidentHandler(handler.APIRouter, playbookRunService, playbookService, client, poster, logger, configService)
 	}
 
 	setDefaultExpectations := func(t *testing.T) {
@@ -173,7 +173,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 		poster.EXPECT().PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 		poster.EXPECT().EphemeralPost(gomock.Any(), gomock.Any(), gomock.Any())
-		incidentService.EXPECT().CreateIncident(&i, &withid, "testUserID", true).Return(retI, nil)
+		playbookRunService.EXPECT().CreateIncident(&i, &withid, "testUserID", true).Return(retI, nil)
 
 		testrecorder := httptest.NewRecorder()
 		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
@@ -235,7 +235,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 		poster.EXPECT().PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 		poster.EXPECT().EphemeralPost(gomock.Any(), gomock.Any(), gomock.Any())
-		incidentService.EXPECT().CreateIncident(&i, &withid, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreateIncident(&i, &withid, "testUserID", true).Return(&retI, nil)
 
 		testrecorder := httptest.NewRecorder()
 		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
@@ -615,7 +615,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		incidentService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
@@ -671,7 +671,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		incidentService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
@@ -705,7 +705,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		incidentService.EXPECT().CreateIncident(&testIncident, nil, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreateIncident(&testIncident, nil, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
@@ -796,8 +796,8 @@ func TestIncidents(t *testing.T) {
 		logger = mock_poster.NewMockLogger(mockCtrl)
 		handler = NewHandler(client, configService, logger)
 		playbookService = mock_app.NewMockPlaybookService(mockCtrl)
-		incidentService = mock_app.NewMockIncidentService(mockCtrl)
-		NewIncidentHandler(handler.APIRouter, incidentService, playbookService, client, poster, logger, configService)
+		playbookRunService = mock_app.NewMockPlaybookRunService(mockCtrl)
+		NewIncidentHandler(handler.APIRouter, playbookRunService, playbookService, client, poster, logger, configService)
 
 		configService.EXPECT().
 			IsAtLeastE10Licensed().
@@ -844,7 +844,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		incidentService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
@@ -883,8 +883,8 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
-		incidentService.EXPECT().GetIncidentIDForChannel("channelID").Return("incidentID", nil)
-		incidentService.EXPECT().GetIncident("incidentID").Return(&testIncident, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel("channelID").Return("incidentID", nil)
+		playbookRunService.EXPECT().GetIncident("incidentID").Return(&testIncident, nil)
 
 		resultIncident, err := c.Incidents.GetByChannelID(context.TODO(), testIncident.ChannelID)
 		require.NoError(t, err)
@@ -910,7 +910,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
-		incidentService.EXPECT().GetIncidentIDForChannel("channelID").Return("", app.ErrNotFound)
+		playbookRunService.EXPECT().GetIncidentIDForChannel("channelID").Return("", app.ErrNotFound)
 		logger.EXPECT().Warnf("User %s does not have permissions to get incident for channel %s", userID, testIncident.ChannelID)
 
 		resultIncident, err := c.Incidents.GetByChannelID(context.TODO(), testIncident.ChannelID)
@@ -935,8 +935,8 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(false)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
@@ -969,7 +969,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
@@ -1006,7 +1006,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil).Times(2)
 
@@ -1043,7 +1043,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
@@ -1082,7 +1082,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil).Times(2)
 
@@ -1119,7 +1119,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil).Times(2)
 
@@ -1152,7 +1152,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
@@ -1193,11 +1193,11 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncidentMetadata("incidentID").
 			Return(&testIncidentMetadata, nil)
 
@@ -1232,7 +1232,7 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
@@ -1275,11 +1275,11 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncidentMetadata("incidentID").
 			Return(&testIncidentMetadata, nil)
 
@@ -1320,11 +1320,11 @@ func TestIncidents(t *testing.T) {
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncident("incidentID").
 			Return(&testIncident, nil)
 
-		incidentService.EXPECT().
+		playbookRunService.EXPECT().
 			GetIncidentMetadata("incidentID").
 			Return(&testIncidentMetadata, nil)
 
@@ -1361,7 +1361,7 @@ func TestIncidents(t *testing.T) {
 			HasMore:    true,
 			Items:      []app.Incident{incident1},
 		}
-		incidentService.EXPECT().GetIncidents(gomock.Any(), gomock.Any()).Return(result, nil)
+		playbookRunService.EXPECT().GetIncidents(gomock.Any(), gomock.Any()).Return(result, nil)
 
 		actualList, err := c.Incidents.List(context.TODO(), 0, 200, icClient.IncidentListOptions{
 			TeamID: teamID,
@@ -1432,9 +1432,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(false)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 
@@ -1462,9 +1462,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
@@ -1474,7 +1474,7 @@ func TestIncidents(t *testing.T) {
 			Description: "test description",
 			Reminder:    600 * time.Second,
 		}
-		incidentService.EXPECT().UpdateStatus("incidentID", "testUserID", updateOptions).Return(nil)
+		playbookRunService.EXPECT().UpdateStatus("incidentID", "testUserID", updateOptions).Return(nil)
 
 		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
 		require.NoError(t, err)
@@ -1494,9 +1494,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
@@ -1518,9 +1518,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(false)
 
@@ -1542,9 +1542,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
@@ -1566,9 +1566,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
@@ -1590,9 +1590,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		incidentService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		incidentService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 

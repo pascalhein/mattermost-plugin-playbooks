@@ -247,8 +247,8 @@ type DialogStateAddToTimeline struct {
 	PostID string `json:"post_id"`
 }
 
-// IncidentService is the incident/service interface.
-type IncidentService interface {
+// PlaybookRunService is the incident/service interface.
+type PlaybookRunService interface {
 	// GetIncidents returns filtered incidents and the total count before paging.
 	GetIncidents(requesterInfo RequesterInfo, options IncidentFilterOptions) (*GetIncidentsResults, error)
 
@@ -369,7 +369,7 @@ type IncidentService interface {
 	CheckAndSendMessageOnJoin(userID, incidentID, channelID string) bool
 }
 
-// PlaybookRunStore defines the methods the IncidentServiceImpl needs from the interfaceStore.
+// PlaybookRunStore defines the methods the PlaybookRunServiceImpl needs from the interfaceStore.
 type PlaybookRunStore interface {
 	// GetIncidents returns filtered incidents and the total count before paging.
 	GetIncidents(requesterInfo RequesterInfo, options IncidentFilterOptions) (*GetIncidentsResults, error)
@@ -420,7 +420,7 @@ type PlaybookRunStore interface {
 	SetViewedChannel(userID, channelID string) error
 }
 
-// IncidentTelemetry defines the methods that the IncidentServiceImpl needs from the RudderTelemetry.
+// IncidentTelemetry defines the methods that the PlaybookRunServiceImpl needs from the RudderTelemetry.
 // Unless otherwise noted, userID is the user initiating the event.
 type IncidentTelemetry interface {
 	// CreateIncident tracks the creation of a new incident.

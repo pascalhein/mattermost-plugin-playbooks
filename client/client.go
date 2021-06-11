@@ -37,7 +37,7 @@ type Client struct {
 	UserAgent string
 
 	// Incidents is a collection of methods used to interact with incidents.
-	Incidents *IncidentsService
+	Incidents *PlaybookRunService
 	// Playbooks is a collection of methods used to interact with playbooks.
 	Playbooks *PlaybooksService
 }
@@ -60,7 +60,7 @@ func newClient(mattermostSiteURL string, httpClient *http.Client) (*Client, erro
 	}
 
 	c := &Client{client: httpClient, BaseURL: siteURL, UserAgent: userAgent}
-	c.Incidents = &IncidentsService{c}
+	c.Incidents = &PlaybookRunService{c}
 	c.Playbooks = &PlaybooksService{c}
 	return c, nil
 }

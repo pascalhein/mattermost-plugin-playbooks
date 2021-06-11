@@ -17,21 +17,21 @@ import (
 // TelemetryHandler is the API handler.
 type TelemetryHandler struct {
 	*ErrorHandler
-	incidentService   app.IncidentService
-	incidentTelemetry app.IncidentTelemetry
-	botTelemetry      bot.Telemetry
-	pluginAPI         *pluginapi.Client
+	playbookRunService app.PlaybookRunService
+	incidentTelemetry  app.IncidentTelemetry
+	botTelemetry       bot.Telemetry
+	pluginAPI          *pluginapi.Client
 }
 
 // NewTelemetryHandler Creates a new Plugin API handler.
-func NewTelemetryHandler(router *mux.Router, incidentService app.IncidentService,
+func NewTelemetryHandler(router *mux.Router, playbookRunService app.PlaybookRunService,
 	api *pluginapi.Client, log bot.Logger, incidentTelemetry app.IncidentTelemetry, botTelemetry bot.Telemetry, configService config.Service) *TelemetryHandler {
 	handler := &TelemetryHandler{
-		ErrorHandler:      &ErrorHandler{log: log},
-		incidentService:   incidentService,
-		incidentTelemetry: incidentTelemetry,
-		botTelemetry:      botTelemetry,
-		pluginAPI:         api,
+		ErrorHandler:       &ErrorHandler{log: log},
+		playbookRunService: playbookRunService,
+		incidentTelemetry:  incidentTelemetry,
+		botTelemetry:       botTelemetry,
+		pluginAPI:          api,
 	}
 
 	telemetryRouter := router.PathPrefix("/telemetry").Subrouter()
@@ -51,7 +51,7 @@ func (h *TelemetryHandler) checkViewPermissions(next http.Handler) http.Handler 
 		vars := mux.Vars(r)
 		userID := r.Header.Get("Mattermost-User-ID")
 
-		incident, err := h.incidentService.GetIncident(vars["id"])
+		incident, err := h.playbookRunService.GetIncident(vars["id"])
 		if err != nil {
 			h.HandleError(w, err)
 			return
@@ -92,7 +92,7 @@ func (h *TelemetryHandler) telemetryForIncident(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	incident, err := h.incidentService.GetIncident(id)
+	incident, err := h.playbookRunService.GetIncident(id)
 	if err != nil {
 		h.HandleError(w, err)
 		return

@@ -147,28 +147,28 @@ func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
 
 // Runner handles commands.
 type Runner struct {
-	context         *plugin.Context
-	args            *model.CommandArgs
-	pluginAPI       *pluginapi.Client
-	logger          bot.Logger
-	poster          bot.Poster
-	incidentService app.IncidentService
-	playbookService app.PlaybookService
-	configService   config.Service
+	context            *plugin.Context
+	args               *model.CommandArgs
+	pluginAPI          *pluginapi.Client
+	logger             bot.Logger
+	poster             bot.Poster
+	playbookRunService app.PlaybookRunService
+	playbookService    app.PlaybookService
+	configService      config.Service
 }
 
 // NewCommandRunner creates a command runner.
 func NewCommandRunner(ctx *plugin.Context, args *model.CommandArgs, api *pluginapi.Client,
-	logger bot.Logger, poster bot.Poster, incidentService app.IncidentService, playbookService app.PlaybookService, configService config.Service) *Runner {
+	logger bot.Logger, poster bot.Poster, playbookRunService app.PlaybookRunService, playbookService app.PlaybookService, configService config.Service) *Runner {
 	return &Runner{
-		context:         ctx,
-		args:            args,
-		pluginAPI:       api,
-		logger:          logger,
-		poster:          poster,
-		incidentService: incidentService,
-		playbookService: playbookService,
-		configService:   configService,
+		context:            ctx,
+		args:               args,
+		pluginAPI:          api,
+		logger:             logger,
+		poster:             poster,
+		playbookRunService: playbookRunService,
+		playbookService:    playbookService,
+		configService:      configService,
 	}
 }
 
@@ -233,7 +233,7 @@ func (r *Runner) actionStart(args []string) {
 		return
 	}
 
-	if err := r.incidentService.OpenCreateIncidentDialog(r.args.TeamId, r.args.UserId, r.args.TriggerId, postID, clientID, playbooksResults.Items, session.IsMobileApp()); err != nil {
+	if err := r.playbookRunService.OpenCreateIncidentDialog(r.args.TeamId, r.args.UserId, r.args.TriggerId, postID, clientID, playbooksResults.Items, session.IsMobileApp()); err != nil {
 		r.warnUserAndLogErrorf("Error: %v", err)
 		return
 	}
@@ -257,7 +257,7 @@ func (r *Runner) actionCheck(args []string) {
 		return
 	}
 
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only check/uncheck an item from within the incident's channel.")
@@ -267,7 +267,7 @@ func (r *Runner) actionCheck(args []string) {
 		return
 	}
 
-	err = r.incidentService.ToggleCheckedState(incidentID, r.args.UserId, checklist, item)
+	err = r.playbookRunService.ToggleCheckedState(incidentID, r.args.UserId, checklist, item)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error checking/unchecking item: %v", err)
 	}
@@ -285,7 +285,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 		return
 	}
 
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only add an item from within the incident's channel.")
@@ -297,7 +297,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 
 	// If we didn't get the item's text, then use the interactive dialog
 	if len(args) == 1 {
-		if err := r.incidentService.OpenAddChecklistItemDialog(r.args.TriggerId, incidentID, checklist); err != nil {
+		if err := r.playbookRunService.OpenAddChecklistItemDialog(r.args.TriggerId, incidentID, checklist); err != nil {
 			r.warnUserAndLogErrorf("Error: %v", err)
 			return
 		}
@@ -305,7 +305,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 	}
 
 	combineargs := strings.Join(args[1:], " ")
-	if err := r.incidentService.AddChecklistItem(incidentID, r.args.UserId, checklist, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(incidentID, r.args.UserId, checklist, app.ChecklistItem{
 		Title: combineargs,
 	}); err != nil {
 		r.warnUserAndLogErrorf("Error: %v", err)
@@ -332,7 +332,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 		return
 	}
 
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only remove an item from within the incident's channel.")
@@ -342,7 +342,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 		return
 	}
 
-	err = r.incidentService.RemoveChecklistItem(incidentID, r.args.UserId, checklist, item)
+	err = r.playbookRunService.RemoveChecklistItem(incidentID, r.args.UserId, checklist, item)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error removing item: %v", err)
 	}
@@ -360,7 +360,7 @@ func (r *Runner) actionOwner(args []string) {
 }
 
 func (r *Runner) actionShowOwner([]string) {
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only see the owner from within the incident's channel.")
 		return
@@ -369,7 +369,7 @@ func (r *Runner) actionShowOwner([]string) {
 		return
 	}
 
-	currentIncident, err := r.incidentService.GetIncident(incidentID)
+	currentIncident, err := r.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -387,7 +387,7 @@ func (r *Runner) actionShowOwner([]string) {
 func (r *Runner) actionChangeOwner(args []string) {
 	targetOwnerUsername := strings.TrimLeft(args[0], "@")
 
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only change the owner from within the incident's channel.")
 		return
@@ -396,7 +396,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 		return
 	}
 
-	currentIncident, err := r.incidentService.GetIncident(incidentID)
+	currentIncident, err := r.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -425,7 +425,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 		return
 	}
 
-	err = r.incidentService.ChangeOwner(currentIncident.ID, r.args.UserId, targetOwnerUser.Id)
+	err = r.playbookRunService.ChangeOwner(currentIncident.ID, r.args.UserId, targetOwnerUser.Id)
 	if err != nil {
 		r.warnUserAndLogErrorf("Failed to change owner to @%s: %v", targetOwnerUsername, err)
 		return
@@ -438,7 +438,7 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only announce from within the incident's channel.")
@@ -448,7 +448,7 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	currentIncident, err := r.incidentService.GetIncident(incidentID)
+	currentIncident, err := r.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -518,7 +518,7 @@ func (r *Runner) actionList() {
 		Statuses:  []string{app.StatusReported, app.StatusActive, app.StatusResolved},
 	}
 
-	result, err := r.incidentService.GetIncidents(requesterInfo, options)
+	result, err := r.playbookRunService.GetIncidents(requesterInfo, options)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving the incidents: %v", err)
 		return
@@ -563,7 +563,7 @@ func (r *Runner) actionList() {
 }
 
 func (r *Runner) actionInfo() {
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only see the details of an incident from within the incident's channel.")
 		return
@@ -584,7 +584,7 @@ func (r *Runner) actionInfo() {
 		return
 	}
 
-	incident, err := r.incidentService.GetIncident(incidentID)
+	incident, err := r.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -639,7 +639,7 @@ func (r *Runner) actionEnd() {
 }
 
 func (r *Runner) actionUpdate() {
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only update an incident from within the incident's channel.")
@@ -658,7 +658,7 @@ func (r *Runner) actionUpdate() {
 		return
 	}
 
-	err = r.incidentService.OpenUpdateStatusDialog(incidentID, r.args.TriggerId)
+	err = r.playbookRunService.OpenUpdateStatusDialog(incidentID, r.args.TriggerId)
 	switch {
 	case errors.Is(err, app.ErrIncidentNotActive):
 		r.postCommandResponse("This incident has already been closed.")
@@ -697,14 +697,14 @@ func (r *Runner) actionAdd(args []string) {
 		IsGuest: isGuest,
 	}
 
-	if err := r.incidentService.OpenAddToTimelineDialog(requesterInfo, postID, r.args.TeamId, r.args.TriggerId); err != nil {
+	if err := r.playbookRunService.OpenAddToTimelineDialog(requesterInfo, postID, r.args.TeamId, r.args.TriggerId); err != nil {
 		r.warnUserAndLogErrorf("Error: %v", err)
 		return
 	}
 }
 
 func (r *Runner) actionTimeline() {
-	incidentID, err := r.incidentService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only run the timeline command from within an incident channel.")
@@ -714,7 +714,7 @@ func (r *Runner) actionTimeline() {
 		return
 	}
 
-	incidentToRead, err := r.incidentService.GetIncident(incidentID)
+	incidentToRead, err := r.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -821,7 +821,7 @@ func (r *Runner) actionTestSelf(args []string) {
 		return
 	}
 
-	if err := r.incidentService.NukeDB(); err != nil {
+	if err := r.playbookRunService.NukeDB(); err != nil {
 		r.postCommandResponse("There was an error while nuking db. Err: " + err.Error())
 		return
 	}
@@ -966,7 +966,7 @@ And... yes, of course, we have emojis
 		return
 	}
 
-	incident, err := r.incidentService.CreateIncident(&app.Incident{
+	incident, err := r.playbookRunService.CreateIncident(&app.Incident{
 		Name:               "Cloud Incident 4739",
 		TeamID:             r.args.TeamId,
 		OwnerUserID:        r.args.UserId,
@@ -979,21 +979,21 @@ And... yes, of course, we have emojis
 		return
 	}
 
-	if err := r.incidentService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
 		Title: "I should be checked and second",
 	}); err != nil {
 		r.postCommandResponse("Unable to add checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.incidentService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
 		Title: "I should be deleted",
 	}); err != nil {
 		r.postCommandResponse("Unable to add checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.incidentService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
 		Title: "I should not say this.",
 		State: app.ChecklistItemStateClosed,
 	}); err != nil {
@@ -1001,28 +1001,28 @@ And... yes, of course, we have emojis
 		return
 	}
 
-	if err := r.incidentService.ModifyCheckedState(incident.ID, r.args.UserId, app.ChecklistItemStateClosed, 0, 0); err != nil {
+	if err := r.playbookRunService.ModifyCheckedState(incident.ID, r.args.UserId, app.ChecklistItemStateClosed, 0, 0); err != nil {
 		r.postCommandResponse("Unable to modify checked state: " + err.Error())
 		return
 	}
 
-	if err := r.incidentService.ModifyCheckedState(incident.ID, r.args.UserId, app.ChecklistItemStateOpen, 0, 2); err != nil {
+	if err := r.playbookRunService.ModifyCheckedState(incident.ID, r.args.UserId, app.ChecklistItemStateOpen, 0, 2); err != nil {
 		r.postCommandResponse("Unable to modify checked state: " + err.Error())
 		return
 	}
 
-	if err := r.incidentService.RemoveChecklistItem(incident.ID, r.args.UserId, 0, 1); err != nil {
+	if err := r.playbookRunService.RemoveChecklistItem(incident.ID, r.args.UserId, 0, 1); err != nil {
 		r.postCommandResponse("Unable to remove checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.incidentService.EditChecklistItem(incident.ID, r.args.UserId, 0, 1,
+	if err := r.playbookRunService.EditChecklistItem(incident.ID, r.args.UserId, 0, 1,
 		"I should say this! and be unchecked and first!", "", ""); err != nil {
 		r.postCommandResponse("Unable to remove checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.incidentService.MoveChecklistItem(incident.ID, r.args.UserId, 0, 0, 1); err != nil {
+	if err := r.playbookRunService.MoveChecklistItem(incident.ID, r.args.UserId, 0, 0, 1); err != nil {
 		r.postCommandResponse("Unable to remove checklist item: " + err.Error())
 		return
 	}
@@ -1092,7 +1092,7 @@ func (r *Runner) actionTestCreate(params []string) {
 
 	incidentName := strings.Join(params[2:], " ")
 
-	incident, err := r.incidentService.CreateIncident(
+	incident, err := r.playbookRunService.CreateIncident(
 		&app.Incident{
 			Name:        incidentName,
 			OwnerUserID: r.args.UserId,
@@ -1109,7 +1109,7 @@ func (r *Runner) actionTestCreate(params []string) {
 		return
 	}
 
-	if err = r.incidentService.ChangeCreationDate(incident.ID, creationTimestamp); err != nil {
+	if err = r.playbookRunService.ChangeCreationDate(incident.ID, creationTimestamp); err != nil {
 		r.warnUserAndLogErrorf("unable to change date of recently created incident: %v", err)
 		return
 	}
@@ -1323,7 +1323,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 			incidentName = fmt.Sprintf("[%s] %s", companyName, incidentName)
 		}
 
-		incident, err := r.incidentService.CreateIncident(
+		incident, err := r.playbookRunService.CreateIncident(
 			&app.Incident{
 				Name:        incidentName,
 				OwnerUserID: r.args.UserId,
@@ -1341,7 +1341,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 		}
 
 		createAt := timeutils.GetTimeForMillis(timestamps[i])
-		err = r.incidentService.ChangeCreationDate(incident.ID, createAt)
+		err = r.playbookRunService.ChangeCreationDate(incident.ID, createAt)
 		if err != nil {
 			r.warnUserAndLogErrorf("Error changing creation date: %v", err)
 			return
@@ -1363,7 +1363,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 	}
 
 	for i := 0; i < numEndedIncidents; i++ {
-		err := r.incidentService.UpdateStatus(incidents[i].ID, r.args.UserId, app.StatusUpdateOptions{
+		err := r.playbookRunService.UpdateStatus(incidents[i].ID, r.args.UserId, app.StatusUpdateOptions{
 			Status:  app.StatusArchived,
 			Message: "This is now archived.",
 		})
@@ -1394,7 +1394,7 @@ func (r *Runner) actionNukeDB(args []string) {
 		return
 	}
 
-	if err := r.incidentService.NukeDB(); err != nil {
+	if err := r.playbookRunService.NukeDB(); err != nil {
 		r.warnUserAndLogErrorf("There was an error while nuking db: %v", err)
 		return
 	}

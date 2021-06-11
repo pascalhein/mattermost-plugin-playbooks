@@ -73,7 +73,7 @@ type TimelineEvent struct {
 	CreatorUserID string            `json:"creator_user_id"`
 }
 
-// IncidentCreateOptions specifies the parameters for IncidentsService.Create method.
+// IncidentCreateOptions specifies the parameters for PlaybookRunService.Create method.
 type IncidentCreateOptions struct {
 	Name        string `json:"name"`
 	OwnerUserID string `json:"owner_user_id"`
@@ -127,7 +127,7 @@ const (
 )
 
 // IncidentListOptions specifies the optional parameters to the
-// IncidentsService.List method.
+// PlaybookRunService.List method.
 type IncidentListOptions struct {
 	// TeamID filters incidents to those in the given team.
 	TeamID string `url:"team_id,omitempty"`

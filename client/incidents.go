@@ -9,14 +9,14 @@ import (
 	"net/http"
 )
 
-// IncidentsService handles communication with the incident related
+// PlaybookRunService handles communication with the incident related
 // methods of the Incident Collaboration API.
-type IncidentsService struct {
+type PlaybookRunService struct {
 	client *Client
 }
 
 // Get an incident.
-func (s *IncidentsService) Get(ctx context.Context, incidentID string) (*Incident, error) {
+func (s *PlaybookRunService) Get(ctx context.Context, incidentID string) (*Incident, error) {
 	incidentURL := fmt.Sprintf("incidents/%s", incidentID)
 	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
 	if err != nil {
@@ -34,7 +34,7 @@ func (s *IncidentsService) Get(ctx context.Context, incidentID string) (*Inciden
 }
 
 // GetByChannelID gets an incident by ChannelID.
-func (s *IncidentsService) GetByChannelID(ctx context.Context, channelID string) (*Incident, error) {
+func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID string) (*Incident, error) {
 	channelURL := fmt.Sprintf("incidents/channel/%s", channelID)
 	req, err := s.client.newRequest(http.MethodGet, channelURL, nil)
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *IncidentsService) GetByChannelID(ctx context.Context, channelID string)
 }
 
 // Get an incident's metadata.
-func (s *IncidentsService) GetMetadata(ctx context.Context, incidentID string) (*IncidentMetadata, error) {
+func (s *PlaybookRunService) GetMetadata(ctx context.Context, incidentID string) (*IncidentMetadata, error) {
 	incidentURL := fmt.Sprintf("incidents/%s/metadata", incidentID)
 	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *IncidentsService) GetMetadata(ctx context.Context, incidentID string) (
 }
 
 // List the incidents.
-func (s *IncidentsService) List(ctx context.Context, page, perPage int, opts IncidentListOptions) (*GetIncidentsResults, error) {
+func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts IncidentListOptions) (*GetIncidentsResults, error) {
 	incidentURL := "incidents"
 	incidentURL, err := addOptions(incidentURL, opts)
 	if err != nil {
@@ -97,7 +97,7 @@ func (s *IncidentsService) List(ctx context.Context, page, perPage int, opts Inc
 }
 
 // Create an incident.
-func (s *IncidentsService) Create(ctx context.Context, opts IncidentCreateOptions) (*Incident, error) {
+func (s *PlaybookRunService) Create(ctx context.Context, opts IncidentCreateOptions) (*Incident, error) {
 	incidentURL := "incidents"
 	req, err := s.client.newRequest(http.MethodPost, incidentURL, opts)
 	if err != nil {
@@ -118,7 +118,7 @@ func (s *IncidentsService) Create(ctx context.Context, opts IncidentCreateOption
 	return incident, nil
 }
 
-func (s *IncidentsService) UpdateStatus(ctx context.Context, incidentID string, status Status, description, message string, reminderInSeconds int64) error {
+func (s *PlaybookRunService) UpdateStatus(ctx context.Context, incidentID string, status Status, description, message string, reminderInSeconds int64) error {
 	updateURL := fmt.Sprintf("incidents/%s/status", incidentID)
 	opts := StatusUpdateOptions{
 		Status:            status,

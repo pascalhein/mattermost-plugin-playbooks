@@ -51,7 +51,7 @@ func TestCreateIncident(t *testing.T) {
 		mattermostConfig.SetDefaults()
 		pluginAPI.On("GetConfig").Return(mattermostConfig)
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		_, err := s.CreateIncident(incident, nil, "testUserID", true)
 		require.Equal(t, err, app.ErrChannelDisplayNameInvalid)
@@ -81,7 +81,7 @@ func TestCreateIncident(t *testing.T) {
 		pluginAPI.On("GetConfig").Return(mattermostConfig)
 		pluginAPI.On("CreateChannel", mock.Anything).Return(nil, &model.AppError{Id: "model.channel.is_valid.2_or_more.app_error"})
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		_, err := s.CreateIncident(incident, nil, "testUserID", true)
 		require.Equal(t, err, app.ErrChannelDisplayNameInvalid)
@@ -130,7 +130,7 @@ func TestCreateIncident(t *testing.T) {
 		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
 			Return(&model.Post{Id: "testId"}, nil)
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		_, err := s.CreateIncident(incident, nil, "user_id", true)
 		require.NoError(t, err)
@@ -161,7 +161,7 @@ func TestCreateIncident(t *testing.T) {
 		pluginAPI.On("GetConfig").Return(mattermostConfig)
 		pluginAPI.On("CreateChannel", mock.Anything).Return(nil, &model.AppError{Id: "store.sql_channel.save_channel.exists.app_error"})
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		_, err := s.CreateIncident(incident, nil, "user_id", true)
 		require.EqualError(t, err, "failed to create incident channel: : , ")
@@ -204,7 +204,7 @@ func TestCreateIncident(t *testing.T) {
 		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
 			Return(&model.Post{Id: "testid"}, nil)
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		_, err := s.CreateIncident(incident, nil, "user_id", true)
 		require.NoError(t, err)
@@ -249,7 +249,7 @@ func TestCreateIncident(t *testing.T) {
 		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
 			Return(&model.Post{Id: "testId"}, nil)
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		_, err := s.CreateIncident(incident, nil, "user_id", true)
 		pluginAPI.AssertExpectations(t)
@@ -319,7 +319,7 @@ func TestCreateIncident(t *testing.T) {
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{Id: "channel_id", Name: "incident-channel-name"}, nil)
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		createdIncident, err := s.CreateIncident(incident, nil, "user_id", true)
 		require.NoError(t, err)
@@ -416,7 +416,7 @@ func TestUpdateStatus(t *testing.T) {
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{}, nil)
 		pluginAPI.On("GetConfig").Return(&model.Config{ServiceSettings: model.ServiceSettings{SiteURL: &siteURL}})
 
-		s := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 		err := s.UpdateStatus(incident.ID, "user_id", statusUpdateOptions)
 		require.NoError(t, err)
@@ -553,7 +553,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 			configService := mock_config.NewMockService(controller)
 			telemetryService := &telemetry.NoopTelemetry{}
 			scheduler := mock_app.NewMockJobOnceScheduler(controller)
-			service := app.NewIncidentService(client, store, poster, logger, configService, scheduler, telemetryService)
+			service := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
 			tt.prepMocks(t, store, poster, api, configService)
 

@@ -24,25 +24,25 @@ import (
 // IncidentHandler is the API handler.
 type IncidentHandler struct {
 	*ErrorHandler
-	config          config.Service
-	incidentService app.IncidentService
-	playbookService app.PlaybookService
-	pluginAPI       *pluginapi.Client
-	poster          bot.Poster
-	log             bot.Logger
+	config             config.Service
+	playbookRunService app.PlaybookRunService
+	playbookService    app.PlaybookService
+	pluginAPI          *pluginapi.Client
+	poster             bot.Poster
+	log                bot.Logger
 }
 
 // NewIncidentHandler Creates a new Plugin API handler.
-func NewIncidentHandler(router *mux.Router, incidentService app.IncidentService, playbookService app.PlaybookService,
+func NewIncidentHandler(router *mux.Router, playbookRunService app.PlaybookRunService, playbookService app.PlaybookService,
 	api *pluginapi.Client, poster bot.Poster, log bot.Logger, configService config.Service) *IncidentHandler {
 	handler := &IncidentHandler{
-		ErrorHandler:    &ErrorHandler{log: log},
-		incidentService: incidentService,
-		playbookService: playbookService,
-		pluginAPI:       api,
-		poster:          poster,
-		log:             log,
-		config:          configService,
+		ErrorHandler:       &ErrorHandler{log: log},
+		playbookRunService: playbookRunService,
+		playbookService:    playbookService,
+		pluginAPI:          api,
+		poster:             poster,
+		log:                log,
+		config:             configService,
 	}
 
 	incidentsRouter := router.PathPrefix("/incidents").Subrouter()
@@ -101,7 +101,7 @@ func (h *IncidentHandler) checkEditPermissions(next http.Handler) http.Handler {
 		vars := mux.Vars(r)
 		userID := r.Header.Get("Mattermost-User-ID")
 
-		incident, err := h.incidentService.GetIncident(vars["id"])
+		incident, err := h.playbookRunService.GetIncident(vars["id"])
 		if err != nil {
 			h.HandleError(w, err)
 			return
@@ -176,7 +176,7 @@ func (h *IncidentHandler) updateIncident(w http.ResponseWriter, r *http.Request)
 	incidentID := vars["id"]
 	//userID := r.Header.Get("Mattermost-User-ID")
 
-	oldIncident, err := h.incidentService.GetIncident(incidentID)
+	oldIncident, err := h.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -305,7 +305,7 @@ func (h *IncidentHandler) addToTimelineDialog(w http.ResponseWriter, r *http.Req
 		summary = rawSummary
 	}
 
-	incident, incErr := h.incidentService.GetIncident(incidentID)
+	incident, incErr := h.playbookRunService.GetIncident(incidentID)
 	if incErr != nil {
 		h.HandleError(w, incErr)
 		return
@@ -322,7 +322,7 @@ func (h *IncidentHandler) addToTimelineDialog(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err = h.incidentService.AddPostToTimeline(incidentID, userID, state.PostID, summary); err != nil {
+	if err = h.playbookRunService.AddPostToTimeline(incidentID, userID, state.PostID, summary); err != nil {
 		h.HandleError(w, errors.Wrap(err, "failed to add post to timeline"))
 		return
 	}
@@ -432,7 +432,7 @@ func (h *IncidentHandler) createIncident(incident app.Incident, userID string) (
 			return nil, errors.New("user is not a member of the channel containing the incident's original post")
 		}
 	}
-	return h.incidentService.CreateIncident(&incident, playbook, userID, public)
+	return h.playbookRunService.CreateIncident(&incident, playbook, userID, public)
 }
 
 func (h *IncidentHandler) getRequesterInfo(userID string) (app.RequesterInfo, error) {
@@ -466,7 +466,7 @@ func (h *IncidentHandler) getIncidents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := h.incidentService.GetIncidents(requesterInfo, *filterOptions)
+	results, err := h.playbookRunService.GetIncidents(requesterInfo, *filterOptions)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -481,7 +481,7 @@ func (h *IncidentHandler) getIncident(w http.ResponseWriter, r *http.Request) {
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToGet, err := h.incidentService.GetIncident(incidentID)
+	incidentToGet, err := h.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -501,7 +501,7 @@ func (h *IncidentHandler) getIncidentMetadata(w http.ResponseWriter, r *http.Req
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToGet, incErr := h.incidentService.GetIncident(incidentID)
+	incidentToGet, incErr := h.playbookRunService.GetIncident(incidentID)
 	if incErr != nil {
 		h.HandleError(w, incErr)
 		return
@@ -513,7 +513,7 @@ func (h *IncidentHandler) getIncidentMetadata(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	incidentMetadata, err := h.incidentService.GetIncidentMetadata(incidentID)
+	incidentMetadata, err := h.playbookRunService.GetIncidentMetadata(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -535,7 +535,7 @@ func (h *IncidentHandler) getIncidentByChannel(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	incidentID, err := h.incidentService.GetIncidentIDForChannel(channelID)
+	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(channelID)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			h.HandleErrorWithCode(w, http.StatusNotFound, "Not found",
@@ -547,7 +547,7 @@ func (h *IncidentHandler) getIncidentByChannel(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	incidentToGet, err := h.incidentService.GetIncident(incidentID)
+	incidentToGet, err := h.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -583,7 +583,7 @@ func (h *IncidentHandler) getOwners(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	owners, err := h.incidentService.GetOwners(requesterInfo, options)
+	owners, err := h.playbookRunService.GetOwners(requesterInfo, options)
 	if err != nil {
 		h.HandleError(w, errors.Wrapf(err, "failed to get owners"))
 		return
@@ -619,7 +619,7 @@ func (h *IncidentHandler) getChannels(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	incidents, err := h.incidentService.GetIncidents(requesterInfo, *filterOptions)
+	incidents, err := h.playbookRunService.GetIncidents(requesterInfo, *filterOptions)
 	if err != nil {
 		h.HandleError(w, errors.Wrapf(err, "failed to get owners"))
 		return
@@ -646,7 +646,7 @@ func (h *IncidentHandler) changeOwner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	incident, err := h.incidentService.GetIncident(vars["id"])
+	incident, err := h.playbookRunService.GetIncident(vars["id"])
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -663,7 +663,7 @@ func (h *IncidentHandler) changeOwner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.incidentService.ChangeOwner(vars["id"], userID, params.OwnerID); err != nil {
+	if err := h.playbookRunService.ChangeOwner(vars["id"], userID, params.OwnerID); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -676,7 +676,7 @@ func (h *IncidentHandler) status(w http.ResponseWriter, r *http.Request) {
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToModify, err := h.incidentService.GetIncident(incidentID)
+	incidentToModify, err := h.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -723,7 +723,7 @@ func (h *IncidentHandler) status(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.incidentService.UpdateStatus(incidentID, userID, options)
+	err = h.playbookRunService.UpdateStatus(incidentID, userID, options)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -739,7 +739,7 @@ func (h *IncidentHandler) updateStatusDialog(w http.ResponseWriter, r *http.Requ
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToModify, err := h.incidentService.GetIncident(incidentID)
+	incidentToModify, err := h.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -796,7 +796,7 @@ func (h *IncidentHandler) updateStatusDialog(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err = h.incidentService.UpdateStatus(incidentID, userID, options)
+	err = h.playbookRunService.UpdateStatus(incidentID, userID, options)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -814,7 +814,7 @@ func (h *IncidentHandler) reminderButtonUpdate(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	incidentID, err := h.incidentService.GetIncidentIDForChannel(requestData.ChannelId)
+	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(requestData.ChannelId)
 	if err != nil {
 		h.HandleErrorWithCode(w, http.StatusInternalServerError, "error getting incident",
 			errors.Wrapf(err, "reminderButtonUpdate failed to find incidentID for channelID: %s", requestData.ChannelId))
@@ -830,7 +830,7 @@ func (h *IncidentHandler) reminderButtonUpdate(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if err = h.incidentService.OpenUpdateStatusDialog(incidentID, requestData.TriggerId); err != nil {
+	if err = h.playbookRunService.OpenUpdateStatusDialog(incidentID, requestData.TriggerId); err != nil {
 		h.HandleError(w, errors.New("reminderButtonUpdate failed to open update status dialog"))
 		return
 	}
@@ -847,7 +847,7 @@ func (h *IncidentHandler) reminderButtonDismiss(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	incidentID, err := h.incidentService.GetIncidentIDForChannel(requestData.ChannelId)
+	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(requestData.ChannelId)
 	if err != nil {
 		h.log.Errorf("reminderButtonDismiss: no incident for requestData's channelID: %s", requestData.ChannelId)
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "no incident for requestData's channelID", err)
@@ -863,7 +863,7 @@ func (h *IncidentHandler) reminderButtonDismiss(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err = h.incidentService.RemoveReminderPost(incidentID); err != nil {
+	if err = h.playbookRunService.RemoveReminderPost(incidentID); err != nil {
 		h.log.Errorf("reminderButtonDismiss: error removing reminder for channelID: %s; error: %s", requestData.ChannelId, err.Error())
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "error removing reminder", err)
 		return
@@ -876,7 +876,7 @@ func (h *IncidentHandler) noRetrospectiveButton(w http.ResponseWriter, r *http.R
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToCancelRetro, err := h.incidentService.GetIncident(incidentID)
+	incidentToCancelRetro, err := h.playbookRunService.GetIncident(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -891,7 +891,7 @@ func (h *IncidentHandler) noRetrospectiveButton(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err := h.incidentService.CancelRetrospective(incidentID, userID); err != nil {
+	if err := h.playbookRunService.CancelRetrospective(incidentID, userID); err != nil {
 		h.HandleErrorWithCode(w, http.StatusInternalServerError, "unable to cancel retrospective", err)
 		return
 	}
@@ -907,7 +907,7 @@ func (h *IncidentHandler) removeTimelineEvent(w http.ResponseWriter, r *http.Req
 	userID := r.Header.Get("Mattermost-User-ID")
 	eventID := vars["eventID"]
 
-	if err := h.incidentService.RemoveTimelineEvent(id, userID, eventID); err != nil {
+	if err := h.playbookRunService.RemoveTimelineEvent(id, userID, eventID); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -922,7 +922,7 @@ func (h *IncidentHandler) checkAndSendMessageOnJoin(w http.ResponseWriter, r *ht
 	channelID := vars["channel_id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	hasViewed := h.incidentService.CheckAndSendMessageOnJoin(userID, incidentID, channelID)
+	hasViewed := h.playbookRunService.CheckAndSendMessageOnJoin(userID, incidentID, channelID)
 	ReturnJSON(w, map[string]interface{}{"viewed": hasViewed}, http.StatusOK)
 }
 
@@ -931,7 +931,7 @@ func (h *IncidentHandler) getChecklistAutocompleteItem(w http.ResponseWriter, r 
 	channelID := query.Get("channel_id")
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentID, err := h.incidentService.GetIncidentIDForChannel(channelID)
+	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(channelID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -942,7 +942,7 @@ func (h *IncidentHandler) getChecklistAutocompleteItem(w http.ResponseWriter, r 
 		return
 	}
 
-	data, err := h.incidentService.GetChecklistItemAutocomplete(incidentID)
+	data, err := h.playbookRunService.GetChecklistItemAutocomplete(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -956,7 +956,7 @@ func (h *IncidentHandler) getChecklistAutocomplete(w http.ResponseWriter, r *htt
 	channelID := query.Get("channel_id")
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentID, err := h.incidentService.GetIncidentIDForChannel(channelID)
+	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(channelID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -967,7 +967,7 @@ func (h *IncidentHandler) getChecklistAutocomplete(w http.ResponseWriter, r *htt
 		return
 	}
 
-	data, err := h.incidentService.GetChecklistAutocomplete(incidentID)
+	data, err := h.playbookRunService.GetChecklistAutocomplete(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -1004,7 +1004,7 @@ func (h *IncidentHandler) itemSetState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.incidentService.ModifyCheckedState(id, userID, params.NewState, checklistNum, itemNum); err != nil {
+	if err := h.playbookRunService.ModifyCheckedState(id, userID, params.NewState, checklistNum, itemNum); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1035,7 +1035,7 @@ func (h *IncidentHandler) itemSetAssignee(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := h.incidentService.SetAssignee(id, userID, params.AssigneeID, checklistNum, itemNum); err != nil {
+	if err := h.playbookRunService.SetAssignee(id, userID, params.AssigneeID, checklistNum, itemNum); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1058,7 +1058,7 @@ func (h *IncidentHandler) itemRun(w http.ResponseWriter, r *http.Request) {
 	}
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	triggerID, err := h.incidentService.RunChecklistItemSlashCommand(incidentID, userID, checklistNum, itemNum)
+	triggerID, err := h.playbookRunService.RunChecklistItemSlashCommand(incidentID, userID, checklistNum, itemNum)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -1090,7 +1090,7 @@ func (h *IncidentHandler) addChecklistItem(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := h.incidentService.AddChecklistItem(id, userID, checklistNum, checklistItem); err != nil {
+	if err := h.playbookRunService.AddChecklistItem(id, userID, checklistNum, checklistItem); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1140,7 +1140,7 @@ func (h *IncidentHandler) addChecklistItemDialog(w http.ResponseWriter, r *http.
 		return
 	}
 
-	if err := h.incidentService.AddChecklistItem(incidentID, userID, checklistNum, checklistItem); err != nil {
+	if err := h.playbookRunService.AddChecklistItem(incidentID, userID, checklistNum, checklistItem); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1164,7 +1164,7 @@ func (h *IncidentHandler) itemDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	if err := h.incidentService.RemoveChecklistItem(id, userID, checklistNum, itemNum); err != nil {
+	if err := h.playbookRunService.RemoveChecklistItem(id, userID, checklistNum, itemNum); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1197,7 +1197,7 @@ func (h *IncidentHandler) itemEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.incidentService.EditChecklistItem(id, userID, checklistNum, itemNum, params.Title, params.Command, params.Description); err != nil {
+	if err := h.playbookRunService.EditChecklistItem(id, userID, checklistNum, itemNum, params.Title, params.Command, params.Description); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1224,7 +1224,7 @@ func (h *IncidentHandler) reorderChecklist(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := h.incidentService.MoveChecklistItem(id, userID, checklistNum, modificationParams.ItemNum, modificationParams.NewLocation); err != nil {
+	if err := h.playbookRunService.MoveChecklistItem(id, userID, checklistNum, modificationParams.ItemNum, modificationParams.NewLocation); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -1260,7 +1260,7 @@ func (h *IncidentHandler) updateRetrospective(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := h.incidentService.UpdateRetrospective(incidentID, userID, retroUpdate.Retrospective); err != nil {
+	if err := h.playbookRunService.UpdateRetrospective(incidentID, userID, retroUpdate.Retrospective); err != nil {
 		h.HandleErrorWithCode(w, http.StatusInternalServerError, "unable to update retrospective", err)
 		return
 	}
@@ -1282,7 +1282,7 @@ func (h *IncidentHandler) publishRetrospective(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if err := h.incidentService.PublishRetrospective(incidentID, retroUpdate.Retrospective, userID); err != nil {
+	if err := h.playbookRunService.PublishRetrospective(incidentID, retroUpdate.Retrospective, userID); err != nil {
 		h.HandleErrorWithCode(w, http.StatusInternalServerError, "unable to publish retrospective", err)
 		return
 	}

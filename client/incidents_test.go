@@ -9,7 +9,7 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-func ExampleIncidentsService_Get() {
+func ExamplePlaybookRunService_Get() {
 	ctx := context.Background()
 
 	client4 := model.NewAPIv4Client("http://localhost:8065")
@@ -29,7 +29,7 @@ func ExampleIncidentsService_Get() {
 	fmt.Printf("Incident Name: %s\n", incident.Name)
 }
 
-func ExampleIncidentsService_List() {
+func ExamplePlaybookRunService_List() {
 	ctx := context.Background()
 
 	client4 := model.NewAPIv4Client("http://localhost:8065")
