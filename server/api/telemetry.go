@@ -18,14 +18,14 @@ import (
 type TelemetryHandler struct {
 	*ErrorHandler
 	playbookRunService app.PlaybookRunService
-	incidentTelemetry  app.IncidentTelemetry
+	incidentTelemetry  app.PlaybookRunTelemetry
 	botTelemetry       bot.Telemetry
 	pluginAPI          *pluginapi.Client
 }
 
 // NewTelemetryHandler Creates a new Plugin API handler.
 func NewTelemetryHandler(router *mux.Router, playbookRunService app.PlaybookRunService,
-	api *pluginapi.Client, log bot.Logger, incidentTelemetry app.IncidentTelemetry, botTelemetry bot.Telemetry, configService config.Service) *TelemetryHandler {
+	api *pluginapi.Client, log bot.Logger, incidentTelemetry app.PlaybookRunTelemetry, botTelemetry bot.Telemetry, configService config.Service) *TelemetryHandler {
 	handler := &TelemetryHandler{
 		ErrorHandler:       &ErrorHandler{log: log},
 		playbookRunService: playbookRunService,

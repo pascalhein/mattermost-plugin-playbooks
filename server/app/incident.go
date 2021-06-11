@@ -420,9 +420,9 @@ type PlaybookRunStore interface {
 	SetViewedChannel(userID, channelID string) error
 }
 
-// IncidentTelemetry defines the methods that the PlaybookRunServiceImpl needs from the RudderTelemetry.
+// PlaybookRunTelemetry defines the methods that the PlaybookRunServiceImpl needs from the RudderTelemetry.
 // Unless otherwise noted, userID is the user initiating the event.
-type IncidentTelemetry interface {
+type PlaybookRunTelemetry interface {
 	// CreateIncident tracks the creation of a new incident.
 	CreateIncident(incident *Incident, userID string, public bool)
 

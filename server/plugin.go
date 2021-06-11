@@ -71,7 +71,7 @@ func (p *Plugin) OnActivate() error {
 	}
 
 	var telemetryClient interface {
-		app.IncidentTelemetry
+		app.PlaybookRunTelemetry
 		app.PlaybookTelemetry
 		bot.Telemetry
 		Enable() error

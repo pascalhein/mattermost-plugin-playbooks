@@ -36,7 +36,7 @@ type PlaybookRunServiceImpl struct {
 	poster        bot.Poster
 	logger        bot.Logger
 	scheduler     JobOnceScheduler
-	telemetry     IncidentTelemetry
+	telemetry     PlaybookRunTelemetry
 }
 
 var allNonSpaceNonWordRegex = regexp.MustCompile(`[^\w\s]`)
@@ -76,7 +76,7 @@ const DialogFieldItemCommandKey = "command"
 
 // NewPlaybookRunService creates a new incident PlaybookRunServiceImpl.
 func NewPlaybookRunService(pluginAPI *pluginapi.Client, store PlaybookRunStore, poster bot.Poster, logger bot.Logger,
-	configService config.Service, scheduler JobOnceScheduler, telemetry IncidentTelemetry) *PlaybookRunServiceImpl {
+	configService config.Service, scheduler JobOnceScheduler, telemetry PlaybookRunTelemetry) *PlaybookRunServiceImpl {
 	return &PlaybookRunServiceImpl{
 		pluginAPI:     pluginAPI,
 		store:         store,
