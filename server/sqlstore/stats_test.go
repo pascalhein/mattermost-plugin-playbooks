@@ -78,7 +78,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		statsStore := setupStatsStore(t, db)
 
 		_, store := setupSQLStore(t, db)
@@ -181,7 +181,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 		incidents := []app.Incident{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
 		for i := range incidents {
-			_, err := incidentStore.CreateIncident(&incidents[i])
+			_, err := playbookRunStore.CreateIncident(&incidents[i])
 			require.NoError(t, err)
 		}
 

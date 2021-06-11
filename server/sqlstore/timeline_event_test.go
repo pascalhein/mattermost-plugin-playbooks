@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIncidentStore_CreateTimelineEvent(t *testing.T) {
+func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		iStore := setupIncidentStore(t, db)
+		iStore := setupPlaybookRunStore(t, db)
 		_, store := setupSQLStore(t, db)
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
@@ -100,10 +100,10 @@ func TestIncidentStore_CreateTimelineEvent(t *testing.T) {
 	}
 }
 
-func TestIncidentStore_UpdateTimelineEvent(t *testing.T) {
+func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		iStore := setupIncidentStore(t, db)
+		iStore := setupPlaybookRunStore(t, db)
 		_, store := setupSQLStore(t, db)
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)

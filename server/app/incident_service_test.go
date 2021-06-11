@@ -31,7 +31,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -61,7 +61,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -91,7 +91,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -140,7 +140,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -171,7 +171,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -214,7 +214,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -260,7 +260,7 @@ func TestCreateIncident(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -347,7 +347,7 @@ func TestUpdateStatus(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
 		client := pluginapi.NewClient(pluginAPI)
-		store := mock_app.NewMockIncidentStore(controller)
+		store := mock_app.NewMockPlaybookRunStore(controller)
 		poster := mock_bot.NewMockPoster(controller)
 		logger := mock_bot.NewMockLogger(controller)
 		configService := mock_config.NewMockService(controller)
@@ -452,7 +452,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		prepMocks func(t *testing.T, store *mock_app.MockIncidentStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService)
+		prepMocks func(t *testing.T, store *mock_app.MockPlaybookRunStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService)
 		wantErr   bool
 	}{
 		{
@@ -466,7 +466,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 				playbooks:   []app.Playbook{},
 				isMobileApp: false,
 			},
-			prepMocks: func(t *testing.T, store *mock_app.MockIncidentStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService) {
+			prepMocks: func(t *testing.T, store *mock_app.MockPlaybookRunStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService) {
 				api.On("GetTeam", "teamID").
 					Return(&model.Team{Id: "teamID", Name: "Team"}, nil)
 				api.On("GetUser", "ownerID").
@@ -492,7 +492,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 				playbooks:   []app.Playbook{},
 				isMobileApp: false,
 			},
-			prepMocks: func(t *testing.T, store *mock_app.MockIncidentStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService) {
+			prepMocks: func(t *testing.T, store *mock_app.MockPlaybookRunStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService) {
 				api.On("GetTeam", "teamID").
 					Return(&model.Team{Id: "teamID", Name: "Team"}, nil)
 				api.On("GetUser", "ownerID").
@@ -522,7 +522,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 				playbooks:   []app.Playbook{},
 				isMobileApp: true,
 			},
-			prepMocks: func(t *testing.T, store *mock_app.MockIncidentStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService) {
+			prepMocks: func(t *testing.T, store *mock_app.MockPlaybookRunStore, poster *mock_bot.MockPoster, api *plugintest.API, configService *mock_config.MockService) {
 				api.On("GetTeam", "teamID").
 					Return(&model.Team{Id: "teamID", Name: "Team"}, nil)
 				api.On("GetUser", "ownerID").
@@ -547,7 +547,7 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 			controller := gomock.NewController(t)
 			api := &plugintest.API{}
 			client := pluginapi.NewClient(api)
-			store := mock_app.NewMockIncidentStore(controller)
+			store := mock_app.NewMockPlaybookRunStore(controller)
 			poster := mock_bot.NewMockPoster(controller)
 			logger := mock_bot.NewMockLogger(controller)
 			configService := mock_config.NewMockService(controller)

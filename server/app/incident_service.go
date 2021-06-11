@@ -32,7 +32,7 @@ type IncidentServiceImpl struct {
 	pluginAPI     *pluginapi.Client
 	httpClient    *http.Client
 	configService config.Service
-	store         IncidentStore
+	store         PlaybookRunStore
 	poster        bot.Poster
 	logger        bot.Logger
 	scheduler     JobOnceScheduler
@@ -75,7 +75,7 @@ const DialogFieldItemDescriptionKey = "description"
 const DialogFieldItemCommandKey = "command"
 
 // NewIncidentService creates a new incident IncidentServiceImpl.
-func NewIncidentService(pluginAPI *pluginapi.Client, store IncidentStore, poster bot.Poster, logger bot.Logger,
+func NewIncidentService(pluginAPI *pluginapi.Client, store PlaybookRunStore, poster bot.Poster, logger bot.Logger,
 	configService config.Service, scheduler JobOnceScheduler, telemetry IncidentTelemetry) *IncidentServiceImpl {
 	return &IncidentServiceImpl{
 		pluginAPI:     pluginAPI,

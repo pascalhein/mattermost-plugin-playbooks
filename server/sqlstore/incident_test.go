@@ -169,13 +169,13 @@ func TestGetIncidents(t *testing.T) {
 
 	incidents := []app.Incident{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
-	createIncidents := func(store *SQLStore, incidentStore app.IncidentStore) {
+	createIncidents := func(store *SQLStore, playbookRunStore app.PlaybookRunStore) {
 		t.Helper()
 
 		createdIncidents := make([]app.Incident, len(incidents))
 
 		for i := range incidents {
-			createdIncident, err := incidentStore.CreateIncident(&incidents[i])
+			createdIncident, err := playbookRunStore.CreateIncident(&incidents[i])
 			require.NoError(t, err)
 
 			createdIncidents[i] = *createdIncident
@@ -907,7 +907,7 @@ func TestGetIncidents(t *testing.T) {
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 
 		_, store := setupSQLStore(t, db)
 		setupUsersTable(t, db)
@@ -925,7 +925,7 @@ func TestGetIncidents(t *testing.T) {
 		makeAdmin(t, store, lucy)
 
 		t.Run("zero incidents", func(t *testing.T) {
-			result, err := incidentStore.GetIncidents(app.RequesterInfo{
+			result, err := playbookRunStore.GetIncidents(app.RequesterInfo{
 				UserID: lucy.ID,
 			},
 				app.IncidentFilterOptions{
@@ -943,11 +943,11 @@ func TestGetIncidents(t *testing.T) {
 			require.Empty(t, result.Items)
 		})
 
-		createIncidents(store, incidentStore)
+		createIncidents(store, playbookRunStore)
 
 		for _, testCase := range testData {
 			t.Run(driverName+" - "+testCase.Name, func(t *testing.T) {
-				result, err := incidentStore.GetIncidents(testCase.RequesterInfo, testCase.Options)
+				result, err := playbookRunStore.GetIncidents(testCase.RequesterInfo, testCase.Options)
 
 				if testCase.ExpectedErr != nil {
 					require.Nil(t, result)
@@ -975,7 +975,7 @@ func TestCreateAndGetIncident(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
 		_, store := setupSQLStore(t, db)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
 
@@ -1038,7 +1038,7 @@ func TestCreateAndGetIncident(t *testing.T) {
 					expectedIncident = *testCase.Incident
 				}
 
-				returned, err := incidentStore.CreateIncident(testCase.Incident)
+				returned, err := playbookRunStore.CreateIncident(testCase.Incident)
 
 				if testCase.ExpectedErr != nil {
 					require.Error(t, err)
@@ -1053,7 +1053,7 @@ func TestCreateAndGetIncident(t *testing.T) {
 
 				createIncidentChannel(t, store, testCase.Incident)
 
-				_, err = incidentStore.GetIncident(expectedIncident.ID)
+				_, err = playbookRunStore.GetIncident(expectedIncident.ID)
 				require.NoError(t, err)
 			})
 		}
@@ -1065,7 +1065,7 @@ func TestCreateAndGetIncident(t *testing.T) {
 func TestGetIncident(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		setupChannelsTable(t, db)
 
 		validIncidents := []struct {
@@ -1087,7 +1087,7 @@ func TestGetIncident(t *testing.T) {
 
 		for _, testCase := range validIncidents {
 			t.Run(testCase.Name, func(t *testing.T) {
-				returned, err := incidentStore.GetIncident(testCase.ID)
+				returned, err := playbookRunStore.GetIncident(testCase.ID)
 
 				require.Error(t, err)
 				require.Equal(t, testCase.ExpectedErr.Error(), err.Error())
@@ -1132,7 +1132,7 @@ func TestUpdateIncident(t *testing.T) {
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		_, store := setupSQLStore(t, db)
 
 		setupChannelsTable(t, db)
@@ -1194,13 +1194,13 @@ func TestUpdateIncident(t *testing.T) {
 
 		for _, testCase := range validIncidents {
 			t.Run(testCase.Name, func(t *testing.T) {
-				returned, err := incidentStore.CreateIncident(testCase.Incident)
+				returned, err := playbookRunStore.CreateIncident(testCase.Incident)
 				require.NoError(t, err)
 				createIncidentChannel(t, store, returned)
 
 				expected := testCase.Update(*returned)
 
-				err = incidentStore.UpdateIncident(expected)
+				err = playbookRunStore.UpdateIncident(expected)
 
 				if testCase.ExpectedErr != nil {
 					require.Error(t, err)
@@ -1210,7 +1210,7 @@ func TestUpdateIncident(t *testing.T) {
 
 				require.NoError(t, err)
 
-				actual, err := incidentStore.GetIncident(expected.ID)
+				actual, err := playbookRunStore.GetIncident(expected.ID)
 				require.NoError(t, err)
 				require.Equal(t, expected, actual)
 			})
@@ -1230,17 +1230,17 @@ func TestStressTestGetIncidents(t *testing.T) {
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		_, store := setupSQLStore(t, db)
 
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
 		teamID := model.NewId()
-		withPosts := createIncidentsAndPosts(t, store, incidentStore, numIncidents, postsPerIncident, teamID)
+		withPosts := createIncidentsAndPosts(t, store, playbookRunStore, numIncidents, postsPerIncident, teamID)
 
 		t.Run("stress test status posts retrieval", func(t *testing.T) {
 			for _, p := range verifyPages {
-				returned, err := incidentStore.GetIncidents(app.RequesterInfo{
+				returned, err := playbookRunStore.GetIncidents(app.RequesterInfo{
 					UserID:  "testID",
 					IsAdmin: true,
 				}, app.IncidentFilterOptions{
@@ -1286,19 +1286,19 @@ func TestStressTestGetIncidentsStats(t *testing.T) {
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		_, store := setupSQLStore(t, db)
 
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
 		teamID := model.NewId()
-		_ = createIncidentsAndPosts(t, store, incidentStore, numIncidents, postsPerIncident, teamID)
+		_ = createIncidentsAndPosts(t, store, playbookRunStore, numIncidents, postsPerIncident, teamID)
 
 		t.Run("stress test status posts retrieval", func(t *testing.T) {
 			intervals := make([]int64, 0, numReps)
 			for i := 0; i < numReps; i++ {
 				start := time.Now()
-				_, err := incidentStore.GetIncidents(app.RequesterInfo{
+				_, err := playbookRunStore.GetIncidents(app.RequesterInfo{
 					UserID:  "testID",
 					IsAdmin: true,
 				}, app.IncidentFilterOptions{
@@ -1318,7 +1318,7 @@ func TestStressTestGetIncidentsStats(t *testing.T) {
 	}
 }
 
-func createIncidentsAndPosts(t testing.TB, store *SQLStore, incidentStore app.IncidentStore, numIncidents, maxPostsPerIncident int, teamID string) []app.Incident {
+func createIncidentsAndPosts(t testing.TB, store *SQLStore, playbookRunStore app.PlaybookRunStore, numIncidents, maxPostsPerIncident int, teamID string) []app.Incident {
 	incidentsSorted := make([]app.Incident, 0, numIncidents)
 	for i := 0; i < numIncidents; i++ {
 		numPosts := maxPostsPerIncident
@@ -1335,7 +1335,7 @@ func createIncidentsAndPosts(t testing.TB, store *SQLStore, incidentStore app.In
 			WithName(fmt.Sprintf("incident %d", i)).
 			WithChecklists([]int{1}).
 			ToIncident()
-		ret, err := incidentStore.CreateIncident(inc)
+		ret, err := playbookRunStore.CreateIncident(inc)
 		require.NoError(t, err)
 		createIncidentChannel(t, store, ret)
 		incidentsSorted = append(incidentsSorted, *ret)
@@ -1361,30 +1361,30 @@ func TestGetIncidentIDForChannel(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
 		_, store := setupSQLStore(t, db)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		setupChannelsTable(t, db)
 
 		t.Run("retrieve existing incidentID", func(t *testing.T) {
 			incident1 := NewBuilder(t).ToIncident()
 			incident2 := NewBuilder(t).ToIncident()
 
-			returned1, err := incidentStore.CreateIncident(incident1)
+			returned1, err := playbookRunStore.CreateIncident(incident1)
 			require.NoError(t, err)
 			createIncidentChannel(t, store, incident1)
 
-			returned2, err := incidentStore.CreateIncident(incident2)
+			returned2, err := playbookRunStore.CreateIncident(incident2)
 			require.NoError(t, err)
 			createIncidentChannel(t, store, incident2)
 
-			id1, err := incidentStore.GetIncidentIDForChannel(incident1.ChannelID)
+			id1, err := playbookRunStore.GetIncidentIDForChannel(incident1.ChannelID)
 			require.NoError(t, err)
 			require.Equal(t, returned1.ID, id1)
-			id2, err := incidentStore.GetIncidentIDForChannel(incident2.ChannelID)
+			id2, err := playbookRunStore.GetIncidentIDForChannel(incident2.ChannelID)
 			require.NoError(t, err)
 			require.Equal(t, returned2.ID, id2)
 		})
 		t.Run("fail to retrieve non-existing incidentID", func(t *testing.T) {
-			id1, err := incidentStore.GetIncidentIDForChannel("nonexistingid")
+			id1, err := playbookRunStore.GetIncidentIDForChannel("nonexistingid")
 			require.Error(t, err)
 			require.Equal(t, "", id1)
 			require.True(t, strings.HasPrefix(err.Error(),
@@ -1633,7 +1633,7 @@ func TestGetOwners(t *testing.T) {
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 
 		_, store := setupSQLStore(t, db)
 		setupUsersTable(t, db)
@@ -1664,7 +1664,7 @@ func TestGetOwners(t *testing.T) {
 		require.NoError(t, err)
 
 		for i := range incidents {
-			_, err := incidentStore.CreateIncident(&incidents[i])
+			_, err := playbookRunStore.CreateIncident(&incidents[i])
 			require.NoError(t, err)
 		}
 
@@ -1672,7 +1672,7 @@ func TestGetOwners(t *testing.T) {
 
 		for _, testCase := range cases {
 			t.Run(testCase.Name, func(t *testing.T) {
-				actual, actualErr := incidentStore.GetOwners(testCase.RequesterInfo, testCase.Options)
+				actual, actualErr := playbookRunStore.GetOwners(testCase.RequesterInfo, testCase.Options)
 
 				if testCase.ExpectedErr != nil {
 					require.EqualError(t, actualErr, testCase.ExpectedErr.Error())
@@ -1709,13 +1709,13 @@ func TestNukeDB(t *testing.T) {
 		setupUsersTable(t, db)
 		setupTeamMembersTable(t, db)
 
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 		playbookStore := setupPlaybookStore(t, db)
 
 		t.Run("nuke db with a few incidents in it", func(t *testing.T) {
 			for i := 0; i < 10; i++ {
 				newIncident := NewBuilder(t).ToIncident()
-				_, err := incidentStore.CreateIncident(newIncident)
+				_, err := playbookRunStore.CreateIncident(newIncident)
 				require.NoError(t, err)
 				createIncidentChannel(t, store, newIncident)
 			}
@@ -1725,7 +1725,7 @@ func TestNukeDB(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, 10, int(rows))
 
-			err = incidentStore.NukeDB()
+			err = playbookRunStore.NukeDB()
 			require.NoError(t, err)
 
 			err = db.Get(&rows, "SELECT COUNT(*) FROM IR_Incident")
@@ -1754,7 +1754,7 @@ func TestNukeDB(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, 20, int(rows))
 
-			err = incidentStore.NukeDB()
+			err = playbookRunStore.NukeDB()
 			require.NoError(t, err)
 
 			err = db.Get(&rows, "SELECT COUNT(*) FROM IR_Playbook")
@@ -1772,7 +1772,7 @@ func TestCheckAndSendMessageOnJoin(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
 		_, _ = setupSQLStore(t, db)
-		incidentStore := setupIncidentStore(t, db)
+		playbookRunStore := setupPlaybookRunStore(t, db)
 
 		t.Run("two new users get welcome messages, one old user doesn't", func(t *testing.T) {
 			channelID := model.NewId()
@@ -1781,34 +1781,34 @@ func TestCheckAndSendMessageOnJoin(t *testing.T) {
 			newID1 := model.NewId()
 			newID2 := model.NewId()
 
-			err := incidentStore.SetViewedChannel(oldID, channelID)
+			err := playbookRunStore.SetViewedChannel(oldID, channelID)
 			require.NoError(t, err)
 
 			// Setting multiple times is okay
-			err = incidentStore.SetViewedChannel(oldID, channelID)
+			err = playbookRunStore.SetViewedChannel(oldID, channelID)
 			require.NoError(t, err)
-			err = incidentStore.SetViewedChannel(oldID, channelID)
+			err = playbookRunStore.SetViewedChannel(oldID, channelID)
 			require.NoError(t, err)
 
 			// new users get welcome messages
-			hasViewed := incidentStore.HasViewedChannel(newID1, channelID)
+			hasViewed := playbookRunStore.HasViewedChannel(newID1, channelID)
 			require.False(t, hasViewed)
-			err = incidentStore.SetViewedChannel(newID1, channelID)
+			err = playbookRunStore.SetViewedChannel(newID1, channelID)
 			require.NoError(t, err)
 
-			hasViewed = incidentStore.HasViewedChannel(newID2, channelID)
+			hasViewed = playbookRunStore.HasViewedChannel(newID2, channelID)
 			require.False(t, hasViewed)
-			err = incidentStore.SetViewedChannel(newID2, channelID)
+			err = playbookRunStore.SetViewedChannel(newID2, channelID)
 			require.NoError(t, err)
 
 			// old user does not
-			hasViewed = incidentStore.HasViewedChannel(oldID, channelID)
+			hasViewed = playbookRunStore.HasViewedChannel(oldID, channelID)
 			require.True(t, hasViewed)
 
 			// new users do not, now:
-			hasViewed = incidentStore.HasViewedChannel(newID1, channelID)
+			hasViewed = playbookRunStore.HasViewedChannel(newID1, channelID)
 			require.True(t, hasViewed)
-			hasViewed = incidentStore.HasViewedChannel(newID2, channelID)
+			hasViewed = playbookRunStore.HasViewedChannel(newID2, channelID)
 			require.True(t, hasViewed)
 
 			var rows int64
@@ -1834,7 +1834,7 @@ func TestCheckAndSendMessageOnJoin(t *testing.T) {
 	}
 }
 
-func setupIncidentStore(t *testing.T, db *sqlx.DB) app.IncidentStore {
+func setupPlaybookRunStore(t *testing.T, db *sqlx.DB) app.PlaybookRunStore {
 	mockCtrl := gomock.NewController(t)
 
 	kvAPI := mock_sqlstore.NewMockKVAPI(mockCtrl)
@@ -1846,7 +1846,7 @@ func setupIncidentStore(t *testing.T, db *sqlx.DB) app.IncidentStore {
 
 	logger, sqlStore := setupSQLStore(t, db)
 
-	return NewIncidentStore(pluginAPIClient, logger, sqlStore)
+	return NewPlaybookRunStore(pluginAPIClient, logger, sqlStore)
 }
 
 // IncidentBuilder is a utility to build incidents with a default base.

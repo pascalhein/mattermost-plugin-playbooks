@@ -32,8 +32,8 @@ type sqlIncident struct {
 	ConcatenatedInvitedGroupIDs string
 }
 
-// incidentStore holds the information needed to fulfill the methods in the store interface.
-type incidentStore struct {
+// playbookRunStore holds the information needed to fulfill the methods in the store interface.
+type playbookRunStore struct {
 	pluginAPI            PluginAPIClient
 	log                  bot.Logger
 	store                *SQLStore
@@ -43,8 +43,8 @@ type incidentStore struct {
 	timelineEventsSelect sq.SelectBuilder
 }
 
-// Ensure incidentStore implements the app.IncidentStore interface.
-var _ app.IncidentStore = (*incidentStore)(nil)
+// Ensure playbookRunStore implements the app.PlaybookRunStore interface.
+var _ app.PlaybookRunStore = (*playbookRunStore)(nil)
 
 type incidentStatusPosts []struct {
 	IncidentID string
@@ -106,8 +106,8 @@ func applyIncidentFilterOptionsSort(builder sq.SelectBuilder, options app.Incide
 	return builder, nil
 }
 
-// NewIncidentStore creates a new store for incident ServiceImpl.
-func NewIncidentStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLStore) app.IncidentStore {
+// NewPlaybookRunStore creates a new store for incident ServiceImpl.
+func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLStore) app.PlaybookRunStore {
 	// When adding an Incident column #1: add to this select
 	incidentSelect := sqlStore.builder.
 		Select("i.ID", "c.DisplayName AS Name", "i.Description", "i.CommanderUserID AS OwnerUserID", "i.TeamID", "i.ChannelID",
@@ -151,7 +151,7 @@ func NewIncidentStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLSt
 		).
 		From("IR_TimelineEvent as te")
 
-	return &incidentStore{
+	return &playbookRunStore{
 		pluginAPI:            pluginAPI,
 		log:                  log,
 		store:                sqlStore,
@@ -163,7 +163,7 @@ func NewIncidentStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLSt
 }
 
 // GetIncidents returns filtered incidents and the total count before paging.
-func (s *incidentStore) GetIncidents(requesterInfo app.RequesterInfo, options app.IncidentFilterOptions) (*app.GetIncidentsResults, error) {
+func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options app.IncidentFilterOptions) (*app.GetIncidentsResults, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
 	queryForResults := s.incidentSelect.
@@ -300,7 +300,7 @@ func (s *incidentStore) GetIncidents(requesterInfo app.RequesterInfo, options ap
 }
 
 // CreateIncident creates a new incident. If incident has an ID, that ID will be used.
-func (s *incidentStore) CreateIncident(incident *app.Incident) (*app.Incident, error) {
+func (s *playbookRunStore) CreateIncident(incident *app.Incident) (*app.Incident, error) {
 	if incident == nil {
 		return nil, errors.New("incident is nil")
 	}
@@ -362,7 +362,7 @@ func (s *incidentStore) CreateIncident(incident *app.Incident) (*app.Incident, e
 }
 
 // UpdateIncident updates an incident.
-func (s *incidentStore) UpdateIncident(incident *app.Incident) error {
+func (s *playbookRunStore) UpdateIncident(incident *app.Incident) error {
 	if incident == nil {
 		return errors.New("incident is nil")
 	}
@@ -408,7 +408,7 @@ func (s *incidentStore) UpdateIncident(incident *app.Incident) error {
 	return nil
 }
 
-func (s *incidentStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
+func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 	if statusPost == nil {
 		return errors.New("status post is nil")
 	}
@@ -446,7 +446,7 @@ func (s *incidentStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 }
 
 // CreateTimelineEvent creates the timeline event
-func (s *incidentStore) CreateTimelineEvent(event *app.TimelineEvent) (*app.TimelineEvent, error) {
+func (s *playbookRunStore) CreateTimelineEvent(event *app.TimelineEvent) (*app.TimelineEvent, error) {
 	if event.IncidentID == "" {
 		return nil, errors.New("needs incident ID")
 	}
@@ -487,7 +487,7 @@ func (s *incidentStore) CreateTimelineEvent(event *app.TimelineEvent) (*app.Time
 }
 
 // UpdateTimelineEvent updates (or inserts) the timeline event
-func (s *incidentStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
+func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 	if event.ID == "" {
 		return errors.New("needs event ID")
 	}
@@ -527,7 +527,7 @@ func (s *incidentStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 }
 
 // GetIncident gets an incident by ID.
-func (s *incidentStore) GetIncident(incidentID string) (*app.Incident, error) {
+func (s *playbookRunStore) GetIncident(incidentID string) (*app.Incident, error) {
 	if incidentID == "" {
 		return nil, errors.New("ID cannot be empty")
 	}
@@ -580,7 +580,7 @@ func (s *incidentStore) GetIncident(incidentID string) (*app.Incident, error) {
 	return incident, nil
 }
 
-func (s *incidentStore) getTimelineEventsForIncident(q sqlx.Queryer, incidentIDs []string) ([]app.TimelineEvent, error) {
+func (s *playbookRunStore) getTimelineEventsForIncident(q sqlx.Queryer, incidentIDs []string) ([]app.TimelineEvent, error) {
 	var timelineEvents []app.TimelineEvent
 
 	timelineEventsSelect := s.timelineEventsSelect.
@@ -596,7 +596,7 @@ func (s *incidentStore) getTimelineEventsForIncident(q sqlx.Queryer, incidentIDs
 }
 
 // GetTimelineEvent returns the timeline event for incidentID by the timeline event ID.
-func (s *incidentStore) GetTimelineEvent(incidentID, eventID string) (*app.TimelineEvent, error) {
+func (s *playbookRunStore) GetTimelineEvent(incidentID, eventID string) (*app.TimelineEvent, error) {
 	var event app.TimelineEvent
 
 	timelineEventSelect := s.timelineEventsSelect.
@@ -613,7 +613,7 @@ func (s *incidentStore) GetTimelineEvent(incidentID, eventID string) (*app.Timel
 }
 
 // GetIncidentIDForChannel gets the incidentID associated with the given channelID.
-func (s *incidentStore) GetIncidentIDForChannel(channelID string) (string, error) {
+func (s *playbookRunStore) GetIncidentIDForChannel(channelID string) (string, error) {
 	query := s.queryBuilder.
 		Select("i.ID").
 		From("IR_Incident i").
@@ -632,7 +632,7 @@ func (s *incidentStore) GetIncidentIDForChannel(channelID string) (string, error
 
 // GetAllIncidentMembersCount returns the count of all members of an incident since the
 // beginning of the incident, excluding bots.
-func (s *incidentStore) GetAllIncidentMembersCount(channelID string) (int64, error) {
+func (s *playbookRunStore) GetAllIncidentMembersCount(channelID string) (int64, error) {
 	query := s.queryBuilder.
 		Select("COUNT(DISTINCT cmh.UserId)").
 		From("ChannelMemberHistory AS cmh").
@@ -649,7 +649,7 @@ func (s *incidentStore) GetAllIncidentMembersCount(channelID string) (int64, err
 }
 
 // GetOwners returns the owners of the incidents selected by options
-func (s *incidentStore) GetOwners(requesterInfo app.RequesterInfo, options app.IncidentFilterOptions) ([]app.OwnerInfo, error) {
+func (s *playbookRunStore) GetOwners(requesterInfo app.RequesterInfo, options app.IncidentFilterOptions) ([]app.OwnerInfo, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
 	// At the moment, the options only includes teamID
@@ -670,7 +670,7 @@ func (s *incidentStore) GetOwners(requesterInfo app.RequesterInfo, options app.I
 }
 
 // NukeDB removes all incident related data.
-func (s *incidentStore) NukeDB() (err error) {
+func (s *playbookRunStore) NukeDB() (err error) {
 	tx, err := s.store.db.Beginx()
 	if err != nil {
 		return errors.Wrap(err, "could not begin transaction")
@@ -688,7 +688,7 @@ func (s *incidentStore) NukeDB() (err error) {
 	return s.store.RunMigrations()
 }
 
-func (s *incidentStore) ChangeCreationDate(incidentID string, creationTimestamp time.Time) error {
+func (s *playbookRunStore) ChangeCreationDate(incidentID string, creationTimestamp time.Time) error {
 	updateQuery := s.queryBuilder.Update("IR_Incident").
 		Where(sq.Eq{"ID": incidentID}).
 		Set("CreateAt", model.GetMillisForTime(creationTimestamp))
@@ -711,7 +711,7 @@ func (s *incidentStore) ChangeCreationDate(incidentID string, creationTimestamp 
 }
 
 // HasViewed returns true if userID has viewed channelID
-func (s *incidentStore) HasViewedChannel(userID, channelID string) bool {
+func (s *playbookRunStore) HasViewedChannel(userID, channelID string) bool {
 	query := sq.Expr(
 		`SELECT EXISTS(SELECT *
                          FROM IR_ViewedChannel as vc
@@ -729,7 +729,7 @@ func (s *incidentStore) HasViewedChannel(userID, channelID string) bool {
 }
 
 // SetViewed records that userID has viewed channelID.
-func (s *incidentStore) SetViewedChannel(userID, channelID string) error {
+func (s *playbookRunStore) SetViewedChannel(userID, channelID string) error {
 	if s.HasViewedChannel(userID, channelID) {
 		return nil
 	}
@@ -760,7 +760,7 @@ func (s *incidentStore) SetViewedChannel(userID, channelID string) error {
 	return nil
 }
 
-func (s *incidentStore) buildPermissionsExpr(info app.RequesterInfo) sq.Sqlizer {
+func (s *playbookRunStore) buildPermissionsExpr(info app.RequesterInfo) sq.Sqlizer {
 	if info.IsAdmin {
 		return nil
 	}
@@ -791,7 +791,7 @@ func (s *incidentStore) buildPermissionsExpr(info app.RequesterInfo) sq.Sqlizer 
 		  )`, info.UserID)
 }
 
-func (s *incidentStore) toIncident(rawIncident sqlIncident) (*app.Incident, error) {
+func (s *playbookRunStore) toIncident(rawIncident sqlIncident) (*app.Incident, error) {
 	incident := rawIncident.Incident
 	if err := json.Unmarshal(rawIncident.ChecklistsJSON, &incident.Checklists); err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal checklists json for incident id: %s", rawIncident.ID)

@@ -369,8 +369,8 @@ type IncidentService interface {
 	CheckAndSendMessageOnJoin(userID, incidentID, channelID string) bool
 }
 
-// IncidentStore defines the methods the IncidentServiceImpl needs from the interfaceStore.
-type IncidentStore interface {
+// PlaybookRunStore defines the methods the IncidentServiceImpl needs from the interfaceStore.
+type PlaybookRunStore interface {
 	// GetIncidents returns filtered incidents and the total count before paging.
 	GetIncidents(requesterInfo RequesterInfo, options IncidentFilterOptions) (*GetIncidentsResults, error)
 

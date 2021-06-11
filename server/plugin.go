@@ -128,7 +128,7 @@ func (p *Plugin) OnActivate() error {
 	}
 	mutex.Unlock()
 
-	incidentStore := sqlstore.NewIncidentStore(apiClient, p.bot, sqlStore)
+	playbookRunStore := sqlstore.NewPlaybookRunStore(apiClient, p.bot, sqlStore)
 	playbookStore := sqlstore.NewPlaybookStore(apiClient, p.bot, sqlStore)
 	statsStore := sqlstore.NewStatsStore(apiClient, p.bot, sqlStore)
 
@@ -138,7 +138,7 @@ func (p *Plugin) OnActivate() error {
 
 	p.incidentService = app.NewIncidentService(
 		pluginAPIClient,
-		incidentStore,
+		playbookRunStore,
 		p.bot,
 		p.bot,
 		p.config,
