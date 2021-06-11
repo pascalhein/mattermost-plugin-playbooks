@@ -8,28 +8,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIncident_MarshalJSON(t *testing.T) {
-	testIncident := &Incident{}
-	result, err := json.Marshal(testIncident)
+func TestPlaybookRun_MarshalJSON(t *testing.T) {
+	testPlaybookRun := &PlaybookRun{}
+	result, err := json.Marshal(testPlaybookRun)
 	require.NoError(t, err)
 	// Should not contain null. Triggering this?
 	// Add your new nullable thing to one of the MarshalJSONs in incident/incident.go
 	require.NotContains(t, string(result), "null")
 }
 
-func TestIncident_LastResovedAt(t *testing.T) {
+func TestPlaybookRun_LastResovedAt(t *testing.T) {
 	for name, tc := range map[string]struct {
-		inc      Incident
+		inc      PlaybookRun
 		expected int64
 	}{
 		"blank": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{},
 			},
 			expected: 0,
 		},
 		"just active": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -41,7 +41,7 @@ func TestIncident_LastResovedAt(t *testing.T) {
 			expected: 0,
 		},
 		"just resolved": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -53,7 +53,7 @@ func TestIncident_LastResovedAt(t *testing.T) {
 			expected: 999,
 		},
 		"resolved": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -70,7 +70,7 @@ func TestIncident_LastResovedAt(t *testing.T) {
 			expected: 123,
 		},
 		"resolved deleted": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -87,7 +87,7 @@ func TestIncident_LastResovedAt(t *testing.T) {
 			expected: 0,
 		},
 		"multiple resolution": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -109,7 +109,7 @@ func TestIncident_LastResovedAt(t *testing.T) {
 			expected: 123,
 		},
 		"multiple resolution with break": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -136,7 +136,7 @@ func TestIncident_LastResovedAt(t *testing.T) {
 			expected: 456,
 		},
 		"resolution but has active afterwards": {
-			inc: Incident{
+			inc: PlaybookRun{
 				StatusPosts: []StatusPost{
 					{
 						DeleteAt: 0,
@@ -164,8 +164,8 @@ func TestIncident_LastResovedAt(t *testing.T) {
 	}
 }
 
-func TestIncidentFilterOptions_Clone(t *testing.T) {
-	options := IncidentFilterOptions{
+func TestPlaybookRunFilterOptions_Clone(t *testing.T) {
+	options := PlaybookRunFilterOptions{
 		TeamID:     "team_id",
 		Page:       1,
 		PerPage:    10,
@@ -194,15 +194,15 @@ func TestIncidentFilterOptions_Clone(t *testing.T) {
 	clone.SearchTerm = "search_term_clone"
 	clone.PlaybookID = "playbook_id_clone"
 
-	var unmarshalledOptions IncidentFilterOptions
+	var unmarshalledOptions PlaybookRunFilterOptions
 	err = json.Unmarshal(marshalledOptions, &unmarshalledOptions)
 	require.NoError(t, err)
 	require.Equal(t, options, unmarshalledOptions)
 }
 
-func TestIncidentFilterOptions_Validate(t *testing.T) {
+func TestPlaybookRunFilterOptions_Validate(t *testing.T) {
 	t.Run("non-positive PerPage", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:  model.NewId(),
 			PerPage: -1,
 		}
@@ -214,7 +214,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid sort option", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID: model.NewId(),
 			Sort:   SortField("invalid"),
 		}
@@ -224,7 +224,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("valid, but wrong case sort option", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID: model.NewId(),
 			Sort:   SortField("END_at"),
 		}
@@ -236,7 +236,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("valid, no explicit sort option", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID: model.NewId(),
 		}
 
@@ -247,7 +247,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid sort direction", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:    model.NewId(),
 			Direction: SortDirection("invalid"),
 		}
@@ -257,7 +257,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("valid, but wrong case direction option", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:    model.NewId(),
 			Direction: SortDirection("DEsC"),
 		}
@@ -269,7 +269,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("valid, no explicit direction", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID: model.NewId(),
 		}
 
@@ -280,7 +280,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid team id", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID: "invalid",
 		}
 
@@ -289,7 +289,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid owner id", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:  model.NewId(),
 			OwnerID: "invalid",
 		}
@@ -299,7 +299,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid member id", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:   model.NewId(),
 			MemberID: "invalid",
 		}
@@ -309,7 +309,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid playbook id", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:     model.NewId(),
 			PlaybookID: "invalid",
 		}
@@ -319,7 +319,7 @@ func TestIncidentFilterOptions_Validate(t *testing.T) {
 	})
 
 	t.Run("valid", func(t *testing.T) {
-		options := IncidentFilterOptions{
+		options := PlaybookRunFilterOptions{
 			TeamID:     model.NewId(),
 			Page:       1,
 			PerPage:    10,

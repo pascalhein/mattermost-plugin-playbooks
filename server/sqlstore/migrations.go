@@ -188,7 +188,7 @@ var migrations = []Migration{
 				}
 			}
 
-			getIncidentsQuery := sqlStore.builder.
+			getPlaybookRunsQuery := sqlStore.builder.
 				Select("ID", "ActiveStage", "ChecklistsJSON").
 				From("IR_Incident")
 
@@ -197,7 +197,7 @@ var migrations = []Migration{
 				ActiveStage    int
 				ChecklistsJSON json.RawMessage
 			}
-			if err := sqlStore.selectBuilder(e, &incidents, getIncidentsQuery); err != nil {
+			if err := sqlStore.selectBuilder(e, &incidents, getPlaybookRunsQuery); err != nil {
 				return errors.Wrapf(err, "failed getting incidents to update their ActiveStageTitle")
 			}
 

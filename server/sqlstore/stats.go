@@ -43,7 +43,7 @@ func applyFilters(query sq.SelectBuilder, filters *StatsFilters) sq.SelectBuilde
 	return ret
 }
 
-func (s *StatsStore) TotalReportedIncidents(filters *StatsFilters) int {
+func (s *StatsStore) TotalReportedPlaybookRuns(filters *StatsFilters) int {
 	query := s.store.builder.
 		Select("COUNT(ID)").
 		From("IR_Incident as i").
@@ -60,7 +60,7 @@ func (s *StatsStore) TotalReportedIncidents(filters *StatsFilters) int {
 	return total
 }
 
-func (s *StatsStore) TotalActiveIncidents(filters *StatsFilters) int {
+func (s *StatsStore) TotalActivePlaybookRuns(filters *StatsFilters) int {
 	query := s.store.builder.
 		Select("COUNT(ID)").
 		From("IR_Incident as i").
@@ -77,7 +77,7 @@ func (s *StatsStore) TotalActiveIncidents(filters *StatsFilters) int {
 	return total
 }
 
-func (s *StatsStore) TotalInProgressIncidents(filters *StatsFilters) int {
+func (s *StatsStore) TotalInProgressPlaybookRuns(filters *StatsFilters) int {
 	query := s.store.builder.
 		Select("COUNT(i.ID)").
 		From("IR_Incident as i").
@@ -138,7 +138,7 @@ func (s *StatsStore) RunsFinishedBetweenDays(filters *StatsFilters, startDay, en
 	return total
 }
 
-func (s *StatsStore) AverageDurationActiveIncidentsMinutes(filters *StatsFilters) int {
+func (s *StatsStore) AverageDurationActivePlaybookRunsMinutes(filters *StatsFilters) int {
 	query := s.store.builder.
 		Select("COALESCE(AVG(i.CreateAt), 0)").
 		From("IR_Incident AS i").
@@ -372,7 +372,7 @@ func (s *StatsStore) performQueryForXCols(q sq.SelectBuilder, x int) ([]int, err
 	return counts, nil
 }
 
-func (s *StatsStore) CountActiveIncidentsByDay(filters *StatsFilters) []int {
+func (s *StatsStore) CountActivePlaybookRunsByDay(filters *StatsFilters) []int {
 	now := model.GetMillis()
 
 	// Get the number of incidents started on each day
@@ -449,7 +449,7 @@ func (s *StatsStore) CountActiveIncidentsByDay(filters *StatsFilters) []int {
 
 // Inefficient. Calculates the number of people in the incident using
 // today's number of people in the incident, but counts it when the incident was created.
-func (s *StatsStore) UniquePeopleInIncidents(filters *StatsFilters) []int {
+func (s *StatsStore) UniquePeopleInPlaybookRuns(filters *StatsFilters) []int {
 	query := s.store.builder.
 		Select("COUNT(DISTINCT cm.UserId)").
 		From("ChannelMembers as cm").
@@ -457,13 +457,13 @@ func (s *StatsStore) UniquePeopleInIncidents(filters *StatsFilters) []int {
 
 	query = applyFilters(query, filters)
 
-	peopleInIncidents, err := s.MovingWindowQueryActive(query, 14)
+	peopleInPlaybookRuns, err := s.MovingWindowQueryActive(query, 14)
 	if err != nil {
 		s.log.Warnf("Unable to get people in incidents %w", err)
 		return []int{}
 	}
 
-	return peopleInIncidents
+	return peopleInPlaybookRuns
 }
 
 // Average times from CreateAt to the first non-"Reported" update for the last number of days.

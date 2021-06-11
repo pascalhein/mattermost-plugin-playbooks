@@ -27,7 +27,7 @@ func setupStatsStore(t *testing.T, db *sqlx.DB) *StatsStore {
 	return NewStatsStore(pluginAPIClient, logger, sqlStore)
 }
 
-func TestTotalReportedIncidents(t *testing.T) {
+func TestTotalReportedPlaybookRuns(t *testing.T) {
 	team1id := model.NewId()
 	team2id := model.NewId()
 
@@ -104,7 +104,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Reported").
 			WithCreateAt(123).
 			WithPlaybookID("playbook1").
-			ToIncident()
+			ToPlaybookRun()
 
 		inc02 := *NewBuilder(nil).
 			WithName("incident 2").
@@ -113,7 +113,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Active").
 			WithCreateAt(123).
 			WithPlaybookID("playbook1").
-			ToIncident()
+			ToPlaybookRun()
 
 		inc03 := *NewBuilder(nil).
 			WithName("incident 3").
@@ -122,7 +122,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Active").
 			WithPlaybookID("playbook2").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
 		inc04 := *NewBuilder(nil).
 			WithName("incident 4").
@@ -131,7 +131,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Reported").
 			WithPlaybookID("playbook1").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
 		inc05 := *NewBuilder(nil).
 			WithName("incident 5").
@@ -140,7 +140,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Active").
 			WithPlaybookID("playbook2").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
 		inc06 := *NewBuilder(nil).
 			WithName("incident 6").
@@ -149,7 +149,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Resolved").
 			WithPlaybookID("playbook1").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
 		inc07 := *NewBuilder(nil).
 			WithName("incident 7").
@@ -158,7 +158,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Resolved").
 			WithPlaybookID("playbook2").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
 		inc08 := *NewBuilder(nil).
 			WithName("incident 8").
@@ -167,7 +167,7 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Archived").
 			WithPlaybookID("playbook1").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
 		inc09 := *NewBuilder(nil).
 			WithName("incident 9").
@@ -176,78 +176,78 @@ func TestTotalReportedIncidents(t *testing.T) {
 			WithCurrentStatus("Archived").
 			WithPlaybookID("playbook2").
 			WithCreateAt(123).
-			ToIncident()
+			ToPlaybookRun()
 
-		incidents := []app.Incident{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
+		incidents := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
 		for i := range incidents {
-			_, err := playbookRunStore.CreateIncident(&incidents[i])
+			_, err := playbookRunStore.CreatePlaybookRun(&incidents[i])
 			require.NoError(t, err)
 		}
 
 		t.Run(driverName+" Reported Incidents - team1", func(t *testing.T) {
-			result := statsStore.TotalReportedIncidents(&StatsFilters{
+			result := statsStore.TotalReportedPlaybookRuns(&StatsFilters{
 				TeamID: team1id,
 			})
 			assert.Equal(t, 1, result)
 		})
 
 		t.Run(driverName+" Reported Incidents - team2", func(t *testing.T) {
-			result := statsStore.TotalReportedIncidents(&StatsFilters{
+			result := statsStore.TotalReportedPlaybookRuns(&StatsFilters{
 				TeamID: team2id,
 			})
 			assert.Equal(t, 1, result)
 		})
 
 		t.Run(driverName+" Reported incidents - playbook1", func(t *testing.T) {
-			result := statsStore.TotalReportedIncidents(&StatsFilters{
+			result := statsStore.TotalReportedPlaybookRuns(&StatsFilters{
 				PlaybookID: "playbook1",
 			})
 			assert.Equal(t, 2, result)
 		})
 
 		t.Run(driverName+" Reported incidents - playbook2", func(t *testing.T) {
-			result := statsStore.TotalReportedIncidents(&StatsFilters{
+			result := statsStore.TotalReportedPlaybookRuns(&StatsFilters{
 				PlaybookID: "playbook2",
 			})
 			assert.Equal(t, 0, result)
 		})
 
 		t.Run(driverName+" Reported incidents - all", func(t *testing.T) {
-			result := statsStore.TotalReportedIncidents(&StatsFilters{})
+			result := statsStore.TotalReportedPlaybookRuns(&StatsFilters{})
 			assert.Equal(t, 2, result)
 		})
 
 		t.Run(driverName+" Active Incidents - team1", func(t *testing.T) {
-			result := statsStore.TotalActiveIncidents(&StatsFilters{
+			result := statsStore.TotalActivePlaybookRuns(&StatsFilters{
 				TeamID: team1id,
 			})
 			assert.Equal(t, 2, result)
 		})
 
 		t.Run(driverName+" Active Incidents - team2", func(t *testing.T) {
-			result := statsStore.TotalActiveIncidents(&StatsFilters{
+			result := statsStore.TotalActivePlaybookRuns(&StatsFilters{
 				TeamID: team2id,
 			})
 			assert.Equal(t, 1, result)
 		})
 
 		t.Run(driverName+" Active incidents - playbook1", func(t *testing.T) {
-			result := statsStore.TotalActiveIncidents(&StatsFilters{
+			result := statsStore.TotalActivePlaybookRuns(&StatsFilters{
 				PlaybookID: "playbook1",
 			})
 			assert.Equal(t, 1, result)
 		})
 
 		t.Run(driverName+" Active incidents - playbook2", func(t *testing.T) {
-			result := statsStore.TotalActiveIncidents(&StatsFilters{
+			result := statsStore.TotalActivePlaybookRuns(&StatsFilters{
 				PlaybookID: "playbook2",
 			})
 			assert.Equal(t, 2, result)
 		})
 
 		t.Run(driverName+" Active incidents - all", func(t *testing.T) {
-			result := statsStore.TotalActiveIncidents(&StatsFilters{})
+			result := statsStore.TotalActivePlaybookRuns(&StatsFilters{})
 			assert.Equal(t, 3, result)
 		})
 
@@ -285,41 +285,41 @@ func TestTotalReportedIncidents(t *testing.T) {
 		})
 
 		t.Run(driverName+" In-progress Incidents - team1", func(t *testing.T) {
-			result := statsStore.TotalInProgressIncidents(&StatsFilters{
+			result := statsStore.TotalInProgressPlaybookRuns(&StatsFilters{
 				TeamID: team1id,
 			})
 			assert.Equal(t, 3, result)
 		})
 
 		t.Run(driverName+" In-progress Incidents - team2", func(t *testing.T) {
-			result := statsStore.TotalInProgressIncidents(&StatsFilters{
+			result := statsStore.TotalInProgressPlaybookRuns(&StatsFilters{
 				TeamID: team2id,
 			})
 			assert.Equal(t, 2, result)
 		})
 
 		t.Run(driverName+" In-progress Incidents - playbook1", func(t *testing.T) {
-			result := statsStore.TotalInProgressIncidents(&StatsFilters{
+			result := statsStore.TotalInProgressPlaybookRuns(&StatsFilters{
 				PlaybookID: "playbook1",
 			})
 			assert.Equal(t, 3, result)
 		})
 
 		t.Run(driverName+" In-progress Incidents - playbook2", func(t *testing.T) {
-			result := statsStore.TotalInProgressIncidents(&StatsFilters{
+			result := statsStore.TotalInProgressPlaybookRuns(&StatsFilters{
 				PlaybookID: "playbook2",
 			})
 			assert.Equal(t, 2, result)
 		})
 
 		t.Run(driverName+" In-progress Incidents - all", func(t *testing.T) {
-			result := statsStore.TotalInProgressIncidents(&StatsFilters{})
+			result := statsStore.TotalInProgressPlaybookRuns(&StatsFilters{})
 			assert.Equal(t, 5, result)
 		})
 
 		/* This can't be tested well because it uses model.GetMillis() inside
 		t.Run(driverName+" Average Druation Active Incidents Minutes", func(t *testing.T) {
-			result := statsStore.AverageDurationActiveIncidentsMinutes()
+			result := statsStore.AverageDurationActivePlaybookRunsMinutes()
 			assert.Equal(t, 26912080, result)
 		})*/
 	}

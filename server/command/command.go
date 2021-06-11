@@ -60,30 +60,30 @@ func getCommand(addTestCommands bool) *model.Command {
 }
 
 func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
-	slashIncident := model.NewAutocompleteData("incident", "[command]",
+	slashPlaybookRun := model.NewAutocompleteData("incident", "[command]",
 		"Available commands: start, end, update, restart, check, checkadd, checkremove, announce, list, owner, info, timeline")
 
 	start := model.NewAutocompleteData("start", "", "Starts a new incident")
-	slashIncident.AddCommand(start)
+	slashPlaybookRun.AddCommand(start)
 
 	end := model.NewAutocompleteData("end", "",
 		"Ends the incident associated with the current channel")
-	slashIncident.AddCommand(end)
+	slashPlaybookRun.AddCommand(end)
 
 	update := model.NewAutocompleteData("update", "",
 		"Update the current incident's status.")
-	slashIncident.AddCommand(update)
+	slashPlaybookRun.AddCommand(update)
 
 	restart := model.NewAutocompleteData("restart", "",
 		"Restarts the incident associated with the current channel")
-	slashIncident.AddCommand(restart)
+	slashPlaybookRun.AddCommand(restart)
 
 	checklist := model.NewAutocompleteData("check", "[checklist item]",
 		"Checks or unchecks a checklist item.")
 	checklist.AddDynamicListArgument(
 		"List of checklist items is downloading from your Incident Collaboration plugin",
 		"api/v0/incidents/checklist-autocomplete-item", true)
-	slashIncident.AddCommand(checklist)
+	slashPlaybookRun.AddCommand(checklist)
 
 	itemAdd := model.NewAutocompleteData("checkadd", "[checklist]",
 		"Add a checklist item")
@@ -97,28 +97,28 @@ func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
 		"List of checklist items is downloading from your Incident Collaboration plugin",
 		"api/v0/incidents/checklist-autocomplete-item", true)
 
-	slashIncident.AddCommand(itemAdd)
-	slashIncident.AddCommand(itemRemove)
+	slashPlaybookRun.AddCommand(itemAdd)
+	slashPlaybookRun.AddCommand(itemRemove)
 
 	announce := model.NewAutocompleteData("announce", "~[channels]",
 		"Announce the current incident in other channels.")
 	announce.AddNamedTextArgument("channel",
 		"Channel to announce incident in", "~[channel]", "", true)
-	slashIncident.AddCommand(announce)
+	slashPlaybookRun.AddCommand(announce)
 
 	list := model.NewAutocompleteData("list", "", "Lists all your incidents")
-	slashIncident.AddCommand(list)
+	slashPlaybookRun.AddCommand(list)
 
 	owner := model.NewAutocompleteData("owner", "[@username]",
 		"Show or change the current owner")
 	owner.AddTextArgument("The desired new owner.", "[@username]", "")
-	slashIncident.AddCommand(owner)
+	slashPlaybookRun.AddCommand(owner)
 
 	info := model.NewAutocompleteData("info", "", "Shows a summary of the current incident")
-	slashIncident.AddCommand(info)
+	slashPlaybookRun.AddCommand(info)
 
 	timeline := model.NewAutocompleteData("timeline", "", "Shows the timeline for the current incident")
-	slashIncident.AddCommand(timeline)
+	slashPlaybookRun.AddCommand(timeline)
 
 	if addTestCommands {
 		test := model.NewAutocompleteData("test", "", "Commands for testing and debugging.")
@@ -139,10 +139,10 @@ func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
 		testSelf := model.NewAutocompleteData("self", "", "DESTRUCTIVE ACTION - Perform a series of self tests to ensure everything works as expected.")
 		test.AddCommand(testSelf)
 
-		slashIncident.AddCommand(test)
+		slashPlaybookRun.AddCommand(test)
 	}
 
-	return slashIncident
+	return slashPlaybookRun
 }
 
 // Runner handles commands.
@@ -233,7 +233,7 @@ func (r *Runner) actionStart(args []string) {
 		return
 	}
 
-	if err := r.playbookRunService.OpenCreateIncidentDialog(r.args.TeamId, r.args.UserId, r.args.TriggerId, postID, clientID, playbooksResults.Items, session.IsMobileApp()); err != nil {
+	if err := r.playbookRunService.OpenCreatePlaybookRunDialog(r.args.TeamId, r.args.UserId, r.args.TriggerId, postID, clientID, playbooksResults.Items, session.IsMobileApp()); err != nil {
 		r.warnUserAndLogErrorf("Error: %v", err)
 		return
 	}
@@ -257,7 +257,7 @@ func (r *Runner) actionCheck(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only check/uncheck an item from within the incident's channel.")
@@ -285,7 +285,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only add an item from within the incident's channel.")
@@ -332,7 +332,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only remove an item from within the incident's channel.")
@@ -360,7 +360,7 @@ func (r *Runner) actionOwner(args []string) {
 }
 
 func (r *Runner) actionShowOwner([]string) {
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only see the owner from within the incident's channel.")
 		return
@@ -369,13 +369,13 @@ func (r *Runner) actionShowOwner([]string) {
 		return
 	}
 
-	currentIncident, err := r.playbookRunService.GetIncident(incidentID)
+	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
 	}
 
-	ownerUser, err := r.pluginAPI.User.Get(currentIncident.OwnerUserID)
+	ownerUser, err := r.pluginAPI.User.Get(currentPlaybookRun.OwnerUserID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving owner user: %v", err)
 		return
@@ -387,7 +387,7 @@ func (r *Runner) actionShowOwner([]string) {
 func (r *Runner) actionChangeOwner(args []string) {
 	targetOwnerUsername := strings.TrimLeft(args[0], "@")
 
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only change the owner from within the incident's channel.")
 		return
@@ -396,7 +396,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 		return
 	}
 
-	currentIncident, err := r.playbookRunService.GetIncident(incidentID)
+	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -411,7 +411,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 		return
 	}
 
-	if currentIncident.OwnerUserID == targetOwnerUser.Id {
+	if currentPlaybookRun.OwnerUserID == targetOwnerUser.Id {
 		r.postCommandResponse(fmt.Sprintf("User @%s is already owner of this incident.", targetOwnerUsername))
 		return
 	}
@@ -425,7 +425,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 		return
 	}
 
-	err = r.playbookRunService.ChangeOwner(currentIncident.ID, r.args.UserId, targetOwnerUser.Id)
+	err = r.playbookRunService.ChangeOwner(currentPlaybookRun.ID, r.args.UserId, targetOwnerUser.Id)
 	if err != nil {
 		r.warnUserAndLogErrorf("Failed to change owner to @%s: %v", targetOwnerUsername, err)
 		return
@@ -438,7 +438,7 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only announce from within the incident's channel.")
@@ -448,19 +448,19 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	currentIncident, err := r.playbookRunService.GetIncident(incidentID)
+	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
 	}
 
-	ownerUser, err := r.pluginAPI.User.Get(currentIncident.OwnerUserID)
+	ownerUser, err := r.pluginAPI.User.Get(currentPlaybookRun.OwnerUserID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving owner user: %v", err)
 		return
 	}
 
-	incidentChannel, err := r.pluginAPI.Channel.Get(currentIncident.ChannelID)
+	incidentChannel, err := r.pluginAPI.Channel.Get(currentPlaybookRun.ChannelID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident channel: %v", err)
 		return
@@ -508,7 +508,7 @@ func (r *Runner) actionList() {
 		return
 	}
 
-	options := app.IncidentFilterOptions{
+	options := app.PlaybookRunFilterOptions{
 		TeamID:    r.args.TeamId,
 		MemberID:  r.args.UserId,
 		Page:      0,
@@ -518,7 +518,7 @@ func (r *Runner) actionList() {
 		Statuses:  []string{app.StatusReported, app.StatusActive, app.StatusResolved},
 	}
 
-	result, err := r.playbookRunService.GetIncidents(requesterInfo, options)
+	result, err := r.playbookRunService.GetPlaybookRuns(requesterInfo, options)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving the incidents: %v", err)
 		return
@@ -563,7 +563,7 @@ func (r *Runner) actionList() {
 }
 
 func (r *Runner) actionInfo() {
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only see the details of an incident from within the incident's channel.")
 		return
@@ -584,7 +584,7 @@ func (r *Runner) actionInfo() {
 		return
 	}
 
-	incident, err := r.playbookRunService.GetIncident(incidentID)
+	incident, err := r.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -639,7 +639,7 @@ func (r *Runner) actionEnd() {
 }
 
 func (r *Runner) actionUpdate() {
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only update an incident from within the incident's channel.")
@@ -649,7 +649,7 @@ func (r *Runner) actionUpdate() {
 		return
 	}
 
-	if err = app.EditIncident(r.args.UserId, r.args.ChannelId, r.pluginAPI); err != nil {
+	if err = app.EditPlaybookRun(r.args.UserId, r.args.ChannelId, r.pluginAPI); err != nil {
 		if errors.Is(err, app.ErrNoPermissions) {
 			r.postCommandResponse(fmt.Sprintf("userID `%s` is not an admin or channel member", r.args.UserId))
 			return
@@ -660,7 +660,7 @@ func (r *Runner) actionUpdate() {
 
 	err = r.playbookRunService.OpenUpdateStatusDialog(incidentID, r.args.TriggerId)
 	switch {
-	case errors.Is(err, app.ErrIncidentNotActive):
+	case errors.Is(err, app.ErrPlaybookRunNotActive):
 		r.postCommandResponse("This incident has already been closed.")
 		return
 	case err != nil:
@@ -704,7 +704,7 @@ func (r *Runner) actionAdd(args []string) {
 }
 
 func (r *Runner) actionTimeline() {
-	incidentID, err := r.playbookRunService.GetIncidentIDForChannel(r.args.ChannelId)
+	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only run the timeline command from within an incident channel.")
@@ -714,7 +714,7 @@ func (r *Runner) actionTimeline() {
 		return
 	}
 
-	incidentToRead, err := r.playbookRunService.GetIncident(incidentID)
+	incidentToRead, err := r.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -738,7 +738,7 @@ func (r *Runner) actionTimeline() {
 
 	var reported time.Time
 	for _, e := range incidentToRead.TimelineEvents {
-		if e.EventType == app.IncidentCreated {
+		if e.EventType == app.PlaybookRunCreated {
 			reported = timeutils.GetTimeForMillis(e.EventAt)
 			break
 		}
@@ -768,7 +768,7 @@ func (r *Runner) summaryMessage(event app.TimelineEvent) string {
 	}
 
 	switch event.EventType {
-	case app.IncidentCreated:
+	case app.PlaybookRunCreated:
 		return "Incident Reported by @" + username
 	case app.StatusUpdated:
 		if event.Summary == "" {
@@ -793,7 +793,7 @@ func (r *Runner) summaryMessage(event app.TimelineEvent) string {
 }
 
 func (r *Runner) timeSince(event app.TimelineEvent, reported time.Time) string {
-	if event.EventType == app.IncidentCreated {
+	if event.EventType == app.PlaybookRunCreated {
 		return ""
 	}
 	eventAt := timeutils.GetTimeForMillis(event.EventAt)
@@ -966,7 +966,7 @@ And... yes, of course, we have emojis
 		return
 	}
 
-	incident, err := r.playbookRunService.CreateIncident(&app.Incident{
+	playbookRun, err := r.playbookRunService.CreatePlaybookRun(&app.PlaybookRun{
 		Name:               "Cloud Incident 4739",
 		TeamID:             r.args.TeamId,
 		OwnerUserID:        r.args.UserId,
@@ -979,21 +979,21 @@ And... yes, of course, we have emojis
 		return
 	}
 
-	if err := r.playbookRunService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(playbookRun.ID, r.args.UserId, 0, app.ChecklistItem{
 		Title: "I should be checked and second",
 	}); err != nil {
 		r.postCommandResponse("Unable to add checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.playbookRunService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(playbookRun.ID, r.args.UserId, 0, app.ChecklistItem{
 		Title: "I should be deleted",
 	}); err != nil {
 		r.postCommandResponse("Unable to add checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.playbookRunService.AddChecklistItem(incident.ID, r.args.UserId, 0, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(playbookRun.ID, r.args.UserId, 0, app.ChecklistItem{
 		Title: "I should not say this.",
 		State: app.ChecklistItemStateClosed,
 	}); err != nil {
@@ -1001,28 +1001,28 @@ And... yes, of course, we have emojis
 		return
 	}
 
-	if err := r.playbookRunService.ModifyCheckedState(incident.ID, r.args.UserId, app.ChecklistItemStateClosed, 0, 0); err != nil {
+	if err := r.playbookRunService.ModifyCheckedState(playbookRun.ID, r.args.UserId, app.ChecklistItemStateClosed, 0, 0); err != nil {
 		r.postCommandResponse("Unable to modify checked state: " + err.Error())
 		return
 	}
 
-	if err := r.playbookRunService.ModifyCheckedState(incident.ID, r.args.UserId, app.ChecklistItemStateOpen, 0, 2); err != nil {
+	if err := r.playbookRunService.ModifyCheckedState(playbookRun.ID, r.args.UserId, app.ChecklistItemStateOpen, 0, 2); err != nil {
 		r.postCommandResponse("Unable to modify checked state: " + err.Error())
 		return
 	}
 
-	if err := r.playbookRunService.RemoveChecklistItem(incident.ID, r.args.UserId, 0, 1); err != nil {
+	if err := r.playbookRunService.RemoveChecklistItem(playbookRun.ID, r.args.UserId, 0, 1); err != nil {
 		r.postCommandResponse("Unable to remove checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.playbookRunService.EditChecklistItem(incident.ID, r.args.UserId, 0, 1,
+	if err := r.playbookRunService.EditChecklistItem(playbookRun.ID, r.args.UserId, 0, 1,
 		"I should say this! and be unchecked and first!", "", ""); err != nil {
 		r.postCommandResponse("Unable to remove checklist item: " + err.Error())
 		return
 	}
 
-	if err := r.playbookRunService.MoveChecklistItem(incident.ID, r.args.UserId, 0, 0, 1); err != nil {
+	if err := r.playbookRunService.MoveChecklistItem(playbookRun.ID, r.args.UserId, 0, 0, 1); err != nil {
 		r.postCommandResponse("Unable to remove checklist item: " + err.Error())
 		return
 	}
@@ -1092,8 +1092,8 @@ func (r *Runner) actionTestCreate(params []string) {
 
 	incidentName := strings.Join(params[2:], " ")
 
-	incident, err := r.playbookRunService.CreateIncident(
-		&app.Incident{
+	playbookRun, err := r.playbookRunService.CreatePlaybookRun(
+		&app.PlaybookRun{
 			Name:        incidentName,
 			OwnerUserID: r.args.UserId,
 			TeamID:      r.args.TeamId,
@@ -1104,23 +1104,24 @@ func (r *Runner) actionTestCreate(params []string) {
 		r.args.UserId,
 		true,
 	)
+
 	if err != nil {
 		r.warnUserAndLogErrorf("unable to create incident: %v", err)
 		return
 	}
 
-	if err = r.playbookRunService.ChangeCreationDate(incident.ID, creationTimestamp); err != nil {
+	if err = r.playbookRunService.ChangeCreationDate(playbookRun.ID, creationTimestamp); err != nil {
 		r.warnUserAndLogErrorf("unable to change date of recently created incident: %v", err)
 		return
 	}
 
-	channel, err := r.pluginAPI.Channel.Get(incident.ChannelID)
+	channel, err := r.pluginAPI.Channel.Get(playbookRun.ChannelID)
 	if err != nil {
 		r.warnUserAndLogErrorf("unable to retrieve information of incident's channel: %v", err)
 		return
 	}
 
-	r.postCommandResponse(fmt.Sprintf("Incident successfully created: ~%s.", channel.Name))
+	r.postCommandResponse(fmt.Sprintf("PlaybookRun successfully created: ~%s.", channel.Name))
 }
 
 func (r *Runner) actionTestData(params []string) {
@@ -1255,27 +1256,27 @@ var incidentNames = []string{
 	"MM HA sync errors",
 }
 
-// generateTestData generates `numActiveIncidents` ongoing incidents and
-// `numEndedIncidents` ended incidents, whose creation timestamp lies randomly
+// generateTestData generates `numActivePlaybookRuns` ongoing incidents and
+// `numEndedPlaybookRuns` ended incidents, whose creation timestamp lies randomly
 // between the `begin` and `end` timestamps.
 // All incidents are created with a playbook randomly picked from the ones the
 // user is a member of, and the randomness is controlled by the `seed` parameter
 // to create reproducible results if needed.
-func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, begin, end time.Time, seed int64) {
+func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns int, begin, end time.Time, seed int64) {
 	rand.Seed(seed)
 
 	beginMillis := begin.Unix() * 1000
 	endMillis := end.Unix() * 1000
 
-	numIncidents := numActiveIncidents + numEndedIncidents
+	numPlaybookRuns := numActivePlaybookRuns + numEndedPlaybookRuns
 
-	if numIncidents == 0 {
+	if numPlaybookRuns == 0 {
 		r.postCommandResponse("Zero incidents created.")
 		return
 	}
 
-	timestamps := make([]int64, 0, numIncidents)
-	for i := 0; i < numIncidents; i++ {
+	timestamps := make([]int64, 0, numPlaybookRuns)
+	for i := 0; i < numPlaybookRuns; i++ {
 		timestamp := rand.Int63n(endMillis-beginMillis) + beginMillis
 		timestamps = append(timestamps, timestamp)
 	}
@@ -1312,8 +1313,8 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 	}
 
 	tableMsg := "| Incident name | Created at | Status |\n|-	|-	|-	|\n"
-	incidents := make([]*app.Incident, 0, numIncidents)
-	for i := 0; i < numIncidents; i++ {
+	incidents := make([]*app.PlaybookRun, 0, numPlaybookRuns)
+	for i := 0; i < numPlaybookRuns; i++ {
 		playbook := playbooks[rand.Intn(len(playbooks))]
 
 		incidentName := incidentNames[rand.Intn(len(incidentNames))]
@@ -1323,8 +1324,8 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 			incidentName = fmt.Sprintf("[%s] %s", companyName, incidentName)
 		}
 
-		incident, err := r.playbookRunService.CreateIncident(
-			&app.Incident{
+		incident, err := r.playbookRunService.CreatePlaybookRun(
+			&app.PlaybookRun{
 				Name:        incidentName,
 				OwnerUserID: r.args.UserId,
 				TeamID:      r.args.TeamId,
@@ -1335,6 +1336,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 			r.args.UserId,
 			true,
 		)
+
 		if err != nil {
 			r.warnUserAndLogErrorf("Error creating incident: %v", err)
 			return
@@ -1354,7 +1356,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 		}
 
 		status := "Ended"
-		if i >= numEndedIncidents {
+		if i >= numEndedPlaybookRuns {
 			status = "Ongoing"
 		}
 		tableMsg += fmt.Sprintf("|~%s|%s|%s|\n", channel.Name, createAt.Format("2006-01-02"), status)
@@ -1362,7 +1364,7 @@ func (r *Runner) generateTestData(numActiveIncidents, numEndedIncidents int, beg
 		incidents = append(incidents, incident)
 	}
 
-	for i := 0; i < numEndedIncidents; i++ {
+	for i := 0; i < numEndedPlaybookRuns; i++ {
 		err := r.playbookRunService.UpdateStatus(incidents[i].ID, r.args.UserId, app.StatusUpdateOptions{
 			Status:  app.StatusArchived,
 			Message: "This is now archived.",

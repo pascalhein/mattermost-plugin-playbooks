@@ -13,11 +13,11 @@ paths:
     get:
       summary: List all incidents
       description: Retrieve a paged list of incidents, filtered by team, status, owner, name and/or members, and sorted by ID, name, status, creation date, end date, team or owner ID.
-      operationId: listIncidents
+      operationId: listPlaybookRuns
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: team_id
           in: query
@@ -116,7 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IncidentList"
+                $ref: "#/components/schemas/PlaybookRunList"
         400:
           $ref: "#/components/schemas/400"
         403:
@@ -126,13 +126,13 @@ paths:
     post:
       summary: Create a new incident
       description: Create a new incident in a team, using a playbook as template, with a specific name and a specific owner.
-      operationId: createIncidentFromPost
+      operationId: createPlaybookRunFromPost
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       requestBody:
-        description: Incident payload.
+        description: Playbook run payload.
         content:
           application/json:
             schema:
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Incident"
+                $ref: "#/components/schemas/PlaybookRun"
         400:
           $ref: "#/components/schemas/400"
         403:
@@ -198,7 +198,7 @@ paths:
     post:
       summary: Create a new incident from dialog
       description: This is an internal endpoint to create an incident from the submission of an interactive dialog, filled by a user in the webapp. See [Interactive Dialogs](https://docs.mattermost.com/developer/interactive-dialogs.html) for more information.
-      operationId: createIncidentFromDialog
+      operationId: createPlaybookRunFromDialog
       security:
         - BearerAuth: []
       tags:
@@ -264,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Incident"
+                $ref: "#/components/schemas/PlaybookRun"
         400:
           $ref: "#/components/schemas/400"
         403:
@@ -280,7 +280,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: team_id
           in: query
@@ -318,7 +318,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: team_id
           in: query
@@ -458,11 +458,11 @@ paths:
   /incidents/channel/{channel_id}:
     get:
       summary: Find incident by channel ID
-      operationId: getIncidentByChannelId
+      operationId: getPlaybookRunByChannelId
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: channel_id
           in: path
@@ -478,11 +478,11 @@ paths:
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'
       responses:
         200:
-          description: Incident associated to the channel.
+          description: Playbook run associated to the channel.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Incident"
+                $ref: "#/components/schemas/PlaybookRun"
         404:
           $ref: "#/components/schemas/404"
         500:
@@ -491,11 +491,11 @@ paths:
   /incidents/{id}:
     get:
       summary: Get an incident
-      operationId: getIncident
+      operationId: getPlaybookRun
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -511,22 +511,22 @@ paths:
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'
       responses:
         200:
-          description: Incident
+          description: Playbook run
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Incident"
+                $ref: "#/components/schemas/PlaybookRun"
         403:
           $ref: "#/components/schemas/403"
         500:
           $ref: "#/components/schemas/500"
     patch:
       summary: Update an incident
-      operationId: updateIncident
+      operationId: updatePlaybookRun
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -536,7 +536,7 @@ paths:
             type: string
             example: mx3xyzdojfgyfdx8sc8of1gdme
       requestBody:
-        description: Incident update payload.
+        description: Playbook run update payload.
         content:
           application/json:
             schema:
@@ -555,7 +555,7 @@ paths:
             -d '{"active_stage": 2}'
       responses:
         200:
-          description: Incident successfully updated.
+          description: Playbook run successfully updated.
         400:
           $ref: "#/components/schemas/400"
         500:
@@ -564,11 +564,11 @@ paths:
   /incidents/{id}/metadata:
     get:
       summary: Get incident metadata
-      operationId: getIncidentMetadata
+      operationId: getPlaybookRunMetadata
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -584,11 +584,11 @@ paths:
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'
       responses:
         200:
-          description: Incident metadata.
+          description: Playbook run metadata.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IncidentMetadata"
+                $ref: "#/components/schemas/PlaybookRunMetadata"
         403:
           $ref: "#/components/schemas/403"
         500:
@@ -597,11 +597,11 @@ paths:
   /incidents/{id}/end:
     put:
       summary: End an incident
-      operationId: endIncident
+      operationId: endPlaybookRun
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -617,13 +617,13 @@ paths:
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'
       responses:
         200:
-          description: Incident ended
+          description: Playbook run ended
         500:
           $ref: "#/components/schemas/500"
     post:
       summary: End an incident from dialog
       description: This is an internal endpoint to end an incident via a confirmation dialog, submitted by a user in the webapp.
-      operationId: endIncidentDialog
+      operationId: endPlaybookRunDialog
       security:
         - BearerAuth: []
       tags:
@@ -643,18 +643,18 @@ paths:
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'
       responses:
         200:
-          description: Incident ended
+          description: Playbook run ended
         500:
           $ref: "#/components/schemas/500"
 
   /incidents/{id}/restart:
     put:
       summary: Restart an incident
-      operationId: restartIncident
+      operationId: restartPlaybookRun
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -670,7 +670,7 @@ paths:
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'
       responses:
         200:
-          description: Incident restarted.
+          description: Playbook run restarted.
         500:
           $ref: "#/components/schemas/500"
 
@@ -681,7 +681,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -730,7 +730,7 @@ paths:
             -d '{"status": "Resolved", "description": "Current situation has been solved, customers are satisfied.", "message": "Resolving incident because the issue was solved."}'
       responses:
         200:
-          description: Incident updated.
+          description: Playbook run updated.
         400:
           $ref: "#/components/schemas/400"
         403:
@@ -745,7 +745,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -798,7 +798,7 @@ paths:
           schema:
             type: string
           required: true
-          description: The Incident ID
+          description: The PlaybookRun ID
       requestBody:
         description: Dialog submission payload.
         content:
@@ -812,7 +812,7 @@ paths:
                   example: "3"
       responses:
         200:
-          description: Incident stage update.
+          description: Playbook run stage update.
         400:
           $ref: "#/components/schemas/400"
         500:
@@ -826,7 +826,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -870,7 +870,7 @@ paths:
                   example: 1607774621321
                 state_modified_post_id:
                   type: string
-                  description: The identifier of the message posted by the Incident Response bot that informs of the latest modification of the item's state.
+                  description: The identifier of the message posted by the PlaybookRun Response bot that informs of the latest modification of the item's state.
                   example: 8nmjfgrkwvokrg13urvo10bx9j
                 assignee_id:
                   type: string
@@ -883,7 +883,7 @@ paths:
                   example: 1608897821125
                 assignee_modified_post_id:
                   type: string
-                  description: The identifier of the message posted by the Incident Response bot that informs of the latest modification of the item's assignee.
+                  description: The identifier of the message posted by the PlaybookRun Response bot that informs of the latest modification of the item's assignee.
                   example: ol7h83caow11xfbydhqvyg16b4
                 command:
                   type: string
@@ -921,7 +921,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -977,7 +977,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -1038,7 +1038,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -1081,7 +1081,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -1143,7 +1143,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -1200,7 +1200,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Incidents
+        - PlaybookRuns
       parameters:
         - name: id
           in: path
@@ -1375,7 +1375,7 @@ paths:
                 title:
                   type: string
                   description: The title of the playbook.
-                  example: Cloud Incidents
+                  example: Cloud PlaybookRuns
                 description:
                   type: string
                   description: The description of the playbook.
@@ -1480,12 +1480,12 @@ paths:
           source: |
             curl -X POST 'http://localhost:8065/plugins/com.mattermost.plugin-incident-management/api/v0/playbooks' \
             -H 'Authorization: Bearer 9g64ig7q9pds8yjz8rsgd6e36e'\
-            -d '{"title": "Cloud Incidents", "description": "A playbook to follow when there is an incident regarding the availability of the cloud service.", "team_id": "p03rbi6viyztysbqnkvcqyel2i","create_public_incident": true,"checklists": [{"title": "Triage issue","items": [{"title": "Gather information from customer."}]}]}'
+            -d '{"title": "Cloud PlaybookRuns", "description": "A playbook to follow when there is an incident regarding the availability of the cloud service.", "team_id": "p03rbi6viyztysbqnkvcqyel2i","create_public_incident": true,"checklists": [{"title": "Triage issue","items": [{"title": "Gather information from customer."}]}]}'
       callbacks:
         incidentCreation:
           "{$request.body#/webhook_on_creation_url}":
             post:
-              summary: Incident's creation outgoing webhook.
+              summary: PlaybookRun's creation outgoing webhook.
               description: When an incident is created with this playbook, a POST request is sent to the URL configured in webhook_on_creation_url. The webhook is considered successful if your server returns a response code within the 200-299 range. Otherwise, the webhook is considered failed, and a warning message is posted in the incident's channel. No retries are made.
               operationId: webhookOncreation
               requestBody:
@@ -1500,7 +1500,7 @@ paths:
         incidentStatusUpdate:
           "{$request.body#/webhook_on_status_update_url}":
             post:
-              summary: Incident's status update outgoing webhook.
+              summary: PlaybookRun's status update outgoing webhook.
               description: When an incident's status is updated, a POST request is sent to the URL configured in webhook_on_status_update_url. The webhook is considered successful if your server returns a response code within the 200-299 range. Otherwise, the webhook is considered failed, and a warning message is posted in the incident's channel. No retries are made.
               operationId: webhookOnStatusUpdate
               requestBody:
@@ -1664,7 +1664,7 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
       description: There was an internal error in the server.
-    Incident:
+    PlaybookRun:
       type: object
       properties:
         id:
@@ -1731,7 +1731,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Checklist"
-    IncidentMetadata:
+    PlaybookRunMetadata:
       type: object
       properties:
         channel_name:
@@ -1756,7 +1756,7 @@ components:
           format: int64
           description: Number of posts in the channel associated to the incident.
           example: 202
-    IncidentList:
+    PlaybookRunList:
       type: object
       properties:
         total_count:
@@ -1777,7 +1777,7 @@ components:
           type: array
           description: The incidents in this page.
           items:
-            $ref: "#/components/schemas/Incident"
+            $ref: "#/components/schemas/PlaybookRun"
     OwnerInfo:
       type: object
       required:
@@ -1811,7 +1811,7 @@ components:
         title:
           type: string
           description: The title of the playbook.
-          example: Cloud Incidents
+          example: Cloud PlaybookRuns
         description:
           type: string
           description: The description of the playbook.
@@ -1920,7 +1920,7 @@ components:
           example: 1607774621321
         state_modified_post_id:
           type: string
-          description: The identifier of the message posted by the Incident Response bot that informs of the latest modification of the item's state.
+          description: The identifier of the message posted by the PlaybookRun Response bot that informs of the latest modification of the item's state.
           example: 8nmjfgrkwvokrg13urvo10bx9j
         assignee_id:
           type: string
@@ -1933,7 +1933,7 @@ components:
           example: 1608897821125
         assignee_modified_post_id:
           type: string
-          description: The identifier of the message posted by the Incident Response bot that informs of the latest modification of the item's assignee.
+          description: The identifier of the message posted by the PlaybookRun Response bot that informs of the latest modification of the item's assignee.
           example: ol7h83caow11xfbydhqvyg16b4
         command:
           type: string
@@ -1964,7 +1964,7 @@ components:
           example: Specific details about the error, depending on the case.
     WebhookOnCreationPayload:
       allOf:
-        - $ref: "#/components/schemas/Incident"
+        - $ref: "#/components/schemas/PlaybookRun"
         - type: object
           properties:
             channel_url:
@@ -1977,7 +1977,7 @@ components:
               example: http://example.com/ad-1/com.mattermost.plugin-incident-management/incidents/incidentID
     WebhookOnStatusUpdatePayload:
       allOf:
-        - $ref: '#/components/schemas/Incident'
+        - $ref: '#/components/schemas/PlaybookRun'
         - type: object
           properties:
             channel_url:

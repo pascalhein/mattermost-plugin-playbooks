@@ -119,19 +119,19 @@ func (mr *MockPlaybookRunServiceMockRecorder) CheckAndSendMessageOnJoin(arg0, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAndSendMessageOnJoin", reflect.TypeOf((*MockPlaybookRunService)(nil).CheckAndSendMessageOnJoin), arg0, arg1, arg2)
 }
 
-// CreateIncident mocks base method
-func (m *MockPlaybookRunService) CreateIncident(arg0 *app.Incident, arg1 *app.Playbook, arg2 string, arg3 bool) (*app.Incident, error) {
+// CreatePlaybookRun mocks base method
+func (m *MockPlaybookRunService) CreatePlaybookRun(arg0 *app.PlaybookRun, arg1 *app.Playbook, arg2 string, arg3 bool) (*app.PlaybookRun, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateIncident", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(*app.Incident)
+	ret := m.ctrl.Call(m, "CreatePlaybookRun", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*app.PlaybookRun)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateIncident indicates an expected call of CreateIncident
-func (mr *MockPlaybookRunServiceMockRecorder) CreateIncident(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+// CreatePlaybookRun indicates an expected call of CreatePlaybookRun
+func (mr *MockPlaybookRunServiceMockRecorder) CreatePlaybookRun(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIncident", reflect.TypeOf((*MockPlaybookRunService)(nil).CreateIncident), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePlaybookRun", reflect.TypeOf((*MockPlaybookRunService)(nil).CreatePlaybookRun), arg0, arg1, arg2, arg3)
 }
 
 // EditChecklistItem mocks base method
@@ -178,68 +178,8 @@ func (mr *MockPlaybookRunServiceMockRecorder) GetChecklistItemAutocomplete(arg0 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChecklistItemAutocomplete", reflect.TypeOf((*MockPlaybookRunService)(nil).GetChecklistItemAutocomplete), arg0)
 }
 
-// GetIncident mocks base method
-func (m *MockPlaybookRunService) GetIncident(arg0 string) (*app.Incident, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetIncident", arg0)
-	ret0, _ := ret[0].(*app.Incident)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetIncident indicates an expected call of GetIncident
-func (mr *MockPlaybookRunServiceMockRecorder) GetIncident(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIncident", reflect.TypeOf((*MockPlaybookRunService)(nil).GetIncident), arg0)
-}
-
-// GetIncidentIDForChannel mocks base method
-func (m *MockPlaybookRunService) GetIncidentIDForChannel(arg0 string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetIncidentIDForChannel", arg0)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetIncidentIDForChannel indicates an expected call of GetIncidentIDForChannel
-func (mr *MockPlaybookRunServiceMockRecorder) GetIncidentIDForChannel(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIncidentIDForChannel", reflect.TypeOf((*MockPlaybookRunService)(nil).GetIncidentIDForChannel), arg0)
-}
-
-// GetIncidentMetadata mocks base method
-func (m *MockPlaybookRunService) GetIncidentMetadata(arg0 string) (*app.Metadata, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetIncidentMetadata", arg0)
-	ret0, _ := ret[0].(*app.Metadata)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetIncidentMetadata indicates an expected call of GetIncidentMetadata
-func (mr *MockPlaybookRunServiceMockRecorder) GetIncidentMetadata(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIncidentMetadata", reflect.TypeOf((*MockPlaybookRunService)(nil).GetIncidentMetadata), arg0)
-}
-
-// GetIncidents mocks base method
-func (m *MockPlaybookRunService) GetIncidents(arg0 app.RequesterInfo, arg1 app.IncidentFilterOptions) (*app.GetIncidentsResults, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetIncidents", arg0, arg1)
-	ret0, _ := ret[0].(*app.GetIncidentsResults)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetIncidents indicates an expected call of GetIncidents
-func (mr *MockPlaybookRunServiceMockRecorder) GetIncidents(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIncidents", reflect.TypeOf((*MockPlaybookRunService)(nil).GetIncidents), arg0, arg1)
-}
-
 // GetOwners mocks base method
-func (m *MockPlaybookRunService) GetOwners(arg0 app.RequesterInfo, arg1 app.IncidentFilterOptions) ([]app.OwnerInfo, error) {
+func (m *MockPlaybookRunService) GetOwners(arg0 app.RequesterInfo, arg1 app.PlaybookRunFilterOptions) ([]app.OwnerInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOwners", arg0, arg1)
 	ret0, _ := ret[0].([]app.OwnerInfo)
@@ -251,6 +191,66 @@ func (m *MockPlaybookRunService) GetOwners(arg0 app.RequesterInfo, arg1 app.Inci
 func (mr *MockPlaybookRunServiceMockRecorder) GetOwners(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOwners", reflect.TypeOf((*MockPlaybookRunService)(nil).GetOwners), arg0, arg1)
+}
+
+// GetPlaybookRun mocks base method
+func (m *MockPlaybookRunService) GetPlaybookRun(arg0 string) (*app.PlaybookRun, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaybookRun", arg0)
+	ret0, _ := ret[0].(*app.PlaybookRun)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlaybookRun indicates an expected call of GetPlaybookRun
+func (mr *MockPlaybookRunServiceMockRecorder) GetPlaybookRun(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaybookRun", reflect.TypeOf((*MockPlaybookRunService)(nil).GetPlaybookRun), arg0)
+}
+
+// GetPlaybookRunIDForChannel mocks base method
+func (m *MockPlaybookRunService) GetPlaybookRunIDForChannel(arg0 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaybookRunIDForChannel", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlaybookRunIDForChannel indicates an expected call of GetPlaybookRunIDForChannel
+func (mr *MockPlaybookRunServiceMockRecorder) GetPlaybookRunIDForChannel(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaybookRunIDForChannel", reflect.TypeOf((*MockPlaybookRunService)(nil).GetPlaybookRunIDForChannel), arg0)
+}
+
+// GetPlaybookRunMetadata mocks base method
+func (m *MockPlaybookRunService) GetPlaybookRunMetadata(arg0 string) (*app.Metadata, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaybookRunMetadata", arg0)
+	ret0, _ := ret[0].(*app.Metadata)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlaybookRunMetadata indicates an expected call of GetPlaybookRunMetadata
+func (mr *MockPlaybookRunServiceMockRecorder) GetPlaybookRunMetadata(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaybookRunMetadata", reflect.TypeOf((*MockPlaybookRunService)(nil).GetPlaybookRunMetadata), arg0)
+}
+
+// GetPlaybookRuns mocks base method
+func (m *MockPlaybookRunService) GetPlaybookRuns(arg0 app.RequesterInfo, arg1 app.PlaybookRunFilterOptions) (*app.GetPlaybookRunsResults, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaybookRuns", arg0, arg1)
+	ret0, _ := ret[0].(*app.GetPlaybookRunsResults)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlaybookRuns indicates an expected call of GetPlaybookRuns
+func (mr *MockPlaybookRunServiceMockRecorder) GetPlaybookRuns(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaybookRuns", reflect.TypeOf((*MockPlaybookRunService)(nil).GetPlaybookRuns), arg0, arg1)
 }
 
 // HandleReminder mocks base method
@@ -349,18 +349,18 @@ func (mr *MockPlaybookRunServiceMockRecorder) OpenAddToTimelineDialog(arg0, arg1
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenAddToTimelineDialog", reflect.TypeOf((*MockPlaybookRunService)(nil).OpenAddToTimelineDialog), arg0, arg1, arg2, arg3)
 }
 
-// OpenCreateIncidentDialog mocks base method
-func (m *MockPlaybookRunService) OpenCreateIncidentDialog(arg0, arg1, arg2, arg3, arg4 string, arg5 []app.Playbook, arg6 bool) error {
+// OpenCreatePlaybookRunDialog mocks base method
+func (m *MockPlaybookRunService) OpenCreatePlaybookRunDialog(arg0, arg1, arg2, arg3, arg4 string, arg5 []app.Playbook, arg6 bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OpenCreateIncidentDialog", arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+	ret := m.ctrl.Call(m, "OpenCreatePlaybookRunDialog", arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// OpenCreateIncidentDialog indicates an expected call of OpenCreateIncidentDialog
-func (mr *MockPlaybookRunServiceMockRecorder) OpenCreateIncidentDialog(arg0, arg1, arg2, arg3, arg4, arg5, arg6 interface{}) *gomock.Call {
+// OpenCreatePlaybookRunDialog indicates an expected call of OpenCreatePlaybookRunDialog
+func (mr *MockPlaybookRunServiceMockRecorder) OpenCreatePlaybookRunDialog(arg0, arg1, arg2, arg3, arg4, arg5, arg6 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenCreateIncidentDialog", reflect.TypeOf((*MockPlaybookRunService)(nil).OpenCreateIncidentDialog), arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenCreatePlaybookRunDialog", reflect.TypeOf((*MockPlaybookRunService)(nil).OpenCreatePlaybookRunDialog), arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 }
 
 // OpenUpdateStatusDialog mocks base method

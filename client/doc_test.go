@@ -24,7 +24,7 @@ func Example() {
 	}
 
 	incidentID := "h4n3h7s1qjf5pkis4dn6cuxgwa"
-	incident, err := c.Incidents.Get(ctx, incidentID)
+	incident, err := c.PlaybookRuns.Get(ctx, incidentID)
 	if err != nil {
 		log.Fatal(err)
 	}

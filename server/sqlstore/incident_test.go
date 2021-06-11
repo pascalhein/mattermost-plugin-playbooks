@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetIncidents(t *testing.T) {
+func TestGetPlaybookRuns(t *testing.T) {
 	team1id := model.NewId()
 	team2id := model.NewId()
 	team3id := model.NewId()
@@ -89,7 +89,7 @@ func TestGetIncidents(t *testing.T) {
 		WithCreateAt(123).
 		WithChecklists([]int{8}).
 		WithPlaybookID("playbook1").
-		ToIncident()
+		ToPlaybookRun()
 
 	inc02 := *NewBuilder(nil).
 		WithName("incident 2 - horse staple battery aliens shotgun mouse shotput").
@@ -99,7 +99,7 @@ func TestGetIncidents(t *testing.T) {
 		WithCreateAt(199).
 		WithChecklists([]int{7}).
 		WithPlaybookID("playbook1").
-		ToIncident()
+		ToPlaybookRun()
 
 	inc03 := *NewBuilder(nil).
 		WithName("incident 3 - Horse stapler battery shotgun mouse shotput").
@@ -110,7 +110,7 @@ func TestGetIncidents(t *testing.T) {
 		WithChecklists([]int{6}).
 		WithCurrentStatus("Archived").
 		WithPlaybookID("playbook2").
-		ToIncident()
+		ToPlaybookRun()
 
 	inc04 := *NewBuilder(nil).
 		WithName("incident 4 - titanic terminatoraliens").
@@ -120,7 +120,7 @@ func TestGetIncidents(t *testing.T) {
 		WithCreateAt(333).
 		WithChecklists([]int{5}).
 		WithCurrentStatus("Archived").
-		ToIncident()
+		ToPlaybookRun()
 
 	inc05 := *NewBuilder(nil).
 		WithName("incident 5 - titanic terminator aliens mouse").
@@ -129,7 +129,7 @@ func TestGetIncidents(t *testing.T) {
 		WithTeamID(team1id).
 		WithCreateAt(400).
 		WithChecklists([]int{1}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc06 := *NewBuilder(nil).
 		WithName("incident 6 - ubik high castle electric sheep").
@@ -138,7 +138,7 @@ func TestGetIncidents(t *testing.T) {
 		WithTeamID(team2id).
 		WithCreateAt(444).
 		WithChecklists([]int{4}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc07 := *NewBuilder(nil).
 		WithName("incident 7 - ubik high castle electric sheep").
@@ -147,7 +147,7 @@ func TestGetIncidents(t *testing.T) {
 		WithTeamID(team2id).
 		WithCreateAt(555).
 		WithChecklists([]int{4}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc08 := *NewBuilder(nil).
 		WithName("incident 8 - ziggürat!").
@@ -156,7 +156,7 @@ func TestGetIncidents(t *testing.T) {
 		WithTeamID(team3id).
 		WithCreateAt(555).
 		WithChecklists([]int{3}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc09 := *NewBuilder(nil).
 		WithName("incident 9 - Ziggürat!").
@@ -165,28 +165,28 @@ func TestGetIncidents(t *testing.T) {
 		WithTeamID(team3id).
 		WithCreateAt(556).
 		WithChecklists([]int{2}).
-		ToIncident()
+		ToPlaybookRun()
 
-	incidents := []app.Incident{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
+	incidents := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
-	createIncidents := func(store *SQLStore, playbookRunStore app.PlaybookRunStore) {
+	createPlaybookRuns := func(store *SQLStore, playbookRunStore app.PlaybookRunStore) {
 		t.Helper()
 
-		createdIncidents := make([]app.Incident, len(incidents))
+		createdPlaybookRuns := make([]app.PlaybookRun, len(incidents))
 
 		for i := range incidents {
-			createdIncident, err := playbookRunStore.CreateIncident(&incidents[i])
+			createdPlaybookRun, err := playbookRunStore.CreatePlaybookRun(&incidents[i])
 			require.NoError(t, err)
 
-			createdIncidents[i] = *createdIncident
+			createdPlaybookRuns[i] = *createdPlaybookRun
 		}
 	}
 
 	testData := []struct {
 		Name          string
 		RequesterInfo app.RequesterInfo
-		Options       app.IncidentFilterOptions
-		Want          app.GetIncidentsResults
+		Options       app.PlaybookRunFilterOptions
+		Want          app.GetPlaybookRunsResults
 		ExpectedErr   error
 	}{
 		{
@@ -195,18 +195,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc01, inc02, inc03, inc04, inc05},
+				Items:      []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -216,18 +216,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsGuest: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 0,
 				PageCount:  0,
 				HasMore:    false,
-				Items:      []app.Incident{},
+				Items:      []app.PlaybookRun{},
 			},
 			ExpectedErr: nil,
 		},
@@ -237,18 +237,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  john.ID,
 				IsGuest: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc01, inc02, inc03},
+				Items:      []app.PlaybookRun{inc01, inc02, inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -258,18 +258,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionDesc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc05, inc04, inc03, inc02, inc01},
+				Items:      []app.PlaybookRun{inc05, inc04, inc03, inc02, inc01},
 			},
 			ExpectedErr: nil,
 		},
@@ -279,18 +279,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionDesc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc07, inc06},
+				Items:      []app.PlaybookRun{inc07, inc06},
 			},
 			ExpectedErr: nil,
 		},
@@ -300,18 +300,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team3id,
 				Sort:      app.SortByName,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc08, inc09},
+				Items:      []app.PlaybookRun{inc08, inc09},
 			},
 			ExpectedErr: nil,
 		},
@@ -321,18 +321,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  5,
 				HasMore:    true,
-				Items:      []app.Incident{inc01},
+				Items:      []app.PlaybookRun{inc01},
 			},
 			ExpectedErr: nil,
 		},
@@ -342,18 +342,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   3,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  2,
 				HasMore:    true,
-				Items:      []app.Incident{inc01, inc02, inc03},
+				Items:      []app.PlaybookRun{inc01, inc02, inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -363,18 +363,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      1,
 				PerPage:   3,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  2,
 				HasMore:    false,
-				Items:      []app.Incident{inc04, inc05},
+				Items:      []app.PlaybookRun{inc04, inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -384,18 +384,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      2,
 				PerPage:   3,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  2,
 				HasMore:    false,
-				Items:      []app.Incident{},
+				Items:      []app.PlaybookRun{},
 			},
 			ExpectedErr: nil,
 		},
@@ -405,18 +405,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      999,
 				PerPage:   3,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  2,
 				HasMore:    false,
-				Items:      []app.Incident{},
+				Items:      []app.PlaybookRun{},
 			},
 			ExpectedErr: nil,
 		},
@@ -426,18 +426,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      2,
 				PerPage:   2,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  3,
 				HasMore:    false,
-				Items:      []app.Incident{inc05},
+				Items:      []app.PlaybookRun{inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -447,18 +447,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      1,
 				PerPage:   2,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  3,
 				HasMore:    true,
-				Items:      []app.Incident{inc03, inc04},
+				Items:      []app.PlaybookRun{inc03, inc04},
 			},
 			ExpectedErr: nil,
 		},
@@ -468,18 +468,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      1,
 				PerPage:   4,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  2,
 				HasMore:    false,
-				Items:      []app.Incident{inc05},
+				Items:      []app.PlaybookRun{inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -489,7 +489,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
@@ -497,11 +497,11 @@ func TestGetIncidents(t *testing.T) {
 				PerPage:   2,
 				Status:    app.StatusReported,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  2,
 				HasMore:    false,
-				Items:      []app.Incident{inc05},
+				Items:      []app.PlaybookRun{inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -511,7 +511,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Status:    app.StatusReported,
 				OwnerID:   owner3.UserID,
@@ -520,11 +520,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 1,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc05},
+				Items:      []app.PlaybookRun{inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -534,7 +534,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team1id,
 				SearchTerm: "horse",
 				Sort:       app.SortByCreateAt,
@@ -542,11 +542,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc02, inc03},
+				Items:      []app.PlaybookRun{inc02, inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -556,7 +556,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team1id,
 				OwnerID:    owner3.UserID,
 				SearchTerm: "aliens",
@@ -565,11 +565,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc04, inc05},
+				Items:      []app.PlaybookRun{inc04, inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -579,7 +579,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team1id,
 				SearchTerm: "sbsm",
 				Sort:       app.SortByCreateAt,
@@ -587,11 +587,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 0,
 				PageCount:  0,
 				HasMore:    false,
-				Items:      []app.Incident{},
+				Items:      []app.PlaybookRun{},
 			},
 			ExpectedErr: nil,
 		},
@@ -601,7 +601,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team1id,
 				SearchTerm: "sbsm",
 				Status:     app.StatusReported,
@@ -610,11 +610,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 0,
 				PageCount:  0,
 				HasMore:    false,
-				Items:      []app.Incident{},
+				Items:      []app.PlaybookRun{},
 			},
 			ExpectedErr: nil,
 		},
@@ -624,7 +624,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team3id,
 				SearchTerm: "ZiGgüRat",
 				Sort:       app.SortByCreateAt,
@@ -632,11 +632,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc08, inc09},
+				Items:      []app.PlaybookRun{inc08, inc09},
 			},
 			ExpectedErr: nil,
 		},
@@ -646,14 +646,14 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      "unknown_field",
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want:        app.GetIncidentsResults{},
+			Want:        app.GetPlaybookRunsResults{},
 			ExpectedErr: errors.New("failed to apply sort options: unsupported sort parameter 'unknown_field'"),
 		},
 		{
@@ -662,18 +662,18 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    "",
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 0,
 				PageCount:  0,
 				HasMore:    false,
-				Items:      []app.Incident{},
+				Items:      []app.PlaybookRun{},
 			},
 			ExpectedErr: nil,
 		},
@@ -683,14 +683,14 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      app.SortByCreateAt,
 				Direction: "invalid direction",
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want:        app.GetIncidentsResults{},
+			Want:        app.GetPlaybookRunsResults{},
 			ExpectedErr: errors.New("failed to apply sort options: unsupported direction parameter 'invalid direction'"),
 		},
 		{
@@ -698,18 +698,18 @@ func TestGetIncidents(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: bob.ID,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionDesc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 5,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc05, inc04, inc03, inc02, inc01},
+				Items:      []app.PlaybookRun{inc05, inc04, inc03, inc02, inc01},
 			},
 			ExpectedErr: nil,
 		},
@@ -718,18 +718,18 @@ func TestGetIncidents(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: bob.ID,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc06, inc07},
+				Items:      []app.PlaybookRun{inc06, inc07},
 			},
 			ExpectedErr: nil,
 		},
@@ -738,18 +738,18 @@ func TestGetIncidents(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: alice.ID,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc01, inc02, inc03},
+				Items:      []app.PlaybookRun{inc01, inc02, inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -758,18 +758,18 @@ func TestGetIncidents(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: charlotte.ID,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 1,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc06},
+				Items:      []app.PlaybookRun{inc06},
 			},
 			ExpectedErr: nil,
 		},
@@ -779,7 +779,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				MemberID:  john.ID,
 				Sort:      app.SortByCreateAt,
@@ -787,11 +787,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc01, inc02, inc03},
+				Items:      []app.PlaybookRun{inc01, inc02, inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -801,7 +801,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				MemberID:  jane.ID,
 				Sort:      app.SortByCreateAt,
@@ -809,11 +809,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc03, inc04, inc05},
+				Items:      []app.PlaybookRun{inc03, inc04, inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -822,7 +822,7 @@ func TestGetIncidents(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: john.ID,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				MemberID:  john.ID,
 				Sort:      app.SortByCreateAt,
@@ -830,11 +830,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc01, inc02, inc03},
+				Items:      []app.PlaybookRun{inc01, inc02, inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -843,7 +843,7 @@ func TestGetIncidents(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: jane.ID,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				MemberID:  jane.ID,
 				Sort:      app.SortByCreateAt,
@@ -851,11 +851,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:      0,
 				PerPage:   1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 3,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc03, inc04, inc05},
+				Items:      []app.PlaybookRun{inc03, inc04, inc05},
 			},
 			ExpectedErr: nil,
 		},
@@ -865,7 +865,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team1id,
 				PlaybookID: "playbook1",
 				Sort:       app.SortByCreateAt,
@@ -873,11 +873,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 2,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc02, inc01},
+				Items:      []app.PlaybookRun{inc02, inc01},
 			},
 			ExpectedErr: nil,
 		},
@@ -887,7 +887,7 @@ func TestGetIncidents(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:     team1id,
 				PlaybookID: "playbook2",
 				Sort:       app.SortByCreateAt,
@@ -895,11 +895,11 @@ func TestGetIncidents(t *testing.T) {
 				Page:       0,
 				PerPage:    1000,
 			},
-			Want: app.GetIncidentsResults{
+			Want: app.GetPlaybookRunsResults{
 				TotalCount: 1,
 				PageCount:  1,
 				HasMore:    false,
-				Items:      []app.Incident{inc03},
+				Items:      []app.PlaybookRun{inc03},
 			},
 			ExpectedErr: nil,
 		},
@@ -925,10 +925,10 @@ func TestGetIncidents(t *testing.T) {
 		makeAdmin(t, store, lucy)
 
 		t.Run("zero incidents", func(t *testing.T) {
-			result, err := playbookRunStore.GetIncidents(app.RequesterInfo{
+			result, err := playbookRunStore.GetPlaybookRuns(app.RequesterInfo{
 				UserID: lucy.ID,
 			},
-				app.IncidentFilterOptions{
+				app.PlaybookRunFilterOptions{
 					TeamID:    team1id,
 					Sort:      app.SortByCreateAt,
 					Direction: app.DirectionAsc,
@@ -943,11 +943,11 @@ func TestGetIncidents(t *testing.T) {
 			require.Empty(t, result.Items)
 		})
 
-		createIncidents(store, playbookRunStore)
+		createPlaybookRuns(store, playbookRunStore)
 
 		for _, testCase := range testData {
 			t.Run(driverName+" - "+testCase.Name, func(t *testing.T) {
-				result, err := playbookRunStore.GetIncidents(testCase.RequesterInfo, testCase.Options)
+				result, err := playbookRunStore.GetPlaybookRuns(testCase.RequesterInfo, testCase.Options)
 
 				if testCase.ExpectedErr != nil {
 					require.Nil(t, result)
@@ -971,7 +971,7 @@ func TestGetIncidents(t *testing.T) {
 	}
 }
 
-func TestCreateAndGetIncident(t *testing.T) {
+func TestCreateAndGetPlaybookRun(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
 		_, store := setupSQLStore(t, db)
@@ -979,66 +979,66 @@ func TestCreateAndGetIncident(t *testing.T) {
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
 
-		validIncidents := []struct {
+		validPlaybookRuns := []struct {
 			Name        string
-			Incident    *app.Incident
+			PlaybookRun *app.PlaybookRun
 			ExpectedErr error
 		}{
 			{
 				Name:        "Empty values",
-				Incident:    &app.Incident{},
+				PlaybookRun: &app.PlaybookRun{},
 				ExpectedErr: nil,
 			},
 			{
 				Name:        "Base incident",
-				Incident:    NewBuilder(t).ToIncident(),
+				PlaybookRun: NewBuilder(t).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 			{
 				Name:        "Name with unicode characters",
-				Incident:    NewBuilder(t).WithName("valid unicode: ñäåö").ToIncident(),
+				PlaybookRun: NewBuilder(t).WithName("valid unicode: ñäåö").ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 			{
 				Name:        "Created at 0",
-				Incident:    NewBuilder(t).WithCreateAt(0).ToIncident(),
+				PlaybookRun: NewBuilder(t).WithCreateAt(0).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 			{
 				Name:        "Deleted incident",
-				Incident:    NewBuilder(t).WithDeleteAt(model.GetMillis()).ToIncident(),
+				PlaybookRun: NewBuilder(t).WithDeleteAt(model.GetMillis()).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 			{
-				Name:        "Incident with one checklist and 10 items",
-				Incident:    NewBuilder(t).WithChecklists([]int{10}).ToIncident(),
+				Name:        "PlaybookRun with one checklist and 10 items",
+				PlaybookRun: NewBuilder(t).WithChecklists([]int{10}).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 			{
-				Name:        "Incident with five checklists with different number of items",
-				Incident:    NewBuilder(t).WithChecklists([]int{1, 2, 3, 4, 5}).ToIncident(),
+				Name:        "PlaybookRun with five checklists with different number of items",
+				PlaybookRun: NewBuilder(t).WithChecklists([]int{1, 2, 3, 4, 5}).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 			{
-				Name:        "Incident should not be nil",
-				Incident:    nil,
+				Name:        "PlaybookRun should not be nil",
+				PlaybookRun: nil,
 				ExpectedErr: errors.New("incident is nil"),
 			},
 			{
-				Name:        "Incident /can/ contain checklists with no items",
-				Incident:    NewBuilder(t).WithChecklists([]int{0}).ToIncident(),
+				Name:        "PlaybookRun /can/ contain checklists with no items",
+				PlaybookRun: NewBuilder(t).WithChecklists([]int{0}).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
 		}
 
-		for _, testCase := range validIncidents {
+		for _, testCase := range validPlaybookRuns {
 			t.Run(testCase.Name, func(t *testing.T) {
-				var expectedIncident app.Incident
-				if testCase.Incident != nil {
-					expectedIncident = *testCase.Incident
+				var expectedPlaybookRun app.PlaybookRun
+				if testCase.PlaybookRun != nil {
+					expectedPlaybookRun = *testCase.PlaybookRun
 				}
 
-				returned, err := playbookRunStore.CreateIncident(testCase.Incident)
+				returned, err := playbookRunStore.CreatePlaybookRun(testCase.PlaybookRun)
 
 				if testCase.ExpectedErr != nil {
 					require.Error(t, err)
@@ -1049,26 +1049,26 @@ func TestCreateAndGetIncident(t *testing.T) {
 
 				require.NoError(t, err)
 				require.True(t, model.IsValidId(returned.ID))
-				expectedIncident.ID = returned.ID
+				expectedPlaybookRun.ID = returned.ID
 
-				createIncidentChannel(t, store, testCase.Incident)
+				createPlaybookRunChannel(t, store, testCase.PlaybookRun)
 
-				_, err = playbookRunStore.GetIncident(expectedIncident.ID)
+				_, err = playbookRunStore.GetPlaybookRun(expectedPlaybookRun.ID)
 				require.NoError(t, err)
 			})
 		}
 	}
 }
 
-// TestGetIncident only tests getting a non-existent incident, since getting existing incidents
-// is tested in TestCreateAndGetIncident above.
-func TestGetIncident(t *testing.T) {
+// TestGetPlaybookRun only tests getting a non-existent incident, since getting existing incidents
+// is tested in TestCreateAndGetPlaybookRun above.
+func TestGetPlaybookRun(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
 		playbookRunStore := setupPlaybookRunStore(t, db)
 		setupChannelsTable(t, db)
 
-		validIncidents := []struct {
+		validPlaybookRuns := []struct {
 			Name        string
 			ID          string
 			ExpectedErr error
@@ -1085,9 +1085,9 @@ func TestGetIncident(t *testing.T) {
 			},
 		}
 
-		for _, testCase := range validIncidents {
+		for _, testCase := range validPlaybookRuns {
 			t.Run(testCase.Name, func(t *testing.T) {
-				returned, err := playbookRunStore.GetIncident(testCase.ID)
+				returned, err := playbookRunStore.GetPlaybookRun(testCase.ID)
 
 				require.Error(t, err)
 				require.Equal(t, testCase.ExpectedErr.Error(), err.Error())
@@ -1097,7 +1097,7 @@ func TestGetIncident(t *testing.T) {
 	}
 }
 
-func TestUpdateIncident(t *testing.T) {
+func TestUpdatePlaybookRun(t *testing.T) {
 	post1 := &model.Post{
 		Id:       model.NewId(),
 		CreateAt: 10000000,
@@ -1139,51 +1139,51 @@ func TestUpdateIncident(t *testing.T) {
 		setupPostsTable(t, db)
 		savePosts(t, store, allPosts)
 
-		validIncidents := []struct {
+		validPlaybookRuns := []struct {
 			Name        string
-			Incident    *app.Incident
-			Update      func(app.Incident) *app.Incident
+			PlaybookRun *app.PlaybookRun
+			Update      func(app.PlaybookRun) *app.PlaybookRun
 			ExpectedErr error
 		}{
 			{
-				Name:     "nil incident",
-				Incident: NewBuilder(t).ToIncident(),
-				Update: func(old app.Incident) *app.Incident {
+				Name:        "nil incident",
+				PlaybookRun: NewBuilder(t).ToPlaybookRun(),
+				Update: func(old app.PlaybookRun) *app.PlaybookRun {
 					return nil
 				},
 				ExpectedErr: errors.New("incident is nil"),
 			},
 			{
-				Name:     "id should not be empty",
-				Incident: NewBuilder(t).ToIncident(),
-				Update: func(old app.Incident) *app.Incident {
+				Name:        "id should not be empty",
+				PlaybookRun: NewBuilder(t).ToPlaybookRun(),
+				Update: func(old app.PlaybookRun) *app.PlaybookRun {
 					old.ID = ""
 					return &old
 				},
 				ExpectedErr: errors.New("ID should not be empty"),
 			},
 			{
-				Name:     "Incident /can/ contain checklists with no items",
-				Incident: NewBuilder(t).WithChecklists([]int{1}).ToIncident(),
-				Update: func(old app.Incident) *app.Incident {
+				Name:        "PlaybookRun /can/ contain checklists with no items",
+				PlaybookRun: NewBuilder(t).WithChecklists([]int{1}).ToPlaybookRun(),
+				Update: func(old app.PlaybookRun) *app.PlaybookRun {
 					old.Checklists[0].Items = nil
 					return &old
 				},
 				ExpectedErr: nil,
 			},
 			{
-				Name:     "new description",
-				Incident: NewBuilder(t).WithDescription("old description").ToIncident(),
-				Update: func(old app.Incident) *app.Incident {
+				Name:        "new description",
+				PlaybookRun: NewBuilder(t).WithDescription("old description").ToPlaybookRun(),
+				Update: func(old app.PlaybookRun) *app.PlaybookRun {
 					old.Description = "new description"
 					return &old
 				},
 				ExpectedErr: nil,
 			},
 			{
-				Name:     "Incident with 2 checklists, update the checklists a bit",
-				Incident: NewBuilder(t).WithChecklists([]int{1, 1}).ToIncident(),
-				Update: func(old app.Incident) *app.Incident {
+				Name:        "PlaybookRun with 2 checklists, update the checklists a bit",
+				PlaybookRun: NewBuilder(t).WithChecklists([]int{1, 1}).ToPlaybookRun(),
+				Update: func(old app.PlaybookRun) *app.PlaybookRun {
 					old.Checklists[0].Items[0].State = app.ChecklistItemStateClosed
 					old.Checklists[1].Items[0].Title = "new title"
 					return &old
@@ -1192,15 +1192,15 @@ func TestUpdateIncident(t *testing.T) {
 			},
 		}
 
-		for _, testCase := range validIncidents {
+		for _, testCase := range validPlaybookRuns {
 			t.Run(testCase.Name, func(t *testing.T) {
-				returned, err := playbookRunStore.CreateIncident(testCase.Incident)
+				returned, err := playbookRunStore.CreatePlaybookRun(testCase.PlaybookRun)
 				require.NoError(t, err)
-				createIncidentChannel(t, store, returned)
+				createPlaybookRunChannel(t, store, returned)
 
 				expected := testCase.Update(*returned)
 
-				err = playbookRunStore.UpdateIncident(expected)
+				err = playbookRunStore.UpdatePlaybookRun(expected)
 
 				if testCase.ExpectedErr != nil {
 					require.Error(t, err)
@@ -1210,7 +1210,7 @@ func TestUpdateIncident(t *testing.T) {
 
 				require.NoError(t, err)
 
-				actual, err := playbookRunStore.GetIncident(expected.ID)
+				actual, err := playbookRunStore.GetPlaybookRun(expected.ID)
 				require.NoError(t, err)
 				require.Equal(t, expected, actual)
 			})
@@ -1219,12 +1219,12 @@ func TestUpdateIncident(t *testing.T) {
 }
 
 // intended to catch problems with the code assembling StatusPosts
-func TestStressTestGetIncidents(t *testing.T) {
+func TestStressTestGetPlaybookRuns(t *testing.T) {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Change these to larger numbers to stress test. Keep them low for CI.
-	numIncidents := 100
-	postsPerIncident := 3
+	numPlaybookRuns := 100
+	postsPerPlaybookRun := 3
 	perPage := 10
 	verifyPages := []int{0, 2, 4, 6, 8}
 
@@ -1236,14 +1236,14 @@ func TestStressTestGetIncidents(t *testing.T) {
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
 		teamID := model.NewId()
-		withPosts := createIncidentsAndPosts(t, store, playbookRunStore, numIncidents, postsPerIncident, teamID)
+		withPosts := createPlaybookRunsAndPosts(t, store, playbookRunStore, numPlaybookRuns, postsPerPlaybookRun, teamID)
 
 		t.Run("stress test status posts retrieval", func(t *testing.T) {
 			for _, p := range verifyPages {
-				returned, err := playbookRunStore.GetIncidents(app.RequesterInfo{
+				returned, err := playbookRunStore.GetPlaybookRuns(app.RequesterInfo{
 					UserID:  "testID",
 					IsAdmin: true,
-				}, app.IncidentFilterOptions{
+				}, app.PlaybookRunFilterOptions{
 					TeamID:    teamID,
 					Sort:      app.SortByCreateAt,
 					Direction: app.DirectionAsc,
@@ -1267,22 +1267,22 @@ func TestStressTestGetIncidents(t *testing.T) {
 	}
 }
 
-func TestStressTestGetIncidentsStats(t *testing.T) {
+func TestStressTestGetPlaybookRunsStats(t *testing.T) {
 	// don't need to assemble stats in CI
 	t.SkipNow()
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Change these to larger numbers to stress test.
-	numIncidents := 1000
-	postsPerIncident := 3
+	numPlaybookRuns := 1000
+	postsPerPlaybookRun := 3
 	perPage := 10
 
 	// For stats:
 	numReps := 30
 
 	// so we don't start returning pages with 0 incidents:
-	require.LessOrEqual(t, numReps*perPage, numIncidents)
+	require.LessOrEqual(t, numReps*perPage, numPlaybookRuns)
 
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
@@ -1292,16 +1292,16 @@ func TestStressTestGetIncidentsStats(t *testing.T) {
 		setupChannelsTable(t, db)
 		setupPostsTable(t, db)
 		teamID := model.NewId()
-		_ = createIncidentsAndPosts(t, store, playbookRunStore, numIncidents, postsPerIncident, teamID)
+		_ = createPlaybookRunsAndPosts(t, store, playbookRunStore, numPlaybookRuns, postsPerPlaybookRun, teamID)
 
 		t.Run("stress test status posts retrieval", func(t *testing.T) {
 			intervals := make([]int64, 0, numReps)
 			for i := 0; i < numReps; i++ {
 				start := time.Now()
-				_, err := playbookRunStore.GetIncidents(app.RequesterInfo{
+				_, err := playbookRunStore.GetPlaybookRuns(app.RequesterInfo{
 					UserID:  "testID",
 					IsAdmin: true,
-				}, app.IncidentFilterOptions{
+				}, app.PlaybookRunFilterOptions{
 					TeamID:    teamID,
 					Sort:      app.SortByCreateAt,
 					Direction: app.DirectionAsc,
@@ -1318,10 +1318,10 @@ func TestStressTestGetIncidentsStats(t *testing.T) {
 	}
 }
 
-func createIncidentsAndPosts(t testing.TB, store *SQLStore, playbookRunStore app.PlaybookRunStore, numIncidents, maxPostsPerIncident int, teamID string) []app.Incident {
-	incidentsSorted := make([]app.Incident, 0, numIncidents)
-	for i := 0; i < numIncidents; i++ {
-		numPosts := maxPostsPerIncident
+func createPlaybookRunsAndPosts(t testing.TB, store *SQLStore, playbookRunStore app.PlaybookRunStore, numPlaybookRuns, maxPostsPerPlaybookRun int, teamID string) []app.PlaybookRun {
+	incidentsSorted := make([]app.PlaybookRun, 0, numPlaybookRuns)
+	for i := 0; i < numPlaybookRuns; i++ {
+		numPosts := maxPostsPerPlaybookRun
 		posts := make([]*model.Post, 0, numPosts)
 		for j := 0; j < numPosts; j++ {
 			post := newPost(rand.Intn(2) == 0)
@@ -1334,10 +1334,10 @@ func createIncidentsAndPosts(t testing.TB, store *SQLStore, playbookRunStore app
 			WithCreateAt(int64(100000 + i)).
 			WithName(fmt.Sprintf("incident %d", i)).
 			WithChecklists([]int{1}).
-			ToIncident()
-		ret, err := playbookRunStore.CreateIncident(inc)
+			ToPlaybookRun()
+		ret, err := playbookRunStore.CreatePlaybookRun(inc)
 		require.NoError(t, err)
-		createIncidentChannel(t, store, ret)
+		createPlaybookRunChannel(t, store, ret)
 		incidentsSorted = append(incidentsSorted, *ret)
 	}
 
@@ -1357,7 +1357,7 @@ func newPost(deleted bool) *model.Post {
 	}
 }
 
-func TestGetIncidentIDForChannel(t *testing.T) {
+func TestGetPlaybookRunIDForChannel(t *testing.T) {
 	for _, driverName := range driverNames {
 		db := setupTestDB(t, driverName)
 		_, store := setupSQLStore(t, db)
@@ -1365,26 +1365,26 @@ func TestGetIncidentIDForChannel(t *testing.T) {
 		setupChannelsTable(t, db)
 
 		t.Run("retrieve existing incidentID", func(t *testing.T) {
-			incident1 := NewBuilder(t).ToIncident()
-			incident2 := NewBuilder(t).ToIncident()
+			incident1 := NewBuilder(t).ToPlaybookRun()
+			incident2 := NewBuilder(t).ToPlaybookRun()
 
-			returned1, err := playbookRunStore.CreateIncident(incident1)
+			returned1, err := playbookRunStore.CreatePlaybookRun(incident1)
 			require.NoError(t, err)
-			createIncidentChannel(t, store, incident1)
+			createPlaybookRunChannel(t, store, incident1)
 
-			returned2, err := playbookRunStore.CreateIncident(incident2)
+			returned2, err := playbookRunStore.CreatePlaybookRun(incident2)
 			require.NoError(t, err)
-			createIncidentChannel(t, store, incident2)
+			createPlaybookRunChannel(t, store, incident2)
 
-			id1, err := playbookRunStore.GetIncidentIDForChannel(incident1.ChannelID)
+			id1, err := playbookRunStore.GetPlaybookRunIDForChannel(incident1.ChannelID)
 			require.NoError(t, err)
 			require.Equal(t, returned1.ID, id1)
-			id2, err := playbookRunStore.GetIncidentIDForChannel(incident2.ChannelID)
+			id2, err := playbookRunStore.GetPlaybookRunIDForChannel(incident2.ChannelID)
 			require.NoError(t, err)
 			require.Equal(t, returned2.ID, id2)
 		})
 		t.Run("fail to retrieve non-existing incidentID", func(t *testing.T) {
-			id1, err := playbookRunStore.GetIncidentIDForChannel("nonexistingid")
+			id1, err := playbookRunStore.GetPlaybookRunIDForChannel("nonexistingid")
 			require.Error(t, err)
 			require.Equal(t, "", id1)
 			require.True(t, strings.HasPrefix(err.Error(),
@@ -1457,7 +1457,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team1id).
 		WithCreateAt(123).
 		WithChecklists([]int{8}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc02 := *NewBuilder(nil).
 		WithName("incident 2 - horse staple battery aliens shotgun mouse shotputmouse").
@@ -1466,7 +1466,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team1id).
 		WithCreateAt(199).
 		WithChecklists([]int{7}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc03 := *NewBuilder(nil).
 		WithName("incident 3 - Horse stapler battery shotgun mouse shotputmouse").
@@ -1475,7 +1475,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team1id).
 		WithCreateAt(222).
 		WithChecklists([]int{6}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc04 := *NewBuilder(nil).
 		WithName("incident 4 - titanic terminatoraliens").
@@ -1484,7 +1484,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team1id).
 		WithCreateAt(333).
 		WithChecklists([]int{5}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc05 := *NewBuilder(nil).
 		WithName("incident 5 - titanic terminator aliens mouse").
@@ -1493,7 +1493,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team1id).
 		WithCreateAt(400).
 		WithChecklists([]int{1}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc06 := *NewBuilder(nil).
 		WithName("incident 6 - ubik high castle electric sheep").
@@ -1502,7 +1502,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team2id).
 		WithCreateAt(444).
 		WithChecklists([]int{4}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc07 := *NewBuilder(nil).
 		WithName("incident 7 - ubik high castle electric sheep").
@@ -1511,7 +1511,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team2id).
 		WithCreateAt(555).
 		WithChecklists([]int{4}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc08 := *NewBuilder(nil).
 		WithName("incident 8 - ziggürat!").
@@ -1520,7 +1520,7 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team3id).
 		WithCreateAt(555).
 		WithChecklists([]int{3}).
-		ToIncident()
+		ToPlaybookRun()
 
 	inc09 := *NewBuilder(nil).
 		WithName("incident 9 - Ziggürat!").
@@ -1529,14 +1529,14 @@ func TestGetOwners(t *testing.T) {
 		WithTeamID(team3id).
 		WithCreateAt(556).
 		WithChecklists([]int{2}).
-		ToIncident()
+		ToPlaybookRun()
 
-	incidents := []app.Incident{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
+	incidents := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
 	cases := []struct {
 		Name          string
 		RequesterInfo app.RequesterInfo
-		Options       app.IncidentFilterOptions
+		Options       app.PlaybookRunFilterOptions
 		Expected      []app.OwnerInfo
 		ExpectedErr   error
 	}{
@@ -1546,7 +1546,7 @@ func TestGetOwners(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID: team1id,
 			},
 			Expected:    []app.OwnerInfo{owner1, owner2, owner3},
@@ -1558,7 +1558,7 @@ func TestGetOwners(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
@@ -1574,7 +1574,7 @@ func TestGetOwners(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team3id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
@@ -1589,7 +1589,7 @@ func TestGetOwners(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: "Alice",
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team1id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
@@ -1604,7 +1604,7 @@ func TestGetOwners(t *testing.T) {
 			RequesterInfo: app.RequesterInfo{
 				UserID: "Charlotte",
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				TeamID:    team2id,
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
@@ -1620,7 +1620,7 @@ func TestGetOwners(t *testing.T) {
 				UserID:  lucy.ID,
 				IsAdmin: true,
 			},
-			Options: app.IncidentFilterOptions{
+			Options: app.PlaybookRunFilterOptions{
 				Sort:      app.SortByCreateAt,
 				Direction: app.DirectionAsc,
 				Page:      0,
@@ -1664,7 +1664,7 @@ func TestGetOwners(t *testing.T) {
 		require.NoError(t, err)
 
 		for i := range incidents {
-			_, err := playbookRunStore.CreateIncident(&incidents[i])
+			_, err := playbookRunStore.CreatePlaybookRun(&incidents[i])
 			require.NoError(t, err)
 		}
 
@@ -1714,10 +1714,10 @@ func TestNukeDB(t *testing.T) {
 
 		t.Run("nuke db with a few incidents in it", func(t *testing.T) {
 			for i := 0; i < 10; i++ {
-				newIncident := NewBuilder(t).ToIncident()
-				_, err := playbookRunStore.CreateIncident(newIncident)
+				newPlaybookRun := NewBuilder(t).ToPlaybookRun()
+				_, err := playbookRunStore.CreatePlaybookRun(newPlaybookRun)
 				require.NoError(t, err)
-				createIncidentChannel(t, store, newIncident)
+				createPlaybookRunChannel(t, store, newPlaybookRun)
 			}
 
 			var rows int64
@@ -1849,18 +1849,18 @@ func setupPlaybookRunStore(t *testing.T, db *sqlx.DB) app.PlaybookRunStore {
 	return NewPlaybookRunStore(pluginAPIClient, logger, sqlStore)
 }
 
-// IncidentBuilder is a utility to build incidents with a default base.
+// PlaybookRunBuilder is a utility to build incidents with a default base.
 // Use it as:
-// NewBuilder.WithName("name").WithXYZ(xyz)....ToIncident()
-type IncidentBuilder struct {
+// NewBuilder.WithName("name").WithXYZ(xyz)....ToPlaybookRun()
+type PlaybookRunBuilder struct {
 	t        testing.TB
-	incident *app.Incident
+	incident *app.PlaybookRun
 }
 
-func NewBuilder(t testing.TB) *IncidentBuilder {
-	return &IncidentBuilder{
+func NewBuilder(t testing.TB) *PlaybookRunBuilder {
+	return &PlaybookRunBuilder{
 		t: t,
-		incident: &app.Incident{
+		incident: &app.PlaybookRun{
 			Name:          "base incident",
 			OwnerUserID:   model.NewId(),
 			TeamID:        model.NewId(),
@@ -1875,41 +1875,41 @@ func NewBuilder(t testing.TB) *IncidentBuilder {
 	}
 }
 
-func (ib *IncidentBuilder) WithName(name string) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithName(name string) *PlaybookRunBuilder {
 	ib.incident.Name = name
 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithDescription(desc string) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithDescription(desc string) *PlaybookRunBuilder {
 	ib.incident.Description = desc
 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithID() *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithID() *PlaybookRunBuilder {
 	ib.incident.ID = model.NewId()
 
 	return ib
 }
 
-func (ib *IncidentBuilder) ToIncident() *app.Incident {
+func (ib *PlaybookRunBuilder) ToPlaybookRun() *app.PlaybookRun {
 	return ib.incident
 }
 
-func (ib *IncidentBuilder) WithCreateAt(createAt int64) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithCreateAt(createAt int64) *PlaybookRunBuilder {
 	ib.incident.CreateAt = createAt
 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithDeleteAt(deleteAt int64) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithDeleteAt(deleteAt int64) *PlaybookRunBuilder {
 	ib.incident.DeleteAt = deleteAt
 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithChecklists(itemsPerChecklist []int) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithChecklists(itemsPerChecklist []int) *PlaybookRunBuilder {
 	ib.incident.Checklists = make([]app.Checklist, len(itemsPerChecklist))
 
 	for i, numItems := range itemsPerChecklist {
@@ -1931,19 +1931,19 @@ func (ib *IncidentBuilder) WithChecklists(itemsPerChecklist []int) *IncidentBuil
 	return ib
 }
 
-func (ib *IncidentBuilder) WithOwnerUserID(id string) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithOwnerUserID(id string) *PlaybookRunBuilder {
 	ib.incident.OwnerUserID = id
 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithTeamID(id string) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithTeamID(id string) *PlaybookRunBuilder {
 	ib.incident.TeamID = id
 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithCurrentStatus(status string) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithCurrentStatus(status string) *PlaybookRunBuilder {
 	ib.incident.CurrentStatus = status
 
 	if status == "Resolved" || status == "Archived" {
@@ -1953,7 +1953,7 @@ func (ib *IncidentBuilder) WithCurrentStatus(status string) *IncidentBuilder {
 	return ib
 }
 
-func (ib *IncidentBuilder) WithChannel(channel *model.Channel) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithChannel(channel *model.Channel) *PlaybookRunBuilder {
 	ib.incident.ChannelID = channel.Id
 
 	// Consider the incident name as authoritative.
@@ -1962,7 +1962,7 @@ func (ib *IncidentBuilder) WithChannel(channel *model.Channel) *IncidentBuilder 
 	return ib
 }
 
-func (ib *IncidentBuilder) WithPlaybookID(id string) *IncidentBuilder {
+func (ib *PlaybookRunBuilder) WithPlaybookID(id string) *PlaybookRunBuilder {
 	ib.incident.PlaybookID = id
 
 	return ib

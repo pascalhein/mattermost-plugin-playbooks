@@ -2,8 +2,8 @@ package client
 
 import "time"
 
-// Incident represents an incident.
-type Incident struct {
+// PlaybookRun represents an incident.
+type PlaybookRun struct {
 	ID                      string          `json:"id"`
 	Name                    string          `json:"name"`
 	Description             string          `json:"description"`
@@ -37,8 +37,8 @@ type StatusPost struct {
 	DeleteAt int64  `json:"delete_at"`
 }
 
-// IncidentMetadata tracks ancillary metadata about an incident.
-type IncidentMetadata struct {
+// PlaybookRunMetadata tracks ancillary metadata about an incident.
+type PlaybookRunMetadata struct {
 	ChannelName        string `json:"channel_name"`
 	ChannelDisplayName string `json:"channel_display_name"`
 	TeamName           string `json:"team_name"`
@@ -50,18 +50,18 @@ type IncidentMetadata struct {
 type TimelineEventType string
 
 const (
-	IncidentCreated   TimelineEventType = "incident_created"
-	TaskStateModified TimelineEventType = "task_state_modified"
-	StatusUpdated     TimelineEventType = "status_updated"
-	OwnerChanged      TimelineEventType = "owner_changed"
-	AssigneeChanged   TimelineEventType = "assignee_changed"
-	RanSlashCommand   TimelineEventType = "ran_slash_command"
+	PlaybookRunCreated TimelineEventType = "incident_created"
+	TaskStateModified  TimelineEventType = "task_state_modified"
+	StatusUpdated      TimelineEventType = "status_updated"
+	OwnerChanged       TimelineEventType = "owner_changed"
+	AssigneeChanged    TimelineEventType = "assignee_changed"
+	RanSlashCommand    TimelineEventType = "ran_slash_command"
 )
 
 // TimelineEvent represents an event recorded to an incident's timeline.
 type TimelineEvent struct {
 	ID            string            `json:"id"`
-	IncidentID    string            `json:"incident_id"`
+	PlaybookRunID string            `json:"incident_id"`
 	CreateAt      int64             `json:"create_at"`
 	DeleteAt      int64             `json:"delete_at"`
 	EventAt       int64             `json:"event_at"`
@@ -73,8 +73,8 @@ type TimelineEvent struct {
 	CreatorUserID string            `json:"creator_user_id"`
 }
 
-// IncidentCreateOptions specifies the parameters for PlaybookRunService.Create method.
-type IncidentCreateOptions struct {
+// PlaybookRunCreateOptions specifies the parameters for PlaybookRunService.Create method.
+type PlaybookRunCreateOptions struct {
 	Name        string `json:"name"`
 	OwnerUserID string `json:"owner_user_id"`
 	TeamID      string `json:"team_id"`
@@ -126,9 +126,9 @@ const (
 	SortAsc SortDirection = "asc"
 )
 
-// IncidentListOptions specifies the optional parameters to the
+// PlaybookRunListOptions specifies the optional parameters to the
 // PlaybookRunService.List method.
-type IncidentListOptions struct {
+type PlaybookRunListOptions struct {
 	// TeamID filters incidents to those in the given team.
 	TeamID string `url:"team_id,omitempty"`
 
@@ -154,12 +154,12 @@ type IncidentListOptions struct {
 	PlaybookID string `url:"playbook_id,omitempty"`
 }
 
-// IncidentList contains the paginated result.
-type IncidentList struct {
+// PlaybookRunList contains the paginated result.
+type PlaybookRunList struct {
 	TotalCount int  `json:"total_count"`
 	PageCount  int  `json:"page_count"`
 	HasMore    bool `json:"has_more"`
-	Items      []*Incident
+	Items      []*PlaybookRun
 }
 
 // Status is the type used to specify the activity status of the incident.
@@ -172,12 +172,12 @@ const (
 	StatusArchived Status = "Archived"
 )
 
-type GetIncidentsResults struct {
-	TotalCount int        `json:"total_count"`
-	PageCount  int        `json:"page_count"`
-	HasMore    bool       `json:"has_more"`
-	Items      []Incident `json:"items"`
-	Disabled   bool       `json:"disabled"`
+type GetPlaybookRunsResults struct {
+	TotalCount int           `json:"total_count"`
+	PageCount  int           `json:"page_count"`
+	HasMore    bool          `json:"has_more"`
+	Items      []PlaybookRun `json:"items"`
+	Disabled   bool          `json:"disabled"`
 }
 
 // StatusUpdateOptions are the fields required to update an incident's status

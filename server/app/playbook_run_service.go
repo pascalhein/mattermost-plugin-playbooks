@@ -21,10 +21,10 @@ import (
 )
 
 const (
-	// IncidentCreatedWSEvent is for incident creation.
-	IncidentCreatedWSEvent = "incident_created"
-	incidentUpdatedWSEvent = "incident_updated"
-	noAssigneeName         = "No Assignee"
+	// PlaybookRunCreatedWSEvent is for incident creation.
+	PlaybookRunCreatedWSEvent = "incident_created"
+	incidentUpdatedWSEvent    = "incident_updated"
+	noAssigneeName            = "No Assignee"
 )
 
 // PlaybookRunServiceImpl holds the information needed by the PlaybookRunService's methods to complete their functions.
@@ -41,26 +41,26 @@ type PlaybookRunServiceImpl struct {
 
 var allNonSpaceNonWordRegex = regexp.MustCompile(`[^\w\s]`)
 
-// DialogFieldPlaybookIDKey is the key for the playbook ID field used in OpenCreateIncidentDialog.
+// DialogFieldPlaybookIDKey is the key for the playbook ID field used in OpenCreatePlaybookRunDialog.
 const DialogFieldPlaybookIDKey = "playbookID"
 
-// DialogFieldNameKey is the key for the incident name field used in OpenCreateIncidentDialog.
+// DialogFieldNameKey is the key for the incident name field used in OpenCreatePlaybookRunDialog.
 const DialogFieldNameKey = "incidentName"
 
-// DialogFieldDescriptionKey is the key for the description textarea field used in UpdateIncidentDialog
+// DialogFieldDescriptionKey is the key for the description textarea field used in UpdatePlaybookRunDialog
 const DialogFieldDescriptionKey = "description"
 
-// DialogFieldMessageKey is the key for the message textarea field used in UpdateIncidentDialog
+// DialogFieldMessageKey is the key for the message textarea field used in UpdatePlaybookRunDialog
 const DialogFieldMessageKey = "message"
 
-// DialogFieldReminderInSecondsKey is the key for the reminder select field used in UpdateIncidentDialog
+// DialogFieldReminderInSecondsKey is the key for the reminder select field used in UpdatePlaybookRunDialog
 const DialogFieldReminderInSecondsKey = "reminder"
 
-// DialogFieldStatusKey is the key for the status select field used in UpdateIncidentDialog
+// DialogFieldStatusKey is the key for the status select field used in UpdatePlaybookRunDialog
 const DialogFieldStatusKey = "status"
 
-// DialogFieldIncidentKey is the key for the incident chosen in AddToTimelineDialog
-const DialogFieldIncidentKey = "incident"
+// DialogFieldPlaybookRunKey is the key for the incident chosen in AddToTimelineDialog
+const DialogFieldPlaybookRunKey = "incident"
 
 // DialogFieldSummary is the key for the summary in AddToTimelineDialog
 const DialogFieldSummary = "summary"
@@ -89,12 +89,12 @@ func NewPlaybookRunService(pluginAPI *pluginapi.Client, store PlaybookRunStore, 
 	}
 }
 
-// GetIncidents returns filtered incidents and the total count before paging.
-func (s *PlaybookRunServiceImpl) GetIncidents(requesterInfo RequesterInfo, options IncidentFilterOptions) (*GetIncidentsResults, error) {
-	return s.store.GetIncidents(requesterInfo, options)
+// GetPlaybookRuns returns filtered incidents and the total count before paging.
+func (s *PlaybookRunServiceImpl) GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error) {
+	return s.store.GetPlaybookRuns(requesterInfo, options)
 }
 
-func (s *PlaybookRunServiceImpl) broadcastIncidentCreation(incident *Incident, owner *model.User) error {
+func (s *PlaybookRunServiceImpl) broadcastPlaybookRunCreation(incident *PlaybookRun, owner *model.User) error {
 	incidentChannel, err := s.pluginAPI.Channel.Get(incident.ChannelID)
 	if err != nil {
 		return err
@@ -116,7 +116,7 @@ func (s *PlaybookRunServiceImpl) broadcastIncidentCreation(incident *Incident, o
 
 // sendWebhookOnCreation sends a POST request to the creation webhook URL.
 // It blocks until a response is received.
-func (s *PlaybookRunServiceImpl) sendWebhookOnCreation(incident Incident) error {
+func (s *PlaybookRunServiceImpl) sendWebhookOnCreation(incident PlaybookRun) error {
 	siteURL := s.pluginAPI.Configuration.GetConfig().ServiceSettings.SiteURL
 	if siteURL == nil {
 		s.pluginAPI.Log.Warn("cannot send webhook on creation, please set siteURL")
@@ -138,13 +138,13 @@ func (s *PlaybookRunServiceImpl) sendWebhookOnCreation(incident Incident) error 
 	detailsURL := getDetailsURL(*siteURL, team.Name, s.configService.GetManifest().Id, incident.ID)
 
 	payload := struct {
-		Incident
+		PlaybookRun
 		ChannelURL string `json:"channel_url"`
 		DetailsURL string `json:"details_url"`
 	}{
-		Incident:   incident,
-		ChannelURL: channelURL,
-		DetailsURL: detailsURL,
+		PlaybookRun: incident,
+		ChannelURL:  channelURL,
+		DetailsURL:  detailsURL,
 	}
 
 	body, err := json.Marshal(payload)
@@ -173,8 +173,8 @@ func (s *PlaybookRunServiceImpl) sendWebhookOnCreation(incident Incident) error 
 	return nil
 }
 
-// CreateIncident creates a new incident. userID is the user who initiated the CreateIncident.
-func (s *PlaybookRunServiceImpl) CreateIncident(incident *Incident, pb *Playbook, userID string, public bool) (*Incident, error) {
+// CreatePlaybookRun creates a new incident. userID is the user who initiated the CreatePlaybookRun.
+func (s *PlaybookRunServiceImpl) CreatePlaybookRun(incident *PlaybookRun, pb *Playbook, userID string, public bool) (*PlaybookRun, error) {
 	if incident.DefaultOwnerID != "" {
 		// Check if the user is a member of the incident's team
 		if !IsMemberOfTeamID(incident.DefaultOwnerID, incident.TeamID, s.pluginAPI) {
@@ -208,7 +208,7 @@ func (s *PlaybookRunServiceImpl) CreateIncident(incident *Incident, pb *Playbook
 	}
 
 	// Try to create the channel first
-	channel, err := s.createIncidentChannel(incident, header, public)
+	channel, err := s.createPlaybookRunChannel(incident, header, public)
 	if err != nil {
 		return nil, err
 	}
@@ -227,12 +227,12 @@ func (s *PlaybookRunServiceImpl) CreateIncident(incident *Incident, pb *Playbook
 		}
 	}
 
-	incident, err = s.store.CreateIncident(incident)
+	incident, err = s.store.CreatePlaybookRun(incident)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create incident")
 	}
 
-	s.telemetry.CreateIncident(incident, userID, public)
+	s.telemetry.CreatePlaybookRun(incident, userID, public)
 
 	invitedUserIDs := incident.InvitedUserIDs
 
@@ -328,7 +328,7 @@ func (s *PlaybookRunServiceImpl) CreateIncident(incident *Incident, pb *Playbook
 	}
 
 	if incident.AnnouncementChannelID != "" {
-		if err2 := s.broadcastIncidentCreation(incident, owner); err2 != nil {
+		if err2 := s.broadcastPlaybookRunCreation(incident, owner); err2 != nil {
 			s.pluginAPI.Log.Warn("failed to broadcast the incident creation to channel", "ChannelID", incident.AnnouncementChannelID)
 
 			if _, err = s.poster.PostMessage(channel.Id, "Failed to announce the creation of this incident in the configured channel."); err != nil {
@@ -338,10 +338,10 @@ func (s *PlaybookRunServiceImpl) CreateIncident(incident *Incident, pb *Playbook
 	}
 
 	event := &TimelineEvent{
-		IncidentID:    incident.ID,
+		PlaybookRunID: incident.ID,
 		CreateAt:      incident.CreateAt,
 		EventAt:       incident.CreateAt,
-		EventType:     IncidentCreated,
+		EventType:     PlaybookRunCreated,
 		PostID:        newPost.Id,
 		SubjectUserID: incident.ReporterUserID,
 	}
@@ -381,9 +381,9 @@ func (s *PlaybookRunServiceImpl) CreateIncident(incident *Incident, pb *Playbook
 	return incident, nil
 }
 
-// OpenCreateIncidentDialog opens a interactive dialog to start a new incident.
-func (s *PlaybookRunServiceImpl) OpenCreateIncidentDialog(teamID, ownerID, triggerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) error {
-	dialog, err := s.newIncidentDialog(teamID, ownerID, postID, clientID, playbooks, isMobileApp)
+// OpenCreatePlaybookRunDialog opens a interactive dialog to start a new incident.
+func (s *PlaybookRunServiceImpl) OpenCreatePlaybookRunDialog(teamID, ownerID, triggerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) error {
+	dialog, err := s.newPlaybookRunDialog(teamID, ownerID, postID, clientID, playbooks, isMobileApp)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create new incident dialog")
 	}
@@ -403,13 +403,13 @@ func (s *PlaybookRunServiceImpl) OpenCreateIncidentDialog(teamID, ownerID, trigg
 }
 
 func (s *PlaybookRunServiceImpl) OpenUpdateStatusDialog(incidentID string, triggerID string) error {
-	currentIncident, err := s.store.GetIncident(incidentID)
+	currentPlaybookRun, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
 
 	message := ""
-	newestPostID := findNewestNonDeletedPostID(currentIncident.StatusPosts)
+	newestPostID := findNewestNonDeletedPostID(currentPlaybookRun.StatusPosts)
 	if newestPostID != "" {
 		var post *model.Post
 		post, err = s.pluginAPI.Post.GetPost(newestPostID)
@@ -418,10 +418,10 @@ func (s *PlaybookRunServiceImpl) OpenUpdateStatusDialog(incidentID string, trigg
 		}
 		message = post.Message
 	} else {
-		message = currentIncident.ReminderMessageTemplate
+		message = currentPlaybookRun.ReminderMessageTemplate
 	}
 
-	dialog, err := s.newUpdateIncidentDialog(currentIncident.Description, message, currentIncident.BroadcastChannelID, currentIncident.CurrentStatus, currentIncident.PreviousReminder)
+	dialog, err := s.newUpdatePlaybookRunDialog(currentPlaybookRun.Description, message, currentPlaybookRun.BroadcastChannelID, currentPlaybookRun.CurrentStatus, currentPlaybookRun.PreviousReminder)
 	if err != nil {
 		return errors.Wrap(err, "failed to create update status dialog")
 	}
@@ -442,7 +442,7 @@ func (s *PlaybookRunServiceImpl) OpenUpdateStatusDialog(incidentID string, trigg
 }
 
 func (s *PlaybookRunServiceImpl) OpenAddToTimelineDialog(requesterInfo RequesterInfo, postID, teamID, triggerID string) error {
-	options := IncidentFilterOptions{
+	options := PlaybookRunFilterOptions{
 		TeamID:    teamID,
 		MemberID:  requesterInfo.UserID,
 		Sort:      SortByCreateAt,
@@ -452,7 +452,7 @@ func (s *PlaybookRunServiceImpl) OpenAddToTimelineDialog(requesterInfo Requester
 		PerPage:   PerPageDefault,
 	}
 
-	result, err := s.GetIncidents(requesterInfo, options)
+	result, err := s.GetPlaybookRuns(requesterInfo, options)
 	if err != nil {
 		return errors.Wrap(err, "Error retrieving the incidents: %v")
 	}
@@ -519,7 +519,7 @@ func (s *PlaybookRunServiceImpl) AddPostToTimeline(incidentID, userID, postID, s
 	}
 
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      model.GetMillis(),
 		DeleteAt:      0,
 		EventAt:       post.CreateAt,
@@ -535,14 +535,14 @@ func (s *PlaybookRunServiceImpl) AddPostToTimeline(incidentID, userID, postID, s
 		return errors.Wrap(err, "failed to create timeline event")
 	}
 
-	incidentModified, err := s.store.GetIncident(incidentID)
+	incidentModified, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
 
 	s.telemetry.AddPostToTimeline(incidentModified, userID)
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return err
 	}
 
@@ -561,21 +561,21 @@ func (s *PlaybookRunServiceImpl) RemoveTimelineEvent(incidentID, userID, eventID
 		return err
 	}
 
-	incidentModified, err := s.store.GetIncident(incidentID)
+	incidentModified, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
 
 	s.telemetry.RemoveTimelineEvent(incidentModified, userID)
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *PlaybookRunServiceImpl) broadcastStatusUpdate(statusUpdate string, incident *Incident, authorID, originalPostID string) error {
+func (s *PlaybookRunServiceImpl) broadcastStatusUpdate(statusUpdate string, incident *PlaybookRun, authorID, originalPostID string) error {
 	incidentChannel, err := s.pluginAPI.Channel.Get(incident.ChannelID)
 	if err != nil {
 		return err
@@ -607,7 +607,7 @@ func (s *PlaybookRunServiceImpl) broadcastStatusUpdate(statusUpdate string, inci
 
 // sendWebhookOnUpdateStatus sends a POST request to the status update webhook URL.
 // It blocks until a response is received.
-func (s *PlaybookRunServiceImpl) sendWebhookOnUpdateStatus(incident Incident) error {
+func (s *PlaybookRunServiceImpl) sendWebhookOnUpdateStatus(incident PlaybookRun) error {
 	siteURL := s.pluginAPI.Configuration.GetConfig().ServiceSettings.SiteURL
 	if siteURL == nil {
 		s.pluginAPI.Log.Warn("cannot send webhook on update, please set siteURL")
@@ -629,13 +629,13 @@ func (s *PlaybookRunServiceImpl) sendWebhookOnUpdateStatus(incident Incident) er
 	detailsURL := getDetailsURL(*siteURL, team.Name, s.configService.GetManifest().Id, incident.ID)
 
 	payload := struct {
-		Incident
+		PlaybookRun
 		ChannelURL string `json:"channel_url"`
 		DetailsURL string `json:"details_url"`
 	}{
-		Incident:   incident,
-		ChannelURL: channelURL,
-		DetailsURL: detailsURL,
+		PlaybookRun: incident,
+		ChannelURL:  channelURL,
+		DetailsURL:  detailsURL,
 	}
 
 	body, err := json.Marshal(payload)
@@ -665,7 +665,7 @@ func (s *PlaybookRunServiceImpl) sendWebhookOnUpdateStatus(incident Incident) er
 
 // UpdateStatus updates an incident's status.
 func (s *PlaybookRunServiceImpl) UpdateStatus(incidentID, userID string, options StatusUpdateOptions) error {
-	incidentToModify, err := s.store.GetIncident(incidentID)
+	incidentToModify, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
@@ -694,15 +694,15 @@ func (s *PlaybookRunServiceImpl) UpdateStatus(incidentID, userID string, options
 	incidentToModify.PreviousReminder = options.Reminder
 	incidentToModify.Description = options.Description
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrap(err, "failed to update incident")
 	}
 
 	if err = s.store.UpdateStatus(&SQLStatusPost{
-		IncidentID: incidentToModify.ID,
-		PostID:     post.Id,
-		Status:     options.Status,
-		EndAt:      incidentToModify.ResolvedAt(),
+		PlaybookRunID: incidentToModify.ID,
+		PostID:        post.Id,
+		Status:        options.Status,
+		EndAt:         incidentToModify.ResolvedAt(),
 	}); err != nil {
 		return errors.Wrap(err, "failed to write status post to store. There is now inconsistent state.")
 	}
@@ -747,7 +747,7 @@ func (s *PlaybookRunServiceImpl) UpdateStatus(incidentID, userID string, options
 		summary = fmt.Sprintf("%s to %s", previousStatus, options.Status)
 	}
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      post.CreateAt,
 		EventAt:       post.CreateAt,
 		EventType:     StatusUpdated,
@@ -762,7 +762,7 @@ func (s *PlaybookRunServiceImpl) UpdateStatus(incidentID, userID string, options
 
 	s.telemetry.UpdateStatus(incidentToModify, userID)
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return err
 	}
 
@@ -778,7 +778,7 @@ func (s *PlaybookRunServiceImpl) UpdateStatus(incidentID, userID string, options
 	return nil
 }
 
-func (s *PlaybookRunServiceImpl) postRetrospectiveReminder(incident *Incident, isInitial bool) error {
+func (s *PlaybookRunServiceImpl) postRetrospectiveReminder(incident *PlaybookRun, isInitial bool) error {
 	team, err := s.pluginAPI.Team.Get(incident.TeamID)
 	if err != nil {
 		return err
@@ -818,14 +818,14 @@ func (s *PlaybookRunServiceImpl) postRetrospectiveReminder(incident *Incident, i
 	return nil
 }
 
-// GetIncident gets an incident by ID. Returns error if it could not be found.
-func (s *PlaybookRunServiceImpl) GetIncident(incidentID string) (*Incident, error) {
-	return s.store.GetIncident(incidentID)
+// GetPlaybookRun gets an incident by ID. Returns error if it could not be found.
+func (s *PlaybookRunServiceImpl) GetPlaybookRun(incidentID string) (*PlaybookRun, error) {
+	return s.store.GetPlaybookRun(incidentID)
 }
 
-// GetIncidentMetadata gets ancillary metadata about an incident.
-func (s *PlaybookRunServiceImpl) GetIncidentMetadata(incidentID string) (*Metadata, error) {
-	incident, err := s.GetIncident(incidentID)
+// GetPlaybookRunMetadata gets ancillary metadata about an incident.
+func (s *PlaybookRunServiceImpl) GetPlaybookRunMetadata(incidentID string) (*Metadata, error) {
+	incident, err := s.GetPlaybookRun(incidentID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to retrieve incident '%s'", incidentID)
 	}
@@ -840,7 +840,7 @@ func (s *PlaybookRunServiceImpl) GetIncidentMetadata(incidentID string) (*Metada
 		return nil, errors.Wrapf(err, "failed to retrieve team id '%s'", channel.TeamId)
 	}
 
-	numMembers, err := s.store.GetAllIncidentMembersCount(incident.ChannelID)
+	numMembers, err := s.store.GetAllPlaybookRunMembersCount(incident.ChannelID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get the count of incident members for channel id '%s'", incident.ChannelID)
 	}
@@ -854,10 +854,10 @@ func (s *PlaybookRunServiceImpl) GetIncidentMetadata(incidentID string) (*Metada
 	}, nil
 }
 
-// GetIncidentIDForChannel get the incidentID associated with this channel. Returns ErrNotFound
+// GetPlaybookRunIDForChannel get the incidentID associated with this channel. Returns ErrNotFound
 // if there is no incident associated with this channel.
-func (s *PlaybookRunServiceImpl) GetIncidentIDForChannel(channelID string) (string, error) {
-	incidentID, err := s.store.GetIncidentIDForChannel(channelID)
+func (s *PlaybookRunServiceImpl) GetPlaybookRunIDForChannel(channelID string) (string, error) {
+	incidentID, err := s.store.GetPlaybookRunIDForChannel(channelID)
 	if err != nil {
 		return "", err
 	}
@@ -865,13 +865,13 @@ func (s *PlaybookRunServiceImpl) GetIncidentIDForChannel(channelID string) (stri
 }
 
 // GetOwners returns all the owners of the incidents selected by options
-func (s *PlaybookRunServiceImpl) GetOwners(requesterInfo RequesterInfo, options IncidentFilterOptions) ([]OwnerInfo, error) {
+func (s *PlaybookRunServiceImpl) GetOwners(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) ([]OwnerInfo, error) {
 	return s.store.GetOwners(requesterInfo, options)
 }
 
 // IsOwner returns true if the userID is the owner for incidentID.
 func (s *PlaybookRunServiceImpl) IsOwner(incidentID, userID string) bool {
-	incident, err := s.store.GetIncident(incidentID)
+	incident, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return false
 	}
@@ -881,7 +881,7 @@ func (s *PlaybookRunServiceImpl) IsOwner(incidentID, userID string) bool {
 // ChangeOwner processes a request from userID to change the owner for incidentID
 // to ownerID. Changing to the same ownerID is a no-op.
 func (s *PlaybookRunServiceImpl) ChangeOwner(incidentID, userID, ownerID string) error {
-	incidentToModify, err := s.store.GetIncident(incidentID)
+	incidentToModify, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return err
 	}
@@ -900,7 +900,7 @@ func (s *PlaybookRunServiceImpl) ChangeOwner(incidentID, userID, ownerID string)
 	}
 
 	incidentToModify.OwnerUserID = ownerID
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident")
 	}
 
@@ -913,7 +913,7 @@ func (s *PlaybookRunServiceImpl) ChangeOwner(incidentID, userID, ownerID string)
 	}
 
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      post.CreateAt,
 		EventAt:       post.CreateAt,
 		EventType:     OwnerChanged,
@@ -928,7 +928,7 @@ func (s *PlaybookRunServiceImpl) ChangeOwner(incidentID, userID, ownerID string)
 
 	s.telemetry.ChangeOwner(incidentToModify, userID)
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return err
 	}
 
@@ -969,14 +969,14 @@ func (s *PlaybookRunServiceImpl) ModifyCheckedState(incidentID, userID, newState
 	itemToCheck.StateModifiedPostID = post.Id
 	incidentToModify.Checklists[checklistNumber].Items[itemNumber] = itemToCheck
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident, is now in inconsistent state")
 	}
 
 	s.telemetry.ModifyCheckedState(incidentID, userID, itemToCheck, incidentToModify.OwnerUserID == userID)
 
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      itemToCheck.StateModified,
 		EventAt:       itemToCheck.StateModified,
 		EventType:     TaskStateModified,
@@ -989,7 +989,7 @@ func (s *PlaybookRunServiceImpl) ModifyCheckedState(incidentID, userID, newState
 		return errors.Wrap(err, "failed to create timeline event")
 	}
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return err
 	}
 
@@ -1067,14 +1067,14 @@ func (s *PlaybookRunServiceImpl) SetAssignee(incidentID, userID, assigneeID stri
 	itemToCheck.AssigneeModifiedPostID = post.Id
 	incidentToModify.Checklists[checklistNumber].Items[itemNumber] = itemToCheck
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident; it is now in an inconsistent state")
 	}
 
 	s.telemetry.SetAssignee(incidentID, userID, itemToCheck)
 
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      itemToCheck.AssigneeModified,
 		EventAt:       itemToCheck.AssigneeModified,
 		EventType:     AssigneeChanged,
@@ -1087,7 +1087,7 @@ func (s *PlaybookRunServiceImpl) SetAssignee(incidentID, userID, assigneeID stri
 		return errors.Wrap(err, "failed to create timeline event")
 	}
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return err
 	}
 
@@ -1130,7 +1130,7 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(incidentID, userID
 
 	// Record the last (successful) run time.
 	incident.Checklists[checklistNumber].Items[itemNumber].CommandLastRun = model.GetMillis()
-	if err = s.store.UpdateIncident(incident); err != nil {
+	if err = s.store.UpdatePlaybookRun(incident); err != nil {
 		return "", errors.Wrapf(err, "failed to update incident recording run of slash command")
 	}
 
@@ -1138,7 +1138,7 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(incidentID, userID
 
 	eventTime := model.GetMillis()
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      eventTime,
 		EventAt:       eventTime,
 		EventType:     RanSlashCommand,
@@ -1150,7 +1150,7 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(incidentID, userID
 		return "", errors.Wrap(err, "failed to create timeline event")
 	}
 
-	if err = s.sendIncidentToClient(incidentID); err != nil {
+	if err = s.sendPlaybookRunToClient(incidentID); err != nil {
 		return "", err
 	}
 
@@ -1166,7 +1166,7 @@ func (s *PlaybookRunServiceImpl) AddChecklistItem(incidentID, userID string, che
 
 	incidentToModify.Checklists[checklistNumber].Items = append(incidentToModify.Checklists[checklistNumber].Items, checklistItem)
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident")
 	}
 
@@ -1189,7 +1189,7 @@ func (s *PlaybookRunServiceImpl) RemoveChecklistItem(incidentID, userID string, 
 		incidentToModify.Checklists[checklistNumber].Items[itemNumber+1:]...,
 	)
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident")
 	}
 
@@ -1211,7 +1211,7 @@ func (s *PlaybookRunServiceImpl) EditChecklistItem(incidentID, userID string, ch
 	incidentToModify.Checklists[checklistNumber].Items[itemNumber].Description = newDescription
 	checklistItem := incidentToModify.Checklists[checklistNumber].Items[itemNumber]
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident")
 	}
 
@@ -1243,7 +1243,7 @@ func (s *PlaybookRunServiceImpl) MoveChecklistItem(incidentID, userID string, ch
 	checklist[newLocation] = itemMoved
 	incidentToModify.Checklists[checklistNumber].Items = checklist
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "failed to update incident")
 	}
 
@@ -1255,7 +1255,7 @@ func (s *PlaybookRunServiceImpl) MoveChecklistItem(incidentID, userID string, ch
 
 // GetChecklistAutocomplete returns the list of checklist items for incidentID to be used in autocomplete
 func (s *PlaybookRunServiceImpl) GetChecklistAutocomplete(incidentID string) ([]model.AutocompleteListItem, error) {
-	incident, err := s.store.GetIncident(incidentID)
+	incident, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to retrieve incident")
 	}
@@ -1274,7 +1274,7 @@ func (s *PlaybookRunServiceImpl) GetChecklistAutocomplete(incidentID string) ([]
 
 // GetChecklistAutocomplete returns the list of checklist items for incidentID to be used in autocomplete
 func (s *PlaybookRunServiceImpl) GetChecklistItemAutocomplete(incidentID string) ([]model.AutocompleteListItem, error) {
-	incident, err := s.store.GetIncident(incidentID)
+	incident, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to retrieve incident")
 	}
@@ -1293,13 +1293,13 @@ func (s *PlaybookRunServiceImpl) GetChecklistItemAutocomplete(incidentID string)
 	return ret, nil
 }
 
-func (s *PlaybookRunServiceImpl) checklistParamsVerify(incidentID, userID string, checklistNumber int) (*Incident, error) {
-	incidentToModify, err := s.store.GetIncident(incidentID)
+func (s *PlaybookRunServiceImpl) checklistParamsVerify(incidentID, userID string, checklistNumber int) (*PlaybookRun, error) {
+	incidentToModify, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to retrieve incident")
 	}
 
-	if !s.hasPermissionToModifyIncident(incidentToModify, userID) {
+	if !s.hasPermissionToModifyPlaybookRun(incidentToModify, userID) {
 		return nil, errors.New("user does not have permission to modify incident")
 	}
 
@@ -1324,7 +1324,7 @@ func (s *PlaybookRunServiceImpl) modificationMessage(userID, channelID, message 
 	return post, nil
 }
 
-func (s *PlaybookRunServiceImpl) checklistItemParamsVerify(incidentID, userID string, checklistNumber, itemNumber int) (*Incident, error) {
+func (s *PlaybookRunServiceImpl) checklistItemParamsVerify(incidentID, userID string, checklistNumber, itemNumber int) (*PlaybookRun, error) {
 	incidentToModify, err := s.checklistParamsVerify(incidentID, userID, checklistNumber)
 	if err != nil {
 		return nil, err
@@ -1350,7 +1350,7 @@ func (s *PlaybookRunServiceImpl) ChangeCreationDate(incidentID string, creationT
 // UserHasJoinedChannel is called when userID has joined channelID. If actorID is not blank, userID
 // was invited by actorID.
 func (s *PlaybookRunServiceImpl) UserHasJoinedChannel(userID, channelID, actorID string) {
-	incidentID, err := s.store.GetIncidentIDForChannel(channelID)
+	incidentID, err := s.store.GetPlaybookRunIDForChannel(channelID)
 
 	if err != nil {
 		// This is not an incident channel
@@ -1383,7 +1383,7 @@ func (s *PlaybookRunServiceImpl) UserHasJoinedChannel(userID, channelID, actorID
 	}
 	now := model.GetMillis()
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      now,
 		EventAt:       now,
 		EventType:     UserJoinedLeft,
@@ -1397,30 +1397,30 @@ func (s *PlaybookRunServiceImpl) UserHasJoinedChannel(userID, channelID, actorID
 		s.logger.Errorf("failed to create timeline event; error: %s", err.Error())
 	}
 
-	_ = s.sendIncidentToClient(incidentID)
+	_ = s.sendPlaybookRunToClient(incidentID)
 }
 
 // CheckAndSendMessageOnJoin checks if userID has viewed channelID and sends
 // incident.MessageOnJoin if it exists. Returns true if the message was sent.
-func (s *PlaybookRunServiceImpl) CheckAndSendMessageOnJoin(userID, givenIncidentID, channelID string) bool {
+func (s *PlaybookRunServiceImpl) CheckAndSendMessageOnJoin(userID, givenPlaybookRunID, channelID string) bool {
 	hasViewed := s.store.HasViewedChannel(userID, channelID)
 
 	if hasViewed {
 		return true
 	}
 
-	incidentID, err := s.store.GetIncidentIDForChannel(channelID)
+	incidentID, err := s.store.GetPlaybookRunIDForChannel(channelID)
 	if err != nil {
 		s.logger.Errorf("failed to resolve incident for channelID: %s; error: %s", channelID, err.Error())
 		return false
 	}
 
-	if incidentID != givenIncidentID {
+	if incidentID != givenPlaybookRunID {
 		s.logger.Errorf("endpoint's incidentID does not match channelID's incidentID")
 		return false
 	}
 
-	incident, err := s.store.GetIncident(incidentID)
+	incident, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		s.logger.Errorf("failed to resolve incident for incidentID: %s; error: %s", incidentID, err.Error())
 		return false
@@ -1443,7 +1443,7 @@ func (s *PlaybookRunServiceImpl) CheckAndSendMessageOnJoin(userID, givenIncident
 // UserHasLeftChannel is called when userID has left channelID. If actorID is not blank, userID
 // was removed from the channel by actorID.
 func (s *PlaybookRunServiceImpl) UserHasLeftChannel(userID, channelID, actorID string) {
-	incidentID, err := s.store.GetIncidentIDForChannel(channelID)
+	incidentID, err := s.store.GetPlaybookRunIDForChannel(channelID)
 
 	if err != nil {
 		// This is not an incident channel
@@ -1476,7 +1476,7 @@ func (s *PlaybookRunServiceImpl) UserHasLeftChannel(userID, channelID, actorID s
 	}
 	now := model.GetMillis()
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      now,
 		EventAt:       now,
 		EventType:     UserJoinedLeft,
@@ -1490,15 +1490,15 @@ func (s *PlaybookRunServiceImpl) UserHasLeftChannel(userID, channelID, actorID s
 		s.logger.Errorf("failed to create timeline event; error: %s", err.Error())
 	}
 
-	_ = s.sendIncidentToClient(incidentID)
+	_ = s.sendPlaybookRunToClient(incidentID)
 }
 
-func (s *PlaybookRunServiceImpl) hasPermissionToModifyIncident(incident *Incident, userID string) bool {
-	// Incident main channel membership is required to modify incident
+func (s *PlaybookRunServiceImpl) hasPermissionToModifyPlaybookRun(incident *PlaybookRun, userID string) bool {
+	// PlaybookRun main channel membership is required to modify incident
 	return s.pluginAPI.User.HasPermissionToChannel(userID, incident.ChannelID, model.PERMISSION_READ_CHANNEL)
 }
 
-func (s *PlaybookRunServiceImpl) createIncidentChannel(incident *Incident, header string, public bool) (*model.Channel, error) {
+func (s *PlaybookRunServiceImpl) createPlaybookRunChannel(incident *PlaybookRun, header string, public bool) (*model.Channel, error) {
 	channelType := model.CHANNEL_PRIVATE
 	if public {
 		channelType = model.CHANNEL_OPEN
@@ -1564,7 +1564,7 @@ func (s *PlaybookRunServiceImpl) createIncidentChannel(incident *Incident, heade
 	return channel, nil
 }
 
-func (s *PlaybookRunServiceImpl) newIncidentDialog(teamID, ownerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) (*model.Dialog, error) {
+func (s *PlaybookRunServiceImpl) newPlaybookRunDialog(teamID, ownerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) (*model.Dialog, error) {
 	team, err := s.pluginAPI.Team.Get(teamID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to fetch team")
@@ -1627,7 +1627,7 @@ func (s *PlaybookRunServiceImpl) newIncidentDialog(teamID, ownerID, postID, clie
 	}, nil
 }
 
-func (s *PlaybookRunServiceImpl) newUpdateIncidentDialog(description, message, broadcastChannelID, status string, reminderTimer time.Duration) (*model.Dialog, error) {
+func (s *PlaybookRunServiceImpl) newUpdatePlaybookRunDialog(description, message, broadcastChannelID, status string, reminderTimer time.Duration) (*model.Dialog, error) {
 	introductionText := "Update your incident status."
 
 	broadcastChannel, err := s.pluginAPI.Channel.Get(broadcastChannelID)
@@ -1738,7 +1738,7 @@ func (s *PlaybookRunServiceImpl) newUpdateIncidentDialog(description, message, b
 	}, nil
 }
 
-func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(incidents []Incident, postID string) (*model.Dialog, error) {
+func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(incidents []PlaybookRun, postID string) (*model.Dialog, error) {
 	var options []*model.PostActionOptions
 	for _, i := range incidents {
 		options = append(options, &model.PostActionOptions{
@@ -1767,7 +1767,7 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(incidents []Incident, po
 		}
 	}
 
-	defaultIncidentID, err := s.GetIncidentIDForChannel(post.ChannelId)
+	defaultPlaybookRunID, err := s.GetPlaybookRunIDForChannel(post.ChannelId)
 	if err != nil && !errors.Is(err, ErrNotFound) {
 		return nil, errors.Wrapf(err, "failed to get incidentID for channel")
 	}
@@ -1777,10 +1777,10 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(incidents []Incident, po
 		Elements: []model.DialogElement{
 			{
 				DisplayName: "Incident",
-				Name:        DialogFieldIncidentKey,
+				Name:        DialogFieldPlaybookRunKey,
 				Type:        "select",
 				Options:     options,
-				Default:     defaultIncidentID,
+				Default:     defaultPlaybookRunID,
 			},
 			{
 				DisplayName: "Summary",
@@ -1798,8 +1798,8 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(incidents []Incident, po
 	}, nil
 }
 
-func (s *PlaybookRunServiceImpl) sendIncidentToClient(incidentID string) error {
-	incidentToSend, err := s.store.GetIncident(incidentID)
+func (s *PlaybookRunServiceImpl) sendPlaybookRunToClient(incidentID string) error {
+	incidentToSend, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
@@ -1810,14 +1810,14 @@ func (s *PlaybookRunServiceImpl) sendIncidentToClient(incidentID string) error {
 }
 
 func (s *PlaybookRunServiceImpl) UpdateRetrospective(incidentID, updaterID, newRetrospective string) error {
-	incidentToModify, err := s.store.GetIncident(incidentID)
+	incidentToModify, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
 
 	incidentToModify.Retrospective = newRetrospective
 
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrap(err, "failed to update incident")
 	}
 
@@ -1828,7 +1828,7 @@ func (s *PlaybookRunServiceImpl) UpdateRetrospective(incidentID, updaterID, newR
 }
 
 func (s *PlaybookRunServiceImpl) PublishRetrospective(incidentID, text, publisherID string) error {
-	incidentToPublish, err := s.store.GetIncident(incidentID)
+	incidentToPublish, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
@@ -1839,7 +1839,7 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(incidentID, text, publishe
 	incidentToPublish.Retrospective = text
 	incidentToPublish.RetrospectivePublishedAt = now
 	incidentToPublish.RetrospectiveWasCanceled = false
-	if err = s.store.UpdateIncident(incidentToPublish); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToPublish); err != nil {
 		return errors.Wrap(err, "failed to update incident")
 	}
 
@@ -1863,7 +1863,7 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(incidentID, text, publishe
 	}
 
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      now,
 		EventAt:       now,
 		EventType:     PublishedRetrospective,
@@ -1874,7 +1874,7 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(incidentID, text, publishe
 		return errors.Wrap(err, "failed to create timeline event")
 	}
 
-	if err := s.sendIncidentToClient(incidentID); err != nil {
+	if err := s.sendPlaybookRunToClient(incidentID); err != nil {
 		s.logger.Errorf("failed send websocket event; error: %s", err.Error())
 	}
 	s.telemetry.PublishRetrospective(incidentToPublish, publisherID)
@@ -1883,7 +1883,7 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(incidentID, text, publishe
 }
 
 func (s *PlaybookRunServiceImpl) CancelRetrospective(incidentID, cancelerID string) error {
-	incidentToCancel, err := s.store.GetIncident(incidentID)
+	incidentToCancel, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve incident")
 	}
@@ -1894,7 +1894,7 @@ func (s *PlaybookRunServiceImpl) CancelRetrospective(incidentID, cancelerID stri
 	incidentToCancel.Retrospective = "No retrospective for this incident."
 	incidentToCancel.RetrospectivePublishedAt = now
 	incidentToCancel.RetrospectiveWasCanceled = true
-	if err = s.store.UpdateIncident(incidentToCancel); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToCancel); err != nil {
 		return errors.Wrap(err, "failed to update incident")
 	}
 
@@ -1908,7 +1908,7 @@ func (s *PlaybookRunServiceImpl) CancelRetrospective(incidentID, cancelerID stri
 	}
 
 	event := &TimelineEvent{
-		IncidentID:    incidentID,
+		PlaybookRunID: incidentID,
 		CreateAt:      now,
 		EventAt:       now,
 		EventType:     CanceledRetrospective,
@@ -1919,7 +1919,7 @@ func (s *PlaybookRunServiceImpl) CancelRetrospective(incidentID, cancelerID stri
 		return errors.Wrap(err, "failed to create timeline event")
 	}
 
-	if err := s.sendIncidentToClient(incidentID); err != nil {
+	if err := s.sendPlaybookRunToClient(incidentID); err != nil {
 		s.logger.Errorf("failed send websocket event; error: %s", err.Error())
 	}
 

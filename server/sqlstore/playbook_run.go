@@ -25,8 +25,8 @@ const (
 	legacyEventTypeCommanderChanged = "commander_changed"
 )
 
-type sqlIncident struct {
-	app.Incident
+type sqlPlaybookRun struct {
+	app.PlaybookRun
 	ChecklistsJSON              json.RawMessage
 	ConcatenatedInvitedUserIDs  string
 	ConcatenatedInvitedGroupIDs string
@@ -47,11 +47,11 @@ type playbookRunStore struct {
 var _ app.PlaybookRunStore = (*playbookRunStore)(nil)
 
 type incidentStatusPosts []struct {
-	IncidentID string
+	PlaybookRunID string
 	app.StatusPost
 }
 
-func applyIncidentFilterOptionsSort(builder sq.SelectBuilder, options app.IncidentFilterOptions) (sq.SelectBuilder, error) {
+func applyPlaybookRunFilterOptionsSort(builder sq.SelectBuilder, options app.PlaybookRunFilterOptions) (sq.SelectBuilder, error) {
 	var sort string
 	switch options.Sort {
 	case app.SortByCreateAt:
@@ -108,7 +108,7 @@ func applyIncidentFilterOptionsSort(builder sq.SelectBuilder, options app.Incide
 
 // NewPlaybookRunStore creates a new store for incident ServiceImpl.
 func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLStore) app.PlaybookRunStore {
-	// When adding an Incident column #1: add to this select
+	// When adding a Playbook Run column #1: add to this select
 	incidentSelect := sqlStore.builder.
 		Select("i.ID", "c.DisplayName AS Name", "i.Description", "i.CommanderUserID AS OwnerUserID", "i.TeamID", "i.ChannelID",
 			"i.CreateAt", "i.EndAt", "i.DeleteAt", "i.PostID", "i.PlaybookID", "i.ReporterUserID", "i.CurrentStatus",
@@ -120,14 +120,14 @@ func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQ
 		Join("Channels AS c ON (c.Id = i.ChannelId)")
 
 	statusPostsSelect := sqlStore.builder.
-		Select("sp.IncidentID", "p.ID", "p.CreateAt", "p.DeleteAt", "sp.Status").
+		Select("sp.IncidentID AS PlaybookRunID", "p.ID", "p.CreateAt", "p.DeleteAt", "sp.Status").
 		From("IR_StatusPosts as sp").
 		Join("Posts as p ON sp.PostID = p.Id")
 
 	timelineEventsSelect := sqlStore.builder.
 		Select(
 			"te.ID",
-			"te.IncidentID",
+			"te.IncidentID AS PlaybookRunID",
 			"te.CreateAt",
 			"te.DeleteAt",
 			"te.EventAt",
@@ -162,8 +162,8 @@ func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQ
 	}
 }
 
-// GetIncidents returns filtered incidents and the total count before paging.
-func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options app.IncidentFilterOptions) (*app.GetIncidentsResults, error) {
+// GetPlaybookRuns returns filtered incidents and the total count before paging.
+func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, options app.PlaybookRunFilterOptions) (*app.GetPlaybookRunsResults, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
 	queryForResults := s.incidentSelect.
@@ -230,7 +230,7 @@ func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options
 		queryForTotal = queryForTotal.Where(sq.Like{column: fmt.Sprint("%", searchString, "%")})
 	}
 
-	queryForResults, err := applyIncidentFilterOptionsSort(queryForResults, options)
+	queryForResults, err := applyPlaybookRunFilterOptionsSort(queryForResults, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to apply sort options")
 	}
@@ -241,8 +241,8 @@ func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options
 	}
 	defer s.store.finalizeTransaction(tx)
 
-	var rawIncidents []sqlIncident
-	if err = s.store.selectBuilder(tx, &rawIncidents, queryForResults); err != nil {
+	var rawPlaybookRuns []sqlPlaybookRun
+	if err = s.store.selectBuilder(tx, &rawPlaybookRuns, queryForResults); err != nil {
 		return nil, errors.Wrap(err, "failed to query for incidents")
 	}
 
@@ -256,11 +256,11 @@ func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options
 	}
 	hasMore := options.Page+1 < pageCount
 
-	incidents := make([]app.Incident, 0, len(rawIncidents))
-	incidentIDs := make([]string, 0, len(rawIncidents))
-	for _, rawIncident := range rawIncidents {
-		var incident *app.Incident
-		incident, err = s.toIncident(rawIncident)
+	incidents := make([]app.PlaybookRun, 0, len(rawPlaybookRuns))
+	incidentIDs := make([]string, 0, len(rawPlaybookRuns))
+	for _, rawPlaybookRun := range rawPlaybookRuns {
+		var incident *app.PlaybookRun
+		incident, err = s.toPlaybookRun(rawPlaybookRun)
 		if err != nil {
 			return nil, err
 		}
@@ -279,7 +279,7 @@ func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options
 		return nil, errors.Wrap(err, "failed to get incidentStatusPosts")
 	}
 
-	timelineEvents, err := s.getTimelineEventsForIncident(tx, incidentIDs)
+	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, incidentIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -288,10 +288,10 @@ func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options
 		return nil, errors.Wrap(err, "could not commit transaction")
 	}
 
-	addStatusPostsToIncidents(statusPosts, incidents)
-	addTimelineEventsToIncidents(timelineEvents, incidents)
+	addStatusPostsToPlaybookRuns(statusPosts, incidents)
+	addTimelineEventsToPlaybookRuns(timelineEvents, incidents)
 
-	return &app.GetIncidentsResults{
+	return &app.GetPlaybookRunsResults{
 		TotalCount: total,
 		PageCount:  pageCount,
 		HasMore:    hasMore,
@@ -299,8 +299,8 @@ func (s *playbookRunStore) GetIncidents(requesterInfo app.RequesterInfo, options
 	}, nil
 }
 
-// CreateIncident creates a new incident. If incident has an ID, that ID will be used.
-func (s *playbookRunStore) CreateIncident(incident *app.Incident) (*app.Incident, error) {
+// CreatePlaybookRun creates a new incident. If incident has an ID, that ID will be used.
+func (s *playbookRunStore) CreatePlaybookRun(incident *app.PlaybookRun) (*app.PlaybookRun, error) {
 	if incident == nil {
 		return nil, errors.New("incident is nil")
 	}
@@ -310,43 +310,43 @@ func (s *playbookRunStore) CreateIncident(incident *app.Incident) (*app.Incident
 		incident.ID = model.NewId()
 	}
 
-	rawIncident, err := toSQLIncident(*incident)
+	rawPlaybookRun, err := toSQLPlaybookRun(*incident)
 	if err != nil {
 		return nil, err
 	}
 
-	// When adding an Incident column #2: add to the SetMap
+	// When adding an PlaybookRun column #2: add to the SetMap
 	_, err = s.store.execBuilder(s.store.db, sq.
 		Insert("IR_Incident").
 		SetMap(map[string]interface{}{
-			"ID":                                   rawIncident.ID,
-			"Name":                                 rawIncident.Name,
-			"Description":                          rawIncident.Description,
-			"CommanderUserID":                      rawIncident.OwnerUserID,
-			"ReporterUserID":                       rawIncident.ReporterUserID,
-			"TeamID":                               rawIncident.TeamID,
-			"ChannelID":                            rawIncident.ChannelID,
-			"CreateAt":                             rawIncident.CreateAt,
-			"EndAt":                                rawIncident.EndAt,
-			"PostID":                               rawIncident.PostID,
-			"PlaybookID":                           rawIncident.PlaybookID,
-			"ChecklistsJSON":                       rawIncident.ChecklistsJSON,
-			"ReminderPostID":                       rawIncident.ReminderPostID,
-			"PreviousReminder":                     rawIncident.PreviousReminder,
-			"BroadcastChannelID":                   rawIncident.BroadcastChannelID,
-			"ReminderMessageTemplate":              rawIncident.ReminderMessageTemplate,
-			"CurrentStatus":                        rawIncident.CurrentStatus,
-			"ConcatenatedInvitedUserIDs":           rawIncident.ConcatenatedInvitedUserIDs,
-			"ConcatenatedInvitedGroupIDs":          rawIncident.ConcatenatedInvitedGroupIDs,
-			"DefaultCommanderID":                   rawIncident.DefaultOwnerID,
-			"AnnouncementChannelID":                rawIncident.AnnouncementChannelID,
-			"WebhookOnCreationURL":                 rawIncident.WebhookOnCreationURL,
-			"Retrospective":                        rawIncident.Retrospective,
-			"RetrospectivePublishedAt":             rawIncident.RetrospectivePublishedAt,
-			"MessageOnJoin":                        rawIncident.MessageOnJoin,
-			"RetrospectiveReminderIntervalSeconds": rawIncident.RetrospectiveReminderIntervalSeconds,
-			"RetrospectiveWasCanceled":             rawIncident.RetrospectiveWasCanceled,
-			"WebhookOnStatusUpdateURL":             rawIncident.WebhookOnStatusUpdateURL,
+			"ID":                                   rawPlaybookRun.ID,
+			"Name":                                 rawPlaybookRun.Name,
+			"Description":                          rawPlaybookRun.Description,
+			"CommanderUserID":                      rawPlaybookRun.OwnerUserID,
+			"ReporterUserID":                       rawPlaybookRun.ReporterUserID,
+			"TeamID":                               rawPlaybookRun.TeamID,
+			"ChannelID":                            rawPlaybookRun.ChannelID,
+			"CreateAt":                             rawPlaybookRun.CreateAt,
+			"EndAt":                                rawPlaybookRun.EndAt,
+			"PostID":                               rawPlaybookRun.PostID,
+			"PlaybookID":                           rawPlaybookRun.PlaybookID,
+			"ChecklistsJSON":                       rawPlaybookRun.ChecklistsJSON,
+			"ReminderPostID":                       rawPlaybookRun.ReminderPostID,
+			"PreviousReminder":                     rawPlaybookRun.PreviousReminder,
+			"BroadcastChannelID":                   rawPlaybookRun.BroadcastChannelID,
+			"ReminderMessageTemplate":              rawPlaybookRun.ReminderMessageTemplate,
+			"CurrentStatus":                        rawPlaybookRun.CurrentStatus,
+			"ConcatenatedInvitedUserIDs":           rawPlaybookRun.ConcatenatedInvitedUserIDs,
+			"ConcatenatedInvitedGroupIDs":          rawPlaybookRun.ConcatenatedInvitedGroupIDs,
+			"DefaultCommanderID":                   rawPlaybookRun.DefaultOwnerID,
+			"AnnouncementChannelID":                rawPlaybookRun.AnnouncementChannelID,
+			"WebhookOnCreationURL":                 rawPlaybookRun.WebhookOnCreationURL,
+			"Retrospective":                        rawPlaybookRun.Retrospective,
+			"RetrospectivePublishedAt":             rawPlaybookRun.RetrospectivePublishedAt,
+			"MessageOnJoin":                        rawPlaybookRun.MessageOnJoin,
+			"RetrospectiveReminderIntervalSeconds": rawPlaybookRun.RetrospectiveReminderIntervalSeconds,
+			"RetrospectiveWasCanceled":             rawPlaybookRun.RetrospectiveWasCanceled,
+			"WebhookOnStatusUpdateURL":             rawPlaybookRun.WebhookOnStatusUpdateURL,
 			// Preserved for backwards compatibility with v1.2
 			"ActiveStage":      0,
 			"ActiveStageTitle": "",
@@ -361,8 +361,8 @@ func (s *playbookRunStore) CreateIncident(incident *app.Incident) (*app.Incident
 	return incident, nil
 }
 
-// UpdateIncident updates an incident.
-func (s *playbookRunStore) UpdateIncident(incident *app.Incident) error {
+// UpdatePlaybookRun updates an incident.
+func (s *playbookRunStore) UpdatePlaybookRun(incident *app.PlaybookRun) error {
 	if incident == nil {
 		return errors.New("incident is nil")
 	}
@@ -370,39 +370,39 @@ func (s *playbookRunStore) UpdateIncident(incident *app.Incident) error {
 		return errors.New("ID should not be empty")
 	}
 
-	rawIncident, err := toSQLIncident(*incident)
+	rawPlaybookRun, err := toSQLPlaybookRun(*incident)
 	if err != nil {
 		return err
 	}
 
-	// When adding an Incident column #3: add to this SetMap (if it is a column that can be updated)
+	// When adding an PlaybookRun column #3: add to this SetMap (if it is a column that can be updated)
 	_, err = s.store.execBuilder(s.store.db, sq.
 		Update("IR_Incident").
 		SetMap(map[string]interface{}{
 			"Name":                                 "",
-			"Description":                          rawIncident.Description,
-			"CommanderUserID":                      rawIncident.OwnerUserID,
-			"ChecklistsJSON":                       rawIncident.ChecklistsJSON,
-			"ReminderPostID":                       rawIncident.ReminderPostID,
-			"PreviousReminder":                     rawIncident.PreviousReminder,
-			"BroadcastChannelID":                   rawIncident.BroadcastChannelID,
-			"EndAt":                                rawIncident.ResolvedAt(),
-			"ConcatenatedInvitedUserIDs":           rawIncident.ConcatenatedInvitedUserIDs,
-			"ConcatenatedInvitedGroupIDs":          rawIncident.ConcatenatedInvitedGroupIDs,
-			"DefaultCommanderID":                   rawIncident.DefaultOwnerID,
-			"AnnouncementChannelID":                rawIncident.AnnouncementChannelID,
-			"WebhookOnCreationURL":                 rawIncident.WebhookOnCreationURL,
-			"Retrospective":                        rawIncident.Retrospective,
-			"RetrospectivePublishedAt":             rawIncident.RetrospectivePublishedAt,
-			"MessageOnJoin":                        rawIncident.MessageOnJoin,
-			"RetrospectiveReminderIntervalSeconds": rawIncident.RetrospectiveReminderIntervalSeconds,
-			"RetrospectiveWasCanceled":             rawIncident.RetrospectiveWasCanceled,
-			"WebhookOnStatusUpdateURL":             rawIncident.WebhookOnStatusUpdateURL,
+			"Description":                          rawPlaybookRun.Description,
+			"CommanderUserID":                      rawPlaybookRun.OwnerUserID,
+			"ChecklistsJSON":                       rawPlaybookRun.ChecklistsJSON,
+			"ReminderPostID":                       rawPlaybookRun.ReminderPostID,
+			"PreviousReminder":                     rawPlaybookRun.PreviousReminder,
+			"BroadcastChannelID":                   rawPlaybookRun.BroadcastChannelID,
+			"EndAt":                                rawPlaybookRun.ResolvedAt(),
+			"ConcatenatedInvitedUserIDs":           rawPlaybookRun.ConcatenatedInvitedUserIDs,
+			"ConcatenatedInvitedGroupIDs":          rawPlaybookRun.ConcatenatedInvitedGroupIDs,
+			"DefaultCommanderID":                   rawPlaybookRun.DefaultOwnerID,
+			"AnnouncementChannelID":                rawPlaybookRun.AnnouncementChannelID,
+			"WebhookOnCreationURL":                 rawPlaybookRun.WebhookOnCreationURL,
+			"Retrospective":                        rawPlaybookRun.Retrospective,
+			"RetrospectivePublishedAt":             rawPlaybookRun.RetrospectivePublishedAt,
+			"MessageOnJoin":                        rawPlaybookRun.MessageOnJoin,
+			"RetrospectiveReminderIntervalSeconds": rawPlaybookRun.RetrospectiveReminderIntervalSeconds,
+			"RetrospectiveWasCanceled":             rawPlaybookRun.RetrospectiveWasCanceled,
+			"WebhookOnStatusUpdateURL":             rawPlaybookRun.WebhookOnStatusUpdateURL,
 		}).
-		Where(sq.Eq{"ID": rawIncident.ID}))
+		Where(sq.Eq{"ID": rawPlaybookRun.ID}))
 
 	if err != nil {
-		return errors.Wrapf(err, "failed to update incident with id '%s'", rawIncident.ID)
+		return errors.Wrapf(err, "failed to update incident with id '%s'", rawPlaybookRun.ID)
 	}
 
 	return nil
@@ -412,7 +412,7 @@ func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 	if statusPost == nil {
 		return errors.New("status post is nil")
 	}
-	if statusPost.IncidentID == "" {
+	if statusPost.PlaybookRunID == "" {
 		return errors.New("needs incident ID")
 	}
 	if statusPost.PostID == "" {
@@ -425,7 +425,7 @@ func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 	if _, err := s.store.execBuilder(s.store.db, sq.
 		Insert("IR_StatusPosts").
 		SetMap(map[string]interface{}{
-			"IncidentID": statusPost.IncidentID,
+			"IncidentID": statusPost.PlaybookRunID,
 			"PostID":     statusPost.PostID,
 			"Status":     statusPost.Status,
 		})); err != nil {
@@ -438,7 +438,7 @@ func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 			"CurrentStatus": statusPost.Status,
 			"EndAt":         statusPost.EndAt,
 		}).
-		Where(sq.Eq{"ID": statusPost.IncidentID})); err != nil {
+		Where(sq.Eq{"ID": statusPost.PlaybookRunID})); err != nil {
 		return errors.Wrap(err, "failed to update current status")
 	}
 
@@ -447,7 +447,7 @@ func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 
 // CreateTimelineEvent creates the timeline event
 func (s *playbookRunStore) CreateTimelineEvent(event *app.TimelineEvent) (*app.TimelineEvent, error) {
-	if event.IncidentID == "" {
+	if event.PlaybookRunID == "" {
 		return nil, errors.New("needs incident ID")
 	}
 	if event.EventType == "" {
@@ -467,7 +467,7 @@ func (s *playbookRunStore) CreateTimelineEvent(event *app.TimelineEvent) (*app.T
 		Insert("IR_TimelineEvent").
 		SetMap(map[string]interface{}{
 			"ID":            event.ID,
-			"IncidentID":    event.IncidentID,
+			"IncidentID":    event.PlaybookRunID,
 			"CreateAt":      event.CreateAt,
 			"DeleteAt":      event.DeleteAt,
 			"EventAt":       event.EventAt,
@@ -491,7 +491,7 @@ func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 	if event.ID == "" {
 		return errors.New("needs event ID")
 	}
-	if event.IncidentID == "" {
+	if event.PlaybookRunID == "" {
 		return errors.New("needs incident ID")
 	}
 	if event.EventType == "" {
@@ -506,7 +506,7 @@ func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 	_, err := s.store.execBuilder(s.store.db, sq.
 		Update("IR_TimelineEvent").
 		SetMap(map[string]interface{}{
-			"IncidentID":    event.IncidentID,
+			"IncidentID":    event.PlaybookRunID,
 			"CreateAt":      event.CreateAt,
 			"DeleteAt":      event.DeleteAt,
 			"EventAt":       event.EventAt,
@@ -526,8 +526,8 @@ func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 	return nil
 }
 
-// GetIncident gets an incident by ID.
-func (s *playbookRunStore) GetIncident(incidentID string) (*app.Incident, error) {
+// GetPlaybookRun gets an incident by ID.
+func (s *playbookRunStore) GetPlaybookRun(incidentID string) (*app.PlaybookRun, error) {
 	if incidentID == "" {
 		return nil, errors.New("ID cannot be empty")
 	}
@@ -538,15 +538,15 @@ func (s *playbookRunStore) GetIncident(incidentID string) (*app.Incident, error)
 	}
 	defer s.store.finalizeTransaction(tx)
 
-	var rawIncident sqlIncident
-	err = s.store.getBuilder(tx, &rawIncident, s.incidentSelect.Where(sq.Eq{"i.ID": incidentID}))
+	var rawPlaybookRun sqlPlaybookRun
+	err = s.store.getBuilder(tx, &rawPlaybookRun, s.incidentSelect.Where(sq.Eq{"i.ID": incidentID}))
 	if err == sql.ErrNoRows {
 		return nil, errors.Wrapf(app.ErrNotFound, "incident with id '%s' does not exist", incidentID)
 	} else if err != nil {
 		return nil, errors.Wrapf(err, "failed to get incident by id '%s'", incidentID)
 	}
 
-	incident, err := s.toIncident(rawIncident)
+	incident, err := s.toPlaybookRun(rawPlaybookRun)
 	if err != nil {
 		return nil, err
 	}
@@ -562,7 +562,7 @@ func (s *playbookRunStore) GetIncident(incidentID string) (*app.Incident, error)
 		return nil, errors.Wrapf(err, "failed to get incidentStatusPosts for incident with id '%s'", incidentID)
 	}
 
-	timelineEvents, err := s.getTimelineEventsForIncident(tx, []string{incidentID})
+	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, []string{incidentID})
 	if err != nil {
 		return nil, err
 	}
@@ -580,7 +580,7 @@ func (s *playbookRunStore) GetIncident(incidentID string) (*app.Incident, error)
 	return incident, nil
 }
 
-func (s *playbookRunStore) getTimelineEventsForIncident(q sqlx.Queryer, incidentIDs []string) ([]app.TimelineEvent, error) {
+func (s *playbookRunStore) getTimelineEventsForPlaybookRun(q sqlx.Queryer, incidentIDs []string) ([]app.TimelineEvent, error) {
 	var timelineEvents []app.TimelineEvent
 
 	timelineEventsSelect := s.timelineEventsSelect.
@@ -612,8 +612,8 @@ func (s *playbookRunStore) GetTimelineEvent(incidentID, eventID string) (*app.Ti
 	return &event, nil
 }
 
-// GetIncidentIDForChannel gets the incidentID associated with the given channelID.
-func (s *playbookRunStore) GetIncidentIDForChannel(channelID string) (string, error) {
+// GetPlaybookRunIDForChannel gets the incidentID associated with the given channelID.
+func (s *playbookRunStore) GetPlaybookRunIDForChannel(channelID string) (string, error) {
 	query := s.queryBuilder.
 		Select("i.ID").
 		From("IR_Incident i").
@@ -630,9 +630,9 @@ func (s *playbookRunStore) GetIncidentIDForChannel(channelID string) (string, er
 	return id, nil
 }
 
-// GetAllIncidentMembersCount returns the count of all members of an incident since the
+// GetAllPlaybookRunMembersCount returns the count of all members of an incident since the
 // beginning of the incident, excluding bots.
-func (s *playbookRunStore) GetAllIncidentMembersCount(channelID string) (int64, error) {
+func (s *playbookRunStore) GetAllPlaybookRunMembersCount(channelID string) (int64, error) {
 	query := s.queryBuilder.
 		Select("COUNT(DISTINCT cmh.UserId)").
 		From("ChannelMemberHistory AS cmh").
@@ -649,7 +649,7 @@ func (s *playbookRunStore) GetAllIncidentMembersCount(channelID string) (int64, 
 }
 
 // GetOwners returns the owners of the incidents selected by options
-func (s *playbookRunStore) GetOwners(requesterInfo app.RequesterInfo, options app.IncidentFilterOptions) ([]app.OwnerInfo, error) {
+func (s *playbookRunStore) GetOwners(requesterInfo app.RequesterInfo, options app.PlaybookRunFilterOptions) ([]app.OwnerInfo, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
 	// At the moment, the options only includes teamID
@@ -791,34 +791,34 @@ func (s *playbookRunStore) buildPermissionsExpr(info app.RequesterInfo) sq.Sqliz
 		  )`, info.UserID)
 }
 
-func (s *playbookRunStore) toIncident(rawIncident sqlIncident) (*app.Incident, error) {
-	incident := rawIncident.Incident
-	if err := json.Unmarshal(rawIncident.ChecklistsJSON, &incident.Checklists); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal checklists json for incident id: %s", rawIncident.ID)
+func (s *playbookRunStore) toPlaybookRun(rawPlaybookRun sqlPlaybookRun) (*app.PlaybookRun, error) {
+	incident := rawPlaybookRun.PlaybookRun
+	if err := json.Unmarshal(rawPlaybookRun.ChecklistsJSON, &incident.Checklists); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal checklists json for incident id: %s", rawPlaybookRun.ID)
 	}
 
 	incident.InvitedUserIDs = []string(nil)
-	if rawIncident.ConcatenatedInvitedUserIDs != "" {
-		incident.InvitedUserIDs = strings.Split(rawIncident.ConcatenatedInvitedUserIDs, ",")
+	if rawPlaybookRun.ConcatenatedInvitedUserIDs != "" {
+		incident.InvitedUserIDs = strings.Split(rawPlaybookRun.ConcatenatedInvitedUserIDs, ",")
 	}
 
 	incident.InvitedGroupIDs = []string(nil)
-	if rawIncident.ConcatenatedInvitedGroupIDs != "" {
-		incident.InvitedGroupIDs = strings.Split(rawIncident.ConcatenatedInvitedGroupIDs, ",")
+	if rawPlaybookRun.ConcatenatedInvitedGroupIDs != "" {
+		incident.InvitedGroupIDs = strings.Split(rawPlaybookRun.ConcatenatedInvitedGroupIDs, ",")
 	}
 
 	return &incident, nil
 }
 
-func toSQLIncident(incident app.Incident) (*sqlIncident, error) {
+func toSQLPlaybookRun(incident app.PlaybookRun) (*sqlPlaybookRun, error) {
 	newChecklists := populateChecklistIDs(incident.Checklists)
 	checklistsJSON, err := checklistsToJSON(newChecklists)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to marshal checklist json for incident id: '%s'", incident.ID)
 	}
 
-	return &sqlIncident{
-		Incident:                    incident,
+	return &sqlPlaybookRun{
+		PlaybookRun:                 incident,
 		ChecklistsJSON:              checklistsJSON,
 		ConcatenatedInvitedUserIDs:  strings.Join(incident.InvitedUserIDs, ","),
 		ConcatenatedInvitedGroupIDs: strings.Join(incident.InvitedGroupIDs, ","),
@@ -857,20 +857,20 @@ func checklistsToJSON(checklists []app.Checklist) (json.RawMessage, error) {
 	return checklistsJSON, nil
 }
 
-func addStatusPostsToIncidents(statusIDs incidentStatusPosts, incidents []app.Incident) {
+func addStatusPostsToPlaybookRuns(statusIDs incidentStatusPosts, incidents []app.PlaybookRun) {
 	iToPosts := make(map[string][]app.StatusPost)
 	for _, p := range statusIDs {
-		iToPosts[p.IncidentID] = append(iToPosts[p.IncidentID], p.StatusPost)
+		iToPosts[p.PlaybookRunID] = append(iToPosts[p.PlaybookRunID], p.StatusPost)
 	}
 	for i, incident := range incidents {
 		incidents[i].StatusPosts = iToPosts[incident.ID]
 	}
 }
 
-func addTimelineEventsToIncidents(timelineEvents []app.TimelineEvent, incidents []app.Incident) {
+func addTimelineEventsToPlaybookRuns(timelineEvents []app.TimelineEvent, incidents []app.PlaybookRun) {
 	iToTe := make(map[string][]app.TimelineEvent)
 	for _, te := range timelineEvents {
-		iToTe[te.IncidentID] = append(iToTe[te.IncidentID], te)
+		iToTe[te.PlaybookRunID] = append(iToTe[te.PlaybookRunID], te)
 	}
 	for i, incident := range incidents {
 		incidents[i].TimelineEvents = iToTe[incident.ID]

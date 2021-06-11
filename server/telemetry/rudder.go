@@ -24,7 +24,7 @@ type RudderTelemetry struct {
 
 // Unique strings that identify each of the tracked events
 const (
-	eventIncident                  = "incident"
+	eventPlaybookRun               = "incident"
 	actionCreate                   = "create"
 	actionEnd                      = "end"
 	actionRestart                  = "restart"
@@ -116,7 +116,7 @@ func (t *RudderTelemetry) track(event string, properties map[string]interface{})
 	})
 }
 
-func incidentProperties(incident *app.Incident, userID string) map[string]interface{} {
+func incidentProperties(incident *app.PlaybookRun, userID string) map[string]interface{} {
 	totalChecklistItems := 0
 	for _, checklist := range incident.Checklists {
 		totalChecklistItems += len(checklist.Items)
@@ -144,60 +144,60 @@ func incidentProperties(incident *app.Incident, userID string) map[string]interf
 	}
 }
 
-// CreateIncident tracks the creation of the incident passed.
-func (t *RudderTelemetry) CreateIncident(incident *app.Incident, userID string, public bool) {
+// CreatePlaybookRun tracks the creation of the incident passed.
+func (t *RudderTelemetry) CreatePlaybookRun(incident *app.PlaybookRun, userID string, public bool) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionCreate
 	properties["Public"] = public
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
-// EndIncident tracks the end of the incident passed.
-func (t *RudderTelemetry) EndIncident(incident *app.Incident, userID string) {
+// EndPlaybookRun tracks the end of the incident passed.
+func (t *RudderTelemetry) EndPlaybookRun(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionEnd
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
-// RestartIncident tracks the restart of the incident.
-func (t *RudderTelemetry) RestartIncident(incident *app.Incident, userID string) {
+// RestartPlaybookRun tracks the restart of the incident.
+func (t *RudderTelemetry) RestartPlaybookRun(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionRestart
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
 // ChangeOwner tracks changes in owner
-func (t *RudderTelemetry) ChangeOwner(incident *app.Incident, userID string) {
+func (t *RudderTelemetry) ChangeOwner(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionChangeOwner
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
-func (t *RudderTelemetry) UpdateStatus(incident *app.Incident, userID string) {
+func (t *RudderTelemetry) UpdateStatus(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionUpdateStatus
 	properties["ReminderTimerSeconds"] = int(incident.PreviousReminder)
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
-func (t *RudderTelemetry) FrontendTelemetryForIncident(incident *app.Incident, userID, action string) {
+func (t *RudderTelemetry) FrontendTelemetryForPlaybookRun(incident *app.PlaybookRun, userID, action string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = action
 	t.track(eventFrontend, properties)
 }
 
 // AddPostToTimeline tracks userID creating a timeline event from a post.
-func (t *RudderTelemetry) AddPostToTimeline(incident *app.Incident, userID string) {
+func (t *RudderTelemetry) AddPostToTimeline(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionAddTimelineEventFromPost
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
 // RemoveTimelineEvent tracks userID removing a timeline event.
-func (t *RudderTelemetry) RemoveTimelineEvent(incident *app.Incident, userID string) {
+func (t *RudderTelemetry) RemoveTimelineEvent(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionRemoveTimelineEvent
-	t.track(eventIncident, properties)
+	t.track(eventPlaybookRun, properties)
 }
 
 func taskProperties(incidentID, userID string, task app.ChecklistItem) map[string]interface{} {
@@ -271,13 +271,13 @@ func (t *RudderTelemetry) RunTaskSlashCommand(incidentID, userID string, task ap
 	t.track(eventTasks, properties)
 }
 
-func (t *RudderTelemetry) UpdateRetrospective(incident *app.Incident, userID string) {
+func (t *RudderTelemetry) UpdateRetrospective(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionUpdateRetrospective
 	t.track(eventTasks, properties)
 }
 
-func (t *RudderTelemetry) PublishRetrospective(incident *app.Incident, userID string) {
+func (t *RudderTelemetry) PublishRetrospective(incident *app.PlaybookRun, userID string) {
 	properties := incidentProperties(incident, userID)
 	properties["Action"] = actionPublishRetrospective
 	t.track(eventTasks, properties)
@@ -300,7 +300,7 @@ func playbookProperties(playbook app.Playbook, userID string) map[string]interfa
 		"PlaybookID":                  playbook.ID,
 		"HasDescription":              playbook.Description != "",
 		"TeamID":                      playbook.TeamID,
-		"IsPublic":                    playbook.CreatePublicIncident,
+		"IsPublic":                    playbook.CreatePublicPlaybookRun,
 		"CreateAt":                    playbook.CreateAt,
 		"DeleteAt":                    playbook.DeleteAt,
 		"NumChecklists":               len(playbook.Checklists),

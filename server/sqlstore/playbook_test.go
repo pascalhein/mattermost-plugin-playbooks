@@ -1015,7 +1015,7 @@ func TestUpdatePlaybook(t *testing.T) {
 				name:     "playbook now public",
 				playbook: NewPBBuilder().WithChecklists([]int{1}).ToPlaybook(),
 				update: func(old app.Playbook) app.Playbook {
-					old.CreatePublicIncident = true
+					old.CreatePublicPlaybookRun = true
 					return old
 				},
 				expectedErr: nil,
@@ -1220,15 +1220,15 @@ type PlaybookBuilder struct {
 func NewPBBuilder() *PlaybookBuilder {
 	return &PlaybookBuilder{
 		&app.Playbook{
-			Title:                "base playbook",
-			TeamID:               model.NewId(),
-			CreatePublicIncident: false,
-			CreateAt:             model.GetMillis(),
-			DeleteAt:             0,
-			Checklists:           []app.Checklist(nil),
-			MemberIDs:            []string(nil),
-			InvitedUserIDs:       []string(nil),
-			InvitedGroupIDs:      []string(nil),
+			Title:                   "base playbook",
+			TeamID:                  model.NewId(),
+			CreatePublicPlaybookRun: false,
+			CreateAt:                model.GetMillis(),
+			DeleteAt:                0,
+			Checklists:              []app.Checklist(nil),
+			MemberIDs:               []string(nil),
+			InvitedUserIDs:          []string(nil),
+			InvitedGroupIDs:         []string(nil),
 		},
 	}
 }
@@ -1258,7 +1258,7 @@ func (p *PlaybookBuilder) WithTeamID(id string) *PlaybookBuilder {
 }
 
 func (p *PlaybookBuilder) WithCreatePublic(public bool) *PlaybookBuilder {
-	p.CreatePublicIncident = public
+	p.CreatePublicPlaybookRun = public
 
 	return p
 }

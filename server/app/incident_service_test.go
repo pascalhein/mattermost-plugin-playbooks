@@ -26,7 +26,7 @@ import (
 	pluginapi "github.com/mattermost/mattermost-plugin-api"
 )
 
-func TestCreateIncident(t *testing.T) {
+func TestCreatePlaybookRun(t *testing.T) {
 	t.Run("invalid channel name has only invalid characters", func(t *testing.T) {
 		controller := gomock.NewController(t)
 		pluginAPI := &plugintest.API{}
@@ -39,12 +39,12 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			Name:   "###",
 			TeamID: teamID,
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		pluginAPI.On("CreateChannel", mock.Anything).Return(nil, &model.AppError{Id: "model.channel.is_valid.display_name.app_error"})
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		mattermostConfig := &model.Config{}
@@ -53,7 +53,7 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreateIncident(incident, nil, "testUserID", true)
+		_, err := s.CreatePlaybookRun(incident, nil, "testUserID", true)
 		require.Equal(t, err, app.ErrChannelDisplayNameInvalid)
 	})
 
@@ -69,12 +69,12 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			Name:   "###",
 			TeamID: teamID,
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -83,7 +83,7 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreateIncident(incident, nil, "testUserID", true)
+		_, err := s.CreatePlaybookRun(incident, nil, "testUserID", true)
 		require.Equal(t, err, app.ErrChannelDisplayNameInvalid)
 	})
 
@@ -99,13 +99,13 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			Name:        "###",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		pluginAPI.On("CreateChannel", &model.Channel{
 			TeamId:      teamID,
@@ -124,7 +124,7 @@ func TestCreateIncident(t *testing.T) {
 		pluginAPI.On("AddChannelMember", "channel_id", "bot_user_id").Return(nil, nil)
 		pluginAPI.On("UpdateChannelMemberRoles", "channel_id", "user_id", fmt.Sprintf("%s %s", model.CHANNEL_ADMIN_ROLE_ID, model.CHANNEL_USER_ROLE_ID)).Return(nil, nil)
 		configService.EXPECT().GetConfiguration().Return(&config.Configuration{BotUserID: "bot_user_id"}).AnyTimes()
-		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
+		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
 		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
@@ -132,7 +132,7 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreateIncident(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
 		require.NoError(t, err)
 	})
 
@@ -148,13 +148,13 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			Name:        "###",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -163,7 +163,7 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreateIncident(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
 		require.EqualError(t, err, "failed to create incident channel: : , ")
 	})
 
@@ -179,13 +179,13 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			Name:        "###",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -198,7 +198,7 @@ func TestCreateIncident(t *testing.T) {
 		pluginAPI.On("UpdateChannelMemberRoles", "channel_id", "user_id", fmt.Sprintf("%s %s", model.CHANNEL_ADMIN_ROLE_ID, model.CHANNEL_USER_ROLE_ID)).Return(nil, &model.AppError{Id: "api.channel.update_channel_member_roles.scheme_role.app_error"})
 		pluginAPI.On("LogWarn", "failed to promote owner to admin", "ChannelID", "channel_id", "OwnerUserID", "user_id", "err", ": , ")
 		configService.EXPECT().GetConfiguration().Return(&config.Configuration{BotUserID: "bot_user_id"}).AnyTimes()
-		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
+		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
 		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
@@ -206,7 +206,7 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreateIncident(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
 		require.NoError(t, err)
 	})
 
@@ -222,13 +222,13 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			Name:        "ททททท",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -243,7 +243,7 @@ func TestCreateIncident(t *testing.T) {
 		pluginAPI.On("AddChannelMember", "channel_id", "bot_user_id").Return(nil, nil)
 		pluginAPI.On("UpdateChannelMemberRoles", "channel_id", "user_id", fmt.Sprintf("%s %s", model.CHANNEL_ADMIN_ROLE_ID, model.CHANNEL_USER_ROLE_ID)).Return(nil, nil)
 		configService.EXPECT().GetConfiguration().Return(&config.Configuration{BotUserID: "bot_user_id"}).AnyTimes()
-		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
+		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
 		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
@@ -251,7 +251,7 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreateIncident(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
 		pluginAPI.AssertExpectations(t)
 		require.NoError(t, err)
 	})
@@ -268,7 +268,7 @@ func TestCreateIncident(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		type webhookPayload struct {
-			app.Incident
+			app.PlaybookRun
 			ChannelURL string `json:"channel_url"`
 			DetailsURL string `json:"details_url"`
 		}
@@ -287,7 +287,7 @@ func TestCreateIncident(t *testing.T) {
 		}))
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			ID:                   "incidentID",
 			Name:                 "Incident Name",
 			TeamID:               teamID,
@@ -295,9 +295,9 @@ func TestCreateIncident(t *testing.T) {
 			WebhookOnCreationURL: server.URL,
 		}
 
-		store.EXPECT().CreateIncident(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
-		store.EXPECT().UpdateIncident(gomock.Any()).Return(nil)
+		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 
 		configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "com.mattermost.plugin-incident-management"}).Times(2)
 		configService.EXPECT().GetConfiguration().Return(&config.Configuration{BotUserID: "bot_user_id"}).AnyTimes()
@@ -321,17 +321,17 @@ func TestCreateIncident(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		createdIncident, err := s.CreateIncident(incident, nil, "user_id", true)
+		createdPlaybookRun, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
 		require.NoError(t, err)
 
 		select {
 		case payload := <-webhookChan:
-			require.Equal(t, *createdIncident, payload.Incident)
+			require.Equal(t, *createdPlaybookRun, payload.PlaybookRun)
 			require.Equal(t,
 				"http://example.com/ad-1/channels/incident-channel-name",
 				payload.ChannelURL)
 			require.Equal(t,
-				"http://example.com/ad-1/com.mattermost.plugin-incident-management/incidents/"+createdIncident.ID,
+				"http://example.com/ad-1/com.mattermost.plugin-incident-management/incidents/"+createdPlaybookRun.ID,
 				payload.DetailsURL)
 
 		case <-time.After(time.Second * 5):
@@ -355,7 +355,7 @@ func TestUpdateStatus(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		type webhookPayload struct {
-			app.Incident
+			app.PlaybookRun
 			ChannelURL   string                  `json:"channel_url"`
 			DetailsURL   string                  `json:"details_url"`
 			StatusUpdate app.StatusUpdateOptions `json:"status_update"`
@@ -375,7 +375,7 @@ func TestUpdateStatus(t *testing.T) {
 		}))
 
 		teamID := model.NewId()
-		incident := &app.Incident{
+		incident := &app.PlaybookRun{
 			ID:                       "incident_id",
 			Name:                     "Incident Name",
 			TeamID:                   teamID,
@@ -396,9 +396,9 @@ func TestUpdateStatus(t *testing.T) {
 		channelID := "channel_id"
 
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
-		store.EXPECT().UpdateIncident(gomock.AssignableToTypeOf(&app.Incident{})).Return(nil)
+		store.EXPECT().UpdatePlaybookRun(gomock.AssignableToTypeOf(&app.PlaybookRun{})).Return(nil)
 		store.EXPECT().UpdateStatus(gomock.AssignableToTypeOf(&app.SQLStatusPost{})).Return(nil)
-		store.EXPECT().GetIncident(gomock.Any()).Return(incident, nil).Times(2)
+		store.EXPECT().GetPlaybookRun(gomock.Any()).Return(incident, nil).Times(2)
 
 		configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "com.mattermost.plugin-incident-management"}).Times(2)
 
@@ -423,7 +423,7 @@ func TestUpdateStatus(t *testing.T) {
 
 		select {
 		case payload := <-webhookChan:
-			require.Equal(t, *incident, payload.Incident)
+			require.Equal(t, *incident, payload.PlaybookRun)
 			require.Equal(t,
 				"http://example.com/team_name/channels/channel_name",
 				payload.ChannelURL)
@@ -437,7 +437,7 @@ func TestUpdateStatus(t *testing.T) {
 	})
 }
 
-func TestOpenCreateIncidentDialog(t *testing.T) {
+func TestOpenCreatePlaybookRunDialog(t *testing.T) {
 	siteURL := "https://mattermost.example.com"
 
 	type args struct {
@@ -557,9 +557,9 @@ func TestOpenCreateIncidentDialog(t *testing.T) {
 
 			tt.prepMocks(t, store, poster, api, configService)
 
-			err := service.OpenCreateIncidentDialog(tt.args.teamID, tt.args.ownerID, tt.args.triggerID, tt.args.postID, tt.args.clientID, tt.args.playbooks, tt.args.isMobileApp)
+			err := service.OpenCreatePlaybookRunDialog(tt.args.teamID, tt.args.ownerID, tt.args.triggerID, tt.args.postID, tt.args.clientID, tt.args.playbooks, tt.args.isMobileApp)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("OpenCreateIncidentDialog() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("OpenCreatePlaybookRunDialog() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})

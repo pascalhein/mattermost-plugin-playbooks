@@ -28,7 +28,7 @@ import (
 	mock_config "github.com/mattermost/mattermost-plugin-incident-collaboration/server/config/mocks"
 )
 
-func TestIncidents(t *testing.T) {
+func TestPlaybookRuns(t *testing.T) {
 	var mockCtrl *gomock.Controller
 	var handler *Handler
 	var poster *mock_poster.MockPoster
@@ -96,14 +96,14 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
 		}
 
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
 			Name:        "incidentName",
@@ -111,7 +111,7 @@ func TestIncidents(t *testing.T) {
 			Checklists:  withid.Checklists,
 		}
 
-		incidentJSON, err := json.Marshal(testIncident)
+		incidentJSON, err := json.Marshal(testPlaybookRun)
 		require.NoError(t, err)
 
 		testrecorder := httptest.NewRecorder()
@@ -131,15 +131,15 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			Description:          "description",
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			Description:             "description",
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -157,7 +157,7 @@ func TestIncidents(t *testing.T) {
 			Return(withid, nil).
 			Times(1)
 
-		i := app.Incident{
+		i := app.PlaybookRun{
 			OwnerUserID:     dialogRequest.UserId,
 			TeamID:          dialogRequest.TeamId,
 			Name:            "incidentName",
@@ -173,7 +173,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 		poster.EXPECT().PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 		poster.EXPECT().EphemeralPost(gomock.Any(), gomock.Any(), gomock.Any())
-		playbookRunService.EXPECT().CreateIncident(&i, &withid, "testUserID", true).Return(retI, nil)
+		playbookRunService.EXPECT().CreatePlaybookRun(&i, &withid, "testUserID", true).Return(retI, nil)
 
 		testrecorder := httptest.NewRecorder()
 		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
@@ -192,15 +192,15 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			Description:          "description",
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			Description:             "description",
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -218,7 +218,7 @@ func TestIncidents(t *testing.T) {
 			Return(withid, nil).
 			Times(1)
 
-		i := app.Incident{
+		i := app.PlaybookRun{
 			OwnerUserID:     dialogRequest.UserId,
 			TeamID:          dialogRequest.TeamId,
 			Name:            "incidentName",
@@ -235,7 +235,7 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 		poster.EXPECT().PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 		poster.EXPECT().EphemeralPost(gomock.Any(), gomock.Any(), gomock.Any())
-		playbookRunService.EXPECT().CreateIncident(&i, &withid, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreatePlaybookRun(&i, &withid, "testUserID", true).Return(&retI, nil)
 
 		testrecorder := httptest.NewRecorder()
 		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
@@ -254,14 +254,14 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -279,7 +279,7 @@ func TestIncidents(t *testing.T) {
 			Return(withid, nil).
 			Times(1)
 
-		i := app.Incident{
+		i := app.PlaybookRun{
 			OwnerUserID: dialogRequest.UserId,
 			TeamID:      dialogRequest.TeamId,
 			Name:        "incidentName",
@@ -321,14 +321,14 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			CreatePublicIncident: false,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			CreatePublicPlaybookRun: false,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -346,7 +346,7 @@ func TestIncidents(t *testing.T) {
 			Return(withid, nil).
 			Times(1)
 
-		i := app.Incident{
+		i := app.PlaybookRun{
 			OwnerUserID: dialogRequest.UserId,
 			TeamID:      dialogRequest.TeamId,
 			Name:        "incidentName",
@@ -389,14 +389,14 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -414,7 +414,7 @@ func TestIncidents(t *testing.T) {
 			Return(withid, nil).
 			Times(1)
 
-		i := app.Incident{
+		i := app.PlaybookRun{
 			OwnerUserID: dialogRequest.UserId,
 			TeamID:      dialogRequest.TeamId,
 			Name:        "incidentName",
@@ -484,15 +484,15 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			Description:          "description",
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			Description:             "description",
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -534,14 +534,14 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		withid := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"some_other_id"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"some_other_id"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
 		dialogRequest := model.SubmitDialogRequest{
@@ -582,18 +582,18 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		testPlaybook := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			Description:          "description",
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			Description:             "description",
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
 			Name:            "incidentName",
@@ -609,27 +609,27 @@ func TestIncidents(t *testing.T) {
 			Return(testPlaybook, nil).
 			Times(1)
 
-		retI := testIncident
+		retI := testPlaybookRun
 		retI.ID = "incidentID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		playbookRunService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreatePlaybookRun(&testPlaybookRun, &testPlaybook, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
 			PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
-			Name:        testIncident.Name,
-			OwnerUserID: testIncident.OwnerUserID,
-			TeamID:      testIncident.TeamID,
-			Description: testIncident.Description,
-			PlaybookID:  testIncident.PlaybookID,
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
+			Name:        testPlaybookRun.Name,
+			OwnerUserID: testPlaybookRun.OwnerUserID,
+			TeamID:      testPlaybookRun.TeamID,
+			Description: testPlaybookRun.Description,
+			PlaybookID:  testPlaybookRun.PlaybookID,
 		})
 		require.NoError(t, err)
-		assert.NotEmpty(t, resultIncident.ID)
+		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
 	t.Run("create valid incident, invite users enabled", func(t *testing.T) {
@@ -638,18 +638,18 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		testPlaybook := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			Description:          "description",
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   true,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			Description:             "description",
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      true,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
 			Name:            "incidentName",
@@ -665,27 +665,27 @@ func TestIncidents(t *testing.T) {
 			Return(testPlaybook, nil).
 			Times(1)
 
-		retI := testIncident
+		retI := testPlaybookRun
 		retI.ID = "incidentID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		playbookRunService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreatePlaybookRun(&testPlaybookRun, &testPlaybook, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
 			PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
-			Name:        testIncident.Name,
-			OwnerUserID: testIncident.OwnerUserID,
-			TeamID:      testIncident.TeamID,
-			Description: testIncident.Description,
-			PlaybookID:  testIncident.PlaybookID,
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
+			Name:        testPlaybookRun.Name,
+			OwnerUserID: testPlaybookRun.OwnerUserID,
+			TeamID:      testPlaybookRun.TeamID,
+			Description: testPlaybookRun.Description,
+			PlaybookID:  testPlaybookRun.PlaybookID,
 		})
 		require.NoError(t, err)
-		assert.NotEmpty(t, resultIncident.ID)
+		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
 	t.Run("create valid incident without playbook", func(t *testing.T) {
@@ -693,31 +693,31 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
 			Name:        "incidentName",
 		}
 
-		retI := testIncident
+		retI := testPlaybookRun
 		retI.ID = "incidentID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		playbookRunService.EXPECT().CreateIncident(&testIncident, nil, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreatePlaybookRun(&testPlaybookRun, nil, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
 			PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
-			Name:        testIncident.Name,
-			OwnerUserID: testIncident.OwnerUserID,
-			TeamID:      testIncident.TeamID,
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
+			Name:        testPlaybookRun.Name,
+			OwnerUserID: testPlaybookRun.OwnerUserID,
+			TeamID:      testPlaybookRun.TeamID,
 		})
 		require.NoError(t, err)
-		assert.NotEmpty(t, resultIncident.ID)
+		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
 	t.Run("create invalid incident - missing owner", func(t *testing.T) {
@@ -726,7 +726,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			TeamID: teamID,
 			Name:   "incidentName",
 		}
@@ -735,12 +735,12 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
-			Name:   testIncident.Name,
-			TeamID: testIncident.TeamID,
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
+			Name:   testPlaybookRun.Name,
+			TeamID: testPlaybookRun.TeamID,
 		})
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("create invalid incident - missing team", func(t *testing.T) {
@@ -748,19 +748,19 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
 			Name:        "incidentName",
 		}
 
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
-			Name:        testIncident.Name,
-			OwnerUserID: testIncident.OwnerUserID,
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
+			Name:        testPlaybookRun.Name,
+			OwnerUserID: testPlaybookRun.OwnerUserID,
 		})
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("create invalid incident - missing name", func(t *testing.T) {
@@ -769,7 +769,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
 		}
@@ -778,13 +778,13 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
 			Name:        "",
-			TeamID:      testIncident.TeamID,
-			OwnerUserID: testIncident.OwnerUserID,
+			TeamID:      testPlaybookRun.TeamID,
+			OwnerUserID: testPlaybookRun.OwnerUserID,
 		})
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("create incident in unlicensed server with pricing plan differentiation enabled", func(*testing.T) {
@@ -811,18 +811,18 @@ func TestIncidents(t *testing.T) {
 
 		teamID := model.NewId()
 		testPlaybook := app.Playbook{
-			ID:                   "playbookid1",
-			Title:                "My Playbook",
-			TeamID:               teamID,
-			Description:          "description",
-			CreatePublicIncident: true,
-			MemberIDs:            []string{"testUserID"},
-			InviteUsersEnabled:   false,
-			InvitedUserIDs:       []string{"testInvitedUserID1", "testInvitedUserID2"},
-			InvitedGroupIDs:      []string{"testInvitedGroupID1", "testInvitedGroupID2"},
+			ID:                      "playbookid1",
+			Title:                   "My Playbook",
+			TeamID:                  teamID,
+			Description:             "description",
+			CreatePublicPlaybookRun: true,
+			MemberIDs:               []string{"testUserID"},
+			InviteUsersEnabled:      false,
+			InvitedUserIDs:          []string{"testInvitedUserID1", "testInvitedUserID2"},
+			InvitedGroupIDs:         []string{"testInvitedGroupID1", "testInvitedGroupID2"},
 		}
 
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
 			Name:            "incidentName",
@@ -838,27 +838,27 @@ func TestIncidents(t *testing.T) {
 			Return(testPlaybook, nil).
 			Times(1)
 
-		retI := testIncident
+		retI := testPlaybookRun
 		retI.ID = "incidentID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
-		playbookRunService.EXPECT().CreateIncident(&testIncident, &testPlaybook, "testUserID", true).Return(&retI, nil)
+		playbookRunService.EXPECT().CreatePlaybookRun(&testPlaybookRun, &testPlaybook, "testUserID", true).Return(&retI, nil)
 
 		// Verify that the websocket event is published
 		poster.EXPECT().
 			PublishWebsocketEventToUser(gomock.Any(), gomock.Any(), gomock.Any())
 
-		resultIncident, err := c.Incidents.Create(context.TODO(), icClient.IncidentCreateOptions{
-			Name:        testIncident.Name,
-			OwnerUserID: testIncident.OwnerUserID,
-			TeamID:      testIncident.TeamID,
-			Description: testIncident.Description,
-			PlaybookID:  testIncident.PlaybookID,
+		resultPlaybookRun, err := c.PlaybookRuns.Create(context.TODO(), icClient.PlaybookRunCreateOptions{
+			Name:        testPlaybookRun.Name,
+			OwnerUserID: testPlaybookRun.OwnerUserID,
+			TeamID:      testPlaybookRun.TeamID,
+			Description: testPlaybookRun.Description,
+			PlaybookID:  testPlaybookRun.PlaybookID,
 		})
 		require.NoError(t, err)
-		assert.NotEmpty(t, resultIncident.ID)
+		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
 	t.Run("get incident by channel id", func(t *testing.T) {
@@ -866,7 +866,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:              "incidentID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
@@ -883,12 +883,12 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel("channelID").Return("incidentID", nil)
-		playbookRunService.EXPECT().GetIncident("incidentID").Return(&testIncident, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel("channelID").Return("incidentID", nil)
+		playbookRunService.EXPECT().GetPlaybookRun("incidentID").Return(&testPlaybookRun, nil)
 
-		resultIncident, err := c.Incidents.GetByChannelID(context.TODO(), testIncident.ChannelID)
+		resultPlaybookRun, err := c.PlaybookRuns.GetByChannelID(context.TODO(), testPlaybookRun.ChannelID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncident, toInternalIncident(*resultIncident))
+		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
 	t.Run("get incident by channel id - not found", func(t *testing.T) {
@@ -898,7 +898,7 @@ func TestIncidents(t *testing.T) {
 		userID := "testUserID"
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -910,12 +910,12 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel("channelID").Return("", app.ErrNotFound)
-		logger.EXPECT().Warnf("User %s does not have permissions to get incident for channel %s", userID, testIncident.ChannelID)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel("channelID").Return("", app.ErrNotFound)
+		logger.EXPECT().Warnf("User %s does not have permissions to get incident for channel %s", userID, testPlaybookRun.ChannelID)
 
-		resultIncident, err := c.Incidents.GetByChannelID(context.TODO(), testIncident.ChannelID)
+		resultPlaybookRun, err := c.PlaybookRuns.GetByChannelID(context.TODO(), testPlaybookRun.ChannelID)
 		requireErrorWithStatusCode(t, err, http.StatusNotFound)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("get incident by channel id - not authorized", func(t *testing.T) {
@@ -924,7 +924,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -935,14 +935,14 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(false)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
-		resultIncident, err := c.Incidents.GetByChannelID(context.TODO(), testIncident.ChannelID)
+		resultPlaybookRun, err := c.PlaybookRuns.GetByChannelID(context.TODO(), testPlaybookRun.ChannelID)
 		requireErrorWithStatusCode(t, err, http.StatusNotFound)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("get private incident - not part of channel", func(t *testing.T) {
@@ -950,7 +950,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -961,21 +961,21 @@ func TestIncidents(t *testing.T) {
 			Checklists:  nil,
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
 			Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(false)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
-		resultIncident, err := c.Incidents.Get(context.TODO(), testIncident.ID)
+		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("get private incident - part of channel", func(t *testing.T) {
@@ -983,7 +983,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:              "incidentID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
@@ -998,21 +998,21 @@ func TestIncidents(t *testing.T) {
 			TimelineEvents:  []app.TimelineEvent{},
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
 			Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(true)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil).Times(2)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil).Times(2)
 
-		resultIncident, err := c.Incidents.Get(context.TODO(), testIncident.ID)
+		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncident, toInternalIncident(*resultIncident))
+		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
 	t.Run("get public incident - not part of channel or team", func(t *testing.T) {
@@ -1020,7 +1020,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:              "incidentID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
@@ -1033,23 +1033,23 @@ func TestIncidents(t *testing.T) {
 			InvitedGroupIDs: []string{},
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
-			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testIncident.TeamID}, nil)
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
+			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testPlaybookRun.TeamID}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(false)
-		pluginAPI.On("HasPermissionToTeam", "testUserID", testIncident.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
+		pluginAPI.On("HasPermissionToTeam", "testUserID", testPlaybookRun.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
 			Return(false)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
-		resultIncident, err := c.Incidents.Get(context.TODO(), testIncident.ID)
+		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("get public incident - not part of channel, but part of team", func(t *testing.T) {
@@ -1057,7 +1057,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:              "incidentID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
@@ -1072,23 +1072,23 @@ func TestIncidents(t *testing.T) {
 			TimelineEvents:  []app.TimelineEvent{},
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
-			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testIncident.TeamID}, nil)
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
+			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testPlaybookRun.TeamID}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(false)
-		pluginAPI.On("HasPermissionToTeam", "testUserID", testIncident.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
+		pluginAPI.On("HasPermissionToTeam", "testUserID", testPlaybookRun.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
 			Return(true)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil).Times(2)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil).Times(2)
 
-		resultIncident, err := c.Incidents.Get(context.TODO(), testIncident.ID)
+		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncident, toInternalIncident(*resultIncident))
+		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
 	t.Run("get public incident - part of channel", func(t *testing.T) {
@@ -1096,7 +1096,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:              "incidentID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
@@ -1111,21 +1111,21 @@ func TestIncidents(t *testing.T) {
 			TimelineEvents:  []app.TimelineEvent{},
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
-			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testIncident.TeamID}, nil)
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
+			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testPlaybookRun.TeamID}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(true)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil).Times(2)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil).Times(2)
 
-		resultIncident, err := c.Incidents.Get(context.TODO(), testIncident.ID)
+		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncident, toInternalIncident(*resultIncident))
+		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
 	t.Run("get private incident metadata - not part of channel", func(t *testing.T) {
@@ -1133,7 +1133,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1144,21 +1144,21 @@ func TestIncidents(t *testing.T) {
 			Checklists:  nil,
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
 			Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(false)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
-		resultIncidentMetadata, err := c.Incidents.GetMetadata(context.TODO(), testIncident.ID)
+		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
-		require.Nil(t, resultIncidentMetadata)
+		require.Nil(t, resultPlaybookRunMetadata)
 	})
 
 	t.Run("get private incident metadata - part of channel", func(t *testing.T) {
@@ -1166,7 +1166,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1177,7 +1177,7 @@ func TestIncidents(t *testing.T) {
 			Checklists:  []app.Checklist{},
 		}
 
-		testIncidentMetadata := app.Metadata{
+		testPlaybookRunMetadata := app.Metadata{
 			ChannelName:        "theChannelName",
 			ChannelDisplayName: "theChannelDisplayName",
 			TeamName:           "ourAwesomeTeam",
@@ -1185,25 +1185,25 @@ func TestIncidents(t *testing.T) {
 			TotalPosts:         42,
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
 			Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(true)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
 		playbookRunService.EXPECT().
-			GetIncidentMetadata("incidentID").
-			Return(&testIncidentMetadata, nil)
+			GetPlaybookRunMetadata("incidentID").
+			Return(&testPlaybookRunMetadata, nil)
 
-		resultIncidentMetadata, err := c.Incidents.GetMetadata(context.TODO(), testIncident.ID)
+		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncidentMetadata, toInternalIncidentMetadata(*resultIncidentMetadata))
+		assert.Equal(t, testPlaybookRunMetadata, toInternalPlaybookRunMetadata(*resultPlaybookRunMetadata))
 	})
 
 	t.Run("get public incident metadata - not part of channel or team", func(t *testing.T) {
@@ -1211,7 +1211,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1222,23 +1222,23 @@ func TestIncidents(t *testing.T) {
 			Checklists:  nil,
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
-			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testIncident.TeamID}, nil)
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
+			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testPlaybookRun.TeamID}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(false)
-		pluginAPI.On("HasPermissionToTeam", "testUserID", testIncident.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
+		pluginAPI.On("HasPermissionToTeam", "testUserID", testPlaybookRun.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
 			Return(false)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
-		resultIncidentMetadata, err := c.Incidents.GetMetadata(context.TODO(), testIncident.ID)
+		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
-		require.Nil(t, resultIncidentMetadata)
+		require.Nil(t, resultPlaybookRunMetadata)
 	})
 
 	t.Run("get public incident metadata - not part of channel, but part of team", func(t *testing.T) {
@@ -1246,7 +1246,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1257,7 +1257,7 @@ func TestIncidents(t *testing.T) {
 			Checklists:  []app.Checklist{},
 		}
 
-		testIncidentMetadata := app.Metadata{
+		testPlaybookRunMetadata := app.Metadata{
 			ChannelName:        "theChannelName",
 			ChannelDisplayName: "theChannelDisplayName",
 			TeamName:           "ourAwesomeTeam",
@@ -1265,27 +1265,27 @@ func TestIncidents(t *testing.T) {
 			TotalPosts:         42,
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
-			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testIncident.TeamID}, nil)
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
+			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testPlaybookRun.TeamID}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(false)
-		pluginAPI.On("HasPermissionToTeam", "testUserID", testIncident.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
+		pluginAPI.On("HasPermissionToTeam", "testUserID", testPlaybookRun.TeamID, model.PERMISSION_LIST_TEAM_CHANNELS).
 			Return(true)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
 		playbookRunService.EXPECT().
-			GetIncidentMetadata("incidentID").
-			Return(&testIncidentMetadata, nil)
+			GetPlaybookRunMetadata("incidentID").
+			Return(&testPlaybookRunMetadata, nil)
 
-		resultIncidentMetadata, err := c.Incidents.GetMetadata(context.TODO(), testIncident.ID)
+		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncidentMetadata, toInternalIncidentMetadata(*resultIncidentMetadata))
+		assert.Equal(t, testPlaybookRunMetadata, toInternalPlaybookRunMetadata(*resultPlaybookRunMetadata))
 	})
 
 	t.Run("get public incident metadata - part of channel", func(t *testing.T) {
@@ -1293,7 +1293,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1304,7 +1304,7 @@ func TestIncidents(t *testing.T) {
 			Checklists:  []app.Checklist{},
 		}
 
-		testIncidentMetadata := app.Metadata{
+		testPlaybookRunMetadata := app.Metadata{
 			ChannelName:        "theChannelName",
 			ChannelDisplayName: "theChannelDisplayName",
 			TeamName:           "ourAwesomeTeam",
@@ -1312,25 +1312,25 @@ func TestIncidents(t *testing.T) {
 			TotalPosts:         42,
 		}
 
-		pluginAPI.On("GetChannel", testIncident.ChannelID).
-			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testIncident.TeamID}, nil)
+		pluginAPI.On("GetChannel", testPlaybookRun.ChannelID).
+			Return(&model.Channel{Type: model.CHANNEL_OPEN, TeamId: testPlaybookRun.TeamID}, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		pluginAPI.On("HasPermissionToChannel", "testUserID", testIncident.ChannelID, model.PERMISSION_READ_CHANNEL).
+		pluginAPI.On("HasPermissionToChannel", "testUserID", testPlaybookRun.ChannelID, model.PERMISSION_READ_CHANNEL).
 			Return(true)
 
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetIncident("incidentID").
-			Return(&testIncident, nil)
+			GetPlaybookRun("incidentID").
+			Return(&testPlaybookRun, nil)
 
 		playbookRunService.EXPECT().
-			GetIncidentMetadata("incidentID").
-			Return(&testIncidentMetadata, nil)
+			GetPlaybookRunMetadata("incidentID").
+			Return(&testPlaybookRunMetadata, nil)
 
-		resultIncidentMetadata, err := c.Incidents.GetMetadata(context.TODO(), testIncident.ID)
+		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testIncidentMetadata, toInternalIncidentMetadata(*resultIncidentMetadata))
+		assert.Equal(t, testPlaybookRunMetadata, toInternalPlaybookRunMetadata(*resultPlaybookRunMetadata))
 	})
 
 	t.Run("get incidents", func(t *testing.T) {
@@ -1338,7 +1338,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		incident1 := app.Incident{
+		incident1 := app.PlaybookRun{
 			ID:              "incidentID1",
 			OwnerUserID:     "testUserID1",
 			TeamID:          teamID,
@@ -1355,24 +1355,24 @@ func TestIncidents(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("GetUser", "testUserID").Return(&model.User{}, nil)
 		pluginAPI.On("HasPermissionToTeam", mock.Anything, mock.Anything, model.PERMISSION_VIEW_TEAM).Return(true)
-		result := &app.GetIncidentsResults{
+		result := &app.GetPlaybookRunsResults{
 			TotalCount: 100,
 			PageCount:  200,
 			HasMore:    true,
-			Items:      []app.Incident{incident1},
+			Items:      []app.PlaybookRun{incident1},
 		}
-		playbookRunService.EXPECT().GetIncidents(gomock.Any(), gomock.Any()).Return(result, nil)
+		playbookRunService.EXPECT().GetPlaybookRuns(gomock.Any(), gomock.Any()).Return(result, nil)
 
-		actualList, err := c.Incidents.List(context.TODO(), 0, 200, icClient.IncidentListOptions{
+		actualList, err := c.PlaybookRuns.List(context.TODO(), 0, 200, icClient.PlaybookRunListOptions{
 			TeamID: teamID,
 		})
 		require.NoError(t, err)
 
-		expectedList := &icClient.GetIncidentsResults{
+		expectedList := &icClient.GetPlaybookRunsResults{
 			TotalCount: 100,
 			PageCount:  200,
 			HasMore:    true,
-			Items:      []icClient.Incident{toAPIIncident(incident1)},
+			Items:      []icClient.PlaybookRun{toAPIPlaybookRun(incident1)},
 		}
 		assert.Equal(t, expectedList, actualList)
 	})
@@ -1385,11 +1385,11 @@ func TestIncidents(t *testing.T) {
 		teamID := model.NewId()
 		pluginAPI.On("HasPermissionToTeam", mock.Anything, teamID, model.PERMISSION_VIEW_TEAM).Return(false)
 
-		resultIncident, err := c.Incidents.List(context.TODO(), 0, 100, icClient.IncidentListOptions{
+		resultPlaybookRun, err := c.PlaybookRuns.List(context.TODO(), 0, 100, icClient.PlaybookRunListOptions{
 			TeamID: teamID,
 		})
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
-		require.Nil(t, resultIncident)
+		require.Nil(t, resultPlaybookRun)
 	})
 
 	t.Run("get disabled list of incidents", func(t *testing.T) {
@@ -1407,12 +1407,12 @@ func TestIncidents(t *testing.T) {
 
 		pluginAPI.On("HasPermissionToTeam", mock.Anything, disabledTeamID, model.PERMISSION_VIEW_TEAM).Return(true)
 
-		actualList, err := c.Incidents.List(context.TODO(), 0, 100, icClient.IncidentListOptions{
+		actualList, err := c.PlaybookRuns.List(context.TODO(), 0, 100, icClient.PlaybookRunListOptions{
 			TeamID: disabledTeamID,
 		})
 		require.NoError(t, err)
 
-		expectedList := &icClient.GetIncidentsResults{
+		expectedList := &icClient.GetPlaybookRunsResults{
 			Disabled: true,
 		}
 		assert.Equal(t, expectedList, actualList)
@@ -1424,7 +1424,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1432,14 +1432,14 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(false)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("GET", "/api/v0/incidents/checklist-autocomplete?channel_id="+testIncident.ChannelID, nil)
+		testreq, err := http.NewRequest("GET", "/api/v0/incidents/checklist-autocomplete?channel_id="+testPlaybookRun.ChannelID, nil)
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -1454,7 +1454,7 @@ func TestIncidents(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1462,9 +1462,9 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
@@ -1476,7 +1476,7 @@ func TestIncidents(t *testing.T) {
 		}
 		playbookRunService.EXPECT().UpdateStatus("incidentID", "testUserID", updateOptions).Return(nil)
 
-		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
 		require.NoError(t, err)
 	})
 
@@ -1486,7 +1486,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1494,13 +1494,13 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", "Arrrrrrrctive", "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", "Arrrrrrrctive", "test description", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 
@@ -1510,7 +1510,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1518,13 +1518,13 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(false)
 
-		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
 	})
 
@@ -1534,7 +1534,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1542,13 +1542,13 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "  \t   \r   \t  \r\r  ", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "  \t   \r   \t  \r\r  ", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 
@@ -1558,7 +1558,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1566,13 +1566,13 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", "\t   \r  ", "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", "\t   \r  ", "test description", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 
@@ -1582,7 +1582,7 @@ func TestIncidents(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
-		testIncident := app.Incident{
+		testPlaybookRun := app.PlaybookRun{
 			ID:          "incidentID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
@@ -1590,13 +1590,13 @@ func TestIncidents(t *testing.T) {
 			ChannelID:   "channelID",
 		}
 
-		playbookRunService.EXPECT().GetIncidentIDForChannel(testIncident.ChannelID).Return(testIncident.ID, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel(testPlaybookRun.ChannelID).Return(testPlaybookRun.ID, nil)
 		pluginAPI.On("HasPermissionTo", mock.Anything, model.PERMISSION_MANAGE_SYSTEM).Return(false)
-		playbookRunService.EXPECT().GetIncident(testIncident.ID).Return(&testIncident, nil).Times(2)
+		playbookRunService.EXPECT().GetPlaybookRun(testPlaybookRun.ID).Return(&testPlaybookRun, nil).Times(2)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.Incidents.UpdateStatus(context.TODO(), "incidentID", "Active", "  \r \n  ", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", "Active", "  \r \n  ", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 }

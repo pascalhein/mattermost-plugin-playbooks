@@ -41,7 +41,7 @@ func NewTelemetryHandler(router *mux.Router, playbookRunService app.PlaybookRunS
 
 	incidentTelemetryRouterAuthorized := telemetryRouter.PathPrefix("/incident").Subrouter()
 	incidentTelemetryRouterAuthorized.Use(handler.checkViewPermissions)
-	incidentTelemetryRouterAuthorized.HandleFunc("/{id:[A-Za-z0-9]+}", handler.telemetryForIncident).Methods(http.MethodPost)
+	incidentTelemetryRouterAuthorized.HandleFunc("/{id:[A-Za-z0-9]+}", handler.telemetryForPlaybookRun).Methods(http.MethodPost)
 
 	return handler
 }
@@ -51,13 +51,13 @@ func (h *TelemetryHandler) checkViewPermissions(next http.Handler) http.Handler 
 		vars := mux.Vars(r)
 		userID := r.Header.Get("Mattermost-User-ID")
 
-		incident, err := h.playbookRunService.GetIncident(vars["id"])
+		incident, err := h.playbookRunService.GetPlaybookRun(vars["id"])
 		if err != nil {
 			h.HandleError(w, err)
 			return
 		}
 
-		if err := app.ViewIncidentFromChannelID(userID, incident.ChannelID, h.pluginAPI); err != nil {
+		if err := app.ViewPlaybookRunFromChannelID(userID, incident.ChannelID, h.pluginAPI); err != nil {
 			if errors.Is(err, app.ErrNoPermissions) {
 				h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", err)
 				return
@@ -74,9 +74,9 @@ type TrackerPayload struct {
 	Action string `json:"action"`
 }
 
-// telemetryForIncident handles the /telemetry/incident/{id}?action=the_action endpoint. The frontend
+// telemetryForPlaybookRun handles the /telemetry/incident/{id}?action=the_action endpoint. The frontend
 // can use this endpoint to track events that occur in the context of an incident
-func (h *TelemetryHandler) telemetryForIncident(w http.ResponseWriter, r *http.Request) {
+func (h *TelemetryHandler) telemetryForPlaybookRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -92,13 +92,13 @@ func (h *TelemetryHandler) telemetryForIncident(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	incident, err := h.playbookRunService.GetIncident(id)
+	incident, err := h.playbookRunService.GetPlaybookRun(id)
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
-	h.incidentTelemetry.FrontendTelemetryForIncident(incident, userID, params.Action)
+	h.incidentTelemetry.FrontendTelemetryForPlaybookRun(incident, userID, params.Action)
 
 	w.WriteHeader(http.StatusNoContent)
 }

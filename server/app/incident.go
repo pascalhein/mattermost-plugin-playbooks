@@ -18,11 +18,11 @@ const (
 	StatusArchived = "Archived"
 )
 
-// Incident holds the detailed information of an incident.
+// PlaybookRun holds the detailed information of an incident.
 //
 // NOTE: when adding a column to the db, search for "When adding an Incident column" to see where
 // that column needs to be added in the sqlstore code.
-type Incident struct {
+type PlaybookRun struct {
 	ID                                   string          `json:"id"`
 	Name                                 string          `json:"name"` // Retrieved from incident channel
 	Description                          string          `json:"description"`
@@ -58,24 +58,24 @@ type Incident struct {
 	MessageOnJoin                        string          `json:"message_on_join"`
 }
 
-func (i *Incident) Clone() *Incident {
-	newIncident := *i
+func (i *PlaybookRun) Clone() *PlaybookRun {
+	newPlaybookRun := *i
 	var newChecklists []Checklist
 	for _, c := range i.Checklists {
 		newChecklists = append(newChecklists, c.Clone())
 	}
-	newIncident.Checklists = newChecklists
+	newPlaybookRun.Checklists = newChecklists
 
-	newIncident.StatusPosts = append([]StatusPost(nil), i.StatusPosts...)
-	newIncident.TimelineEvents = append([]TimelineEvent(nil), i.TimelineEvents...)
-	newIncident.InvitedUserIDs = append([]string(nil), i.InvitedUserIDs...)
-	newIncident.InvitedGroupIDs = append([]string(nil), i.InvitedGroupIDs...)
+	newPlaybookRun.StatusPosts = append([]StatusPost(nil), i.StatusPosts...)
+	newPlaybookRun.TimelineEvents = append([]TimelineEvent(nil), i.TimelineEvents...)
+	newPlaybookRun.InvitedUserIDs = append([]string(nil), i.InvitedUserIDs...)
+	newPlaybookRun.InvitedGroupIDs = append([]string(nil), i.InvitedGroupIDs...)
 
-	return &newIncident
+	return &newPlaybookRun
 }
 
-func (i *Incident) MarshalJSON() ([]byte, error) {
-	type Alias Incident
+func (i *PlaybookRun) MarshalJSON() ([]byte, error) {
+	type Alias PlaybookRun
 
 	old := (*Alias)(i.Clone())
 	// replace nils with empty slices for the frontend
@@ -103,12 +103,12 @@ func (i *Incident) MarshalJSON() ([]byte, error) {
 	return json.Marshal(old)
 }
 
-func (i *Incident) IsActive() bool {
+func (i *PlaybookRun) IsActive() bool {
 	currentStatus := i.CurrentStatus
 	return currentStatus != StatusResolved && currentStatus != StatusArchived
 }
 
-func (i *Incident) ResolvedAt() int64 {
+func (i *PlaybookRun) ResolvedAt() int64 {
 	// Backwards compatibility for incidents with old status updates
 	if len(i.StatusPosts) > 0 && i.StatusPosts[len(i.StatusPosts)-1].Status == "" {
 		return i.EndAt
@@ -164,7 +164,7 @@ type Metadata struct {
 type timelineEventType string
 
 const (
-	IncidentCreated        timelineEventType = "incident_created"
+	PlaybookRunCreated     timelineEventType = "incident_created"
 	TaskStateModified      timelineEventType = "task_state_modified"
 	StatusUpdated          timelineEventType = "status_updated"
 	OwnerChanged           timelineEventType = "owner_changed"
@@ -178,7 +178,7 @@ const (
 
 type TimelineEvent struct {
 	ID            string            `json:"id"`
-	IncidentID    string            `json:"incident_id"`
+	PlaybookRunID string            `json:"incident_id"`
 	CreateAt      int64             `json:"create_at"`
 	DeleteAt      int64             `json:"delete_at"`
 	EventAt       int64             `json:"event_at"`
@@ -190,41 +190,41 @@ type TimelineEvent struct {
 	CreatorUserID string            `json:"creator_user_id"`
 }
 
-// GetIncidentsResults collects the results of the GetIncidents call: the list of Incidents matching
+// GetPlaybookRunsResults collects the results of the GetPlaybookRuns call: the list of PlaybookRuns matching
 // the HeaderFilterOptions, and the TotalCount of the matching incidents before paging was applied.
-type GetIncidentsResults struct {
-	TotalCount int        `json:"total_count"`
-	PageCount  int        `json:"page_count"`
-	HasMore    bool       `json:"has_more"`
-	Items      []Incident `json:"items"`
+type GetPlaybookRunsResults struct {
+	TotalCount int           `json:"total_count"`
+	PageCount  int           `json:"page_count"`
+	HasMore    bool          `json:"has_more"`
+	Items      []PlaybookRun `json:"items"`
 }
 
 type SQLStatusPost struct {
-	IncidentID string
-	PostID     string
-	Status     string
-	EndAt      int64
+	PlaybookRunID string
+	PostID        string
+	Status        string
+	EndAt         int64
 }
 
-func (r GetIncidentsResults) Clone() GetIncidentsResults {
-	newGetIncidentsResults := r
+func (r GetPlaybookRunsResults) Clone() GetPlaybookRunsResults {
+	newGetPlaybookRunsResults := r
 
-	newGetIncidentsResults.Items = make([]Incident, 0, len(r.Items))
+	newGetPlaybookRunsResults.Items = make([]PlaybookRun, 0, len(r.Items))
 	for _, i := range r.Items {
-		newGetIncidentsResults.Items = append(newGetIncidentsResults.Items, *i.Clone())
+		newGetPlaybookRunsResults.Items = append(newGetPlaybookRunsResults.Items, *i.Clone())
 	}
 
-	return newGetIncidentsResults
+	return newGetPlaybookRunsResults
 }
 
-func (r GetIncidentsResults) MarshalJSON() ([]byte, error) {
-	type Alias GetIncidentsResults
+func (r GetPlaybookRunsResults) MarshalJSON() ([]byte, error) {
+	type Alias GetPlaybookRunsResults
 
 	old := Alias(r.Clone())
 
 	// replace nils with empty slices for the frontend
 	if old.Items == nil {
-		old.Items = []Incident{}
+		old.Items = []PlaybookRun{}
 	}
 
 	return json.Marshal(old)
@@ -249,14 +249,14 @@ type DialogStateAddToTimeline struct {
 
 // PlaybookRunService is the incident/service interface.
 type PlaybookRunService interface {
-	// GetIncidents returns filtered incidents and the total count before paging.
-	GetIncidents(requesterInfo RequesterInfo, options IncidentFilterOptions) (*GetIncidentsResults, error)
+	// GetPlaybookRuns returns filtered incidents and the total count before paging.
+	GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error)
 
-	// CreateIncident creates a new incident. userID is the user who initiated the CreateIncident.
-	CreateIncident(incident *Incident, playbook *Playbook, userID string, public bool) (*Incident, error)
+	// CreatePlaybookRun creates a new incident. userID is the user who initiated the CreatePlaybookRun.
+	CreatePlaybookRun(incident *PlaybookRun, playbook *Playbook, userID string, public bool) (*PlaybookRun, error)
 
-	// OpenCreateIncidentDialog opens an interactive dialog to start a new incident.
-	OpenCreateIncidentDialog(teamID, ownerID, triggerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) error
+	// OpenCreatePlaybookRunDialog opens an interactive dialog to start a new incident.
+	OpenCreatePlaybookRunDialog(teamID, ownerID, triggerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) error
 
 	// OpenUpdateStatusDialog opens an interactive dialog so the user can update the incident's status.
 	OpenUpdateStatusDialog(incidentID, triggerID string) error
@@ -276,18 +276,18 @@ type PlaybookRunService interface {
 	// UpdateStatus updates an incident's status.
 	UpdateStatus(incidentID, userID string, options StatusUpdateOptions) error
 
-	// GetIncident gets an incident by ID. Returns error if it could not be found.
-	GetIncident(incidentID string) (*Incident, error)
+	// GetPlaybookRun gets an incident by ID. Returns error if it could not be found.
+	GetPlaybookRun(incidentID string) (*PlaybookRun, error)
 
-	// GetIncidentMetadata gets ancillary metadata about an incident.
-	GetIncidentMetadata(incidentID string) (*Metadata, error)
+	// GetPlaybookRunMetadata gets ancillary metadata about an incident.
+	GetPlaybookRunMetadata(incidentID string) (*Metadata, error)
 
-	// GetIncidentIDForChannel get the incidentID associated with this channel. Returns ErrNotFound
+	// GetPlaybookRunIDForChannel get the incidentID associated with this channel. Returns ErrNotFound
 	// if there is no incident associated with this channel.
-	GetIncidentIDForChannel(channelID string) (string, error)
+	GetPlaybookRunIDForChannel(channelID string) (string, error)
 
 	// GetOwners returns all the owners of incidents selected
-	GetOwners(requesterInfo RequesterInfo, options IncidentFilterOptions) ([]OwnerInfo, error)
+	GetOwners(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) ([]OwnerInfo, error)
 
 	// IsOwner returns true if the userID is the owner for incidentID.
 	IsOwner(incidentID string, userID string) bool
@@ -371,14 +371,14 @@ type PlaybookRunService interface {
 
 // PlaybookRunStore defines the methods the PlaybookRunServiceImpl needs from the interfaceStore.
 type PlaybookRunStore interface {
-	// GetIncidents returns filtered incidents and the total count before paging.
-	GetIncidents(requesterInfo RequesterInfo, options IncidentFilterOptions) (*GetIncidentsResults, error)
+	// GetPlaybookRuns returns filtered incidents and the total count before paging.
+	GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error)
 
-	// CreateIncident creates a new incident. If incident has an ID, that ID will be used.
-	CreateIncident(incident *Incident) (*Incident, error)
+	// CreatePlaybookRun creates a new incident. If incident has an ID, that ID will be used.
+	CreatePlaybookRun(incident *PlaybookRun) (*PlaybookRun, error)
 
-	// UpdateIncident updates an incident.
-	UpdateIncident(incident *Incident) error
+	// UpdatePlaybookRun updates an incident.
+	UpdatePlaybookRun(incident *PlaybookRun) error
 
 	// UpdateStatus updates the status of an incident.
 	UpdateStatus(statusPost *SQLStatusPost) error
@@ -392,19 +392,19 @@ type PlaybookRunStore interface {
 	// UpdateTimelineEvent updates an existing timeline event
 	UpdateTimelineEvent(event *TimelineEvent) error
 
-	// GetIncident gets an incident by ID.
-	GetIncident(incidentID string) (*Incident, error)
+	// GetPlaybookRun gets an incident by ID.
+	GetPlaybookRun(incidentID string) (*PlaybookRun, error)
 
-	// GetIncidentByChannel gets an incident associated with the given channel id.
-	GetIncidentIDForChannel(channelID string) (string, error)
+	// GetPlaybookRunByChannel gets an incident associated with the given channel id.
+	GetPlaybookRunIDForChannel(channelID string) (string, error)
 
-	// GetAllIncidentMembersCount returns the count of all members of the
+	// GetAllPlaybookRunMembersCount returns the count of all members of the
 	// incident associated with the given channel id since the beginning of the
 	// incident, excluding bots.
-	GetAllIncidentMembersCount(channelID string) (int64, error)
+	GetAllPlaybookRunMembersCount(channelID string) (int64, error)
 
 	// GetOwners returns the owners of the incidents selected by options
-	GetOwners(requesterInfo RequesterInfo, options IncidentFilterOptions) ([]OwnerInfo, error)
+	GetOwners(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) ([]OwnerInfo, error)
 
 	// NukeDB removes all incident related data.
 	NukeDB() error
@@ -423,29 +423,29 @@ type PlaybookRunStore interface {
 // PlaybookRunTelemetry defines the methods that the PlaybookRunServiceImpl needs from the RudderTelemetry.
 // Unless otherwise noted, userID is the user initiating the event.
 type PlaybookRunTelemetry interface {
-	// CreateIncident tracks the creation of a new incident.
-	CreateIncident(incident *Incident, userID string, public bool)
+	// CreatePlaybookRun tracks the creation of a new incident.
+	CreatePlaybookRun(incident *PlaybookRun, userID string, public bool)
 
-	// EndIncident tracks the end of an incident.
-	EndIncident(incident *Incident, userID string)
+	// EndPlaybookRun tracks the end of an incident.
+	EndPlaybookRun(incident *PlaybookRun, userID string)
 
-	// RestartIncident tracks the restart of an incident.
-	RestartIncident(incident *Incident, userID string)
+	// RestartPlaybookRun tracks the restart of an incident.
+	RestartPlaybookRun(incident *PlaybookRun, userID string)
 
 	// ChangeOwner tracks changes in owner.
-	ChangeOwner(incident *Incident, userID string)
+	ChangeOwner(incident *PlaybookRun, userID string)
 
 	// UpdateStatus tracks when an incident's status has been updated
-	UpdateStatus(incident *Incident, userID string)
+	UpdateStatus(incident *PlaybookRun, userID string)
 
-	// FrontendTelemetryForIncident tracks an event originating from the frontend
-	FrontendTelemetryForIncident(incident *Incident, userID, action string)
+	// FrontendTelemetryForPlaybookRun tracks an event originating from the frontend
+	FrontendTelemetryForPlaybookRun(incident *PlaybookRun, userID, action string)
 
 	// AddPostToTimeline tracks userID creating a timeline event from a post.
-	AddPostToTimeline(incident *Incident, userID string)
+	AddPostToTimeline(incident *PlaybookRun, userID string)
 
 	// RemoveTimelineEvent tracks userID removing a timeline event.
-	RemoveTimelineEvent(incident *Incident, userID string)
+	RemoveTimelineEvent(incident *PlaybookRun, userID string)
 
 	// ModifyCheckedState tracks the checking and unchecking of items.
 	ModifyCheckedState(incidentID, userID string, task ChecklistItem, wasOwner bool)
@@ -470,10 +470,10 @@ type PlaybookRunTelemetry interface {
 	RunTaskSlashCommand(incidentID, userID string, task ChecklistItem)
 
 	// UpdateRetrospective event
-	UpdateRetrospective(incident *Incident, userID string)
+	UpdateRetrospective(incident *PlaybookRun, userID string)
 
 	// PublishRetrospective event
-	PublishRetrospective(incident *Incident, userID string)
+	PublishRetrospective(incident *PlaybookRun, userID string)
 }
 
 type JobOnceScheduler interface {
@@ -486,8 +486,8 @@ type JobOnceScheduler interface {
 
 const PerPageDefault = 1000
 
-// IncidentFilterOptions specifies the optional parameters when getting headers.
-type IncidentFilterOptions struct {
+// PlaybookRunFilterOptions specifies the optional parameters when getting headers.
+type PlaybookRunFilterOptions struct {
 	// Gets all the headers with this TeamID.
 	TeamID string `url:"team_id,omitempty"`
 
@@ -525,15 +525,15 @@ type IncidentFilterOptions struct {
 }
 
 // Clone duplicates the given options.
-func (o *IncidentFilterOptions) Clone() IncidentFilterOptions {
-	newIncidentFilterOptions := *o
-	newIncidentFilterOptions.Statuses = append([]string{}, o.Statuses...)
+func (o *PlaybookRunFilterOptions) Clone() PlaybookRunFilterOptions {
+	newPlaybookRunFilterOptions := *o
+	newPlaybookRunFilterOptions.Statuses = append([]string{}, o.Statuses...)
 
-	return newIncidentFilterOptions
+	return newPlaybookRunFilterOptions
 }
 
 // Validate returns a new, validated filter options or returns an error if invalid.
-func (o IncidentFilterOptions) Validate() (IncidentFilterOptions, error) {
+func (o PlaybookRunFilterOptions) Validate() (PlaybookRunFilterOptions, error) {
 	options := o.Clone()
 
 	if options.PerPage <= 0 {
@@ -552,7 +552,7 @@ func (o IncidentFilterOptions) Validate() (IncidentFilterOptions, error) {
 	case "": // default
 		options.Sort = SortByCreateAt
 	default:
-		return IncidentFilterOptions{}, errors.Errorf("unsupported sort '%s'", options.Sort)
+		return PlaybookRunFilterOptions{}, errors.Errorf("unsupported sort '%s'", options.Sort)
 	}
 
 	options.Direction = SortDirection(strings.ToUpper(string(options.Direction)))
@@ -562,23 +562,23 @@ func (o IncidentFilterOptions) Validate() (IncidentFilterOptions, error) {
 	case "": //default
 		options.Direction = DirectionAsc
 	default:
-		return IncidentFilterOptions{}, errors.Errorf("unsupported direction '%s'", options.Direction)
+		return PlaybookRunFilterOptions{}, errors.Errorf("unsupported direction '%s'", options.Direction)
 	}
 
 	if options.TeamID != "" && !model.IsValidId(options.TeamID) {
-		return IncidentFilterOptions{}, errors.New("bad parameter 'team_id': must be 26 characters or blank")
+		return PlaybookRunFilterOptions{}, errors.New("bad parameter 'team_id': must be 26 characters or blank")
 	}
 
 	if options.OwnerID != "" && !model.IsValidId(options.OwnerID) {
-		return IncidentFilterOptions{}, errors.New("bad parameter 'owner_id': must be 26 characters or blank")
+		return PlaybookRunFilterOptions{}, errors.New("bad parameter 'owner_id': must be 26 characters or blank")
 	}
 
 	if options.MemberID != "" && !model.IsValidId(options.MemberID) {
-		return IncidentFilterOptions{}, errors.New("bad parameter 'member_id': must be 26 characters or blank")
+		return PlaybookRunFilterOptions{}, errors.New("bad parameter 'member_id': must be 26 characters or blank")
 	}
 
 	if options.PlaybookID != "" && !model.IsValidId(options.PlaybookID) {
-		return IncidentFilterOptions{}, errors.New("bad parameter 'playbook_id': must be 26 characters or blank")
+		return PlaybookRunFilterOptions{}, errors.New("bad parameter 'playbook_id': must be 26 characters or blank")
 	}
 
 	return options, nil

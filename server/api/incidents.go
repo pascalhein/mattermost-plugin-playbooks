@@ -46,10 +46,10 @@ func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRu
 	}
 
 	incidentsRouter := router.PathPrefix("/incidents").Subrouter()
-	incidentsRouter.HandleFunc("", handler.getIncidents).Methods(http.MethodGet)
-	incidentsRouter.HandleFunc("", handler.createIncidentFromPost).Methods(http.MethodPost)
+	incidentsRouter.HandleFunc("", handler.getPlaybookRuns).Methods(http.MethodGet)
+	incidentsRouter.HandleFunc("", handler.createPlaybookRunFromPost).Methods(http.MethodPost)
 
-	incidentsRouter.HandleFunc("/dialog", handler.createIncidentFromDialog).Methods(http.MethodPost)
+	incidentsRouter.HandleFunc("/dialog", handler.createPlaybookRunFromDialog).Methods(http.MethodPost)
 	incidentsRouter.HandleFunc("/add-to-timeline-dialog", handler.addToTimelineDialog).Methods(http.MethodPost)
 	incidentsRouter.HandleFunc("/owners", handler.getOwners).Methods(http.MethodGet)
 	incidentsRouter.HandleFunc("/channels", handler.getChannels).Methods(http.MethodGet)
@@ -57,12 +57,12 @@ func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRu
 	incidentsRouter.HandleFunc("/checklist-autocomplete-item", handler.getChecklistAutocompleteItem).Methods(http.MethodGet)
 
 	incidentRouter := incidentsRouter.PathPrefix("/{id:[A-Za-z0-9]+}").Subrouter()
-	incidentRouter.HandleFunc("", handler.getIncident).Methods(http.MethodGet)
-	incidentRouter.HandleFunc("/metadata", handler.getIncidentMetadata).Methods(http.MethodGet)
+	incidentRouter.HandleFunc("", handler.getPlaybookRun).Methods(http.MethodGet)
+	incidentRouter.HandleFunc("/metadata", handler.getPlaybookRunMetadata).Methods(http.MethodGet)
 
 	incidentRouterAuthorized := incidentRouter.PathPrefix("").Subrouter()
 	incidentRouterAuthorized.Use(handler.checkEditPermissions)
-	incidentRouterAuthorized.HandleFunc("", handler.updateIncident).Methods(http.MethodPatch)
+	incidentRouterAuthorized.HandleFunc("", handler.updatePlaybookRun).Methods(http.MethodPatch)
 	incidentRouterAuthorized.HandleFunc("/owner", handler.changeOwner).Methods(http.MethodPost)
 	incidentRouterAuthorized.HandleFunc("/status", handler.status).Methods(http.MethodPost)
 	incidentRouterAuthorized.HandleFunc("/update-status-dialog", handler.updateStatusDialog).Methods(http.MethodPost)
@@ -73,7 +73,7 @@ func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRu
 	incidentRouterAuthorized.HandleFunc("/check-and-send-message-on-join/{channel_id:[A-Za-z0-9]+}", handler.checkAndSendMessageOnJoin).Methods(http.MethodGet)
 
 	channelRouter := incidentsRouter.PathPrefix("/channel").Subrouter()
-	channelRouter.HandleFunc("/{channel_id:[A-Za-z0-9]+}", handler.getIncidentByChannel).Methods(http.MethodGet)
+	channelRouter.HandleFunc("/{channel_id:[A-Za-z0-9]+}", handler.getPlaybookRunByChannel).Methods(http.MethodGet)
 
 	checklistsRouter := incidentRouterAuthorized.PathPrefix("/checklists").Subrouter()
 
@@ -101,13 +101,13 @@ func (h *PlaybookRunHandler) checkEditPermissions(next http.Handler) http.Handle
 		vars := mux.Vars(r)
 		userID := r.Header.Get("Mattermost-User-ID")
 
-		incident, err := h.playbookRunService.GetIncident(vars["id"])
+		incident, err := h.playbookRunService.GetPlaybookRun(vars["id"])
 		if err != nil {
 			h.HandleError(w, err)
 			return
 		}
 
-		if err := app.EditIncident(userID, incident.ChannelID, h.pluginAPI); err != nil {
+		if err := app.EditPlaybookRun(userID, incident.ChannelID, h.pluginAPI); err != nil {
 			if errors.Is(err, app.ErrNoPermissions) {
 				h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", err)
 				return
@@ -120,11 +120,11 @@ func (h *PlaybookRunHandler) checkEditPermissions(next http.Handler) http.Handle
 	})
 }
 
-// createIncidentFromPost handles the POST /incidents endpoint
-func (h *PlaybookRunHandler) createIncidentFromPost(w http.ResponseWriter, r *http.Request) {
+// createPlaybookRunFromPost handles the POST /incidents endpoint
+func (h *PlaybookRunHandler) createPlaybookRunFromPost(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	var incidentCreateOptions client.IncidentCreateOptions
+	var incidentCreateOptions client.PlaybookRunCreateOptions
 	if err := json.NewDecoder(r.Body).Decode(&incidentCreateOptions); err != nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to decode incident create options", err)
 		return
@@ -135,8 +135,8 @@ func (h *PlaybookRunHandler) createIncidentFromPost(w http.ResponseWriter, r *ht
 		return
 	}
 
-	incident, err := h.createIncident(
-		app.Incident{
+	incident, err := h.createPlaybookRun(
+		app.PlaybookRun{
 			OwnerUserID: incidentCreateOptions.OwnerUserID,
 			TeamID:      incidentCreateOptions.TeamID,
 			Name:        incidentCreateOptions.Name,
@@ -152,7 +152,7 @@ func (h *PlaybookRunHandler) createIncidentFromPost(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if errors.Is(err, app.ErrMalformedIncident) {
+	if errors.Is(err, app.ErrMalformedPlaybookRun) {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to create incident", err)
 		return
 	}
@@ -162,7 +162,7 @@ func (h *PlaybookRunHandler) createIncidentFromPost(w http.ResponseWriter, r *ht
 		return
 	}
 
-	h.poster.PublishWebsocketEventToUser(app.IncidentCreatedWSEvent, map[string]interface{}{
+	h.poster.PublishWebsocketEventToUser(app.PlaybookRunCreatedWSEvent, map[string]interface{}{
 		"incident": incident,
 	}, userID)
 
@@ -171,12 +171,12 @@ func (h *PlaybookRunHandler) createIncidentFromPost(w http.ResponseWriter, r *ht
 }
 
 // Note that this currently does nothing. This is temporary given the removal of stages. Will be used by status.
-func (h *PlaybookRunHandler) updateIncident(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) updatePlaybookRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	//userID := r.Header.Get("Mattermost-User-ID")
 
-	oldIncident, err := h.playbookRunService.GetIncident(incidentID)
+	oldPlaybookRun, err := h.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -188,14 +188,14 @@ func (h *PlaybookRunHandler) updateIncident(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	updatedIncident := oldIncident
+	updatedPlaybookRun := oldPlaybookRun
 
-	ReturnJSON(w, updatedIncident, http.StatusOK)
+	ReturnJSON(w, updatedPlaybookRun, http.StatusOK)
 }
 
-// createIncidentFromDialog handles the interactive dialog submission when a user presses confirm on
+// createPlaybookRunFromDialog handles the interactive dialog submission when a user presses confirm on
 // the create incident dialog.
-func (h *PlaybookRunHandler) createIncidentFromDialog(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
 	request := model.SubmitDialogRequestFromJson(r.Body)
@@ -229,8 +229,8 @@ func (h *PlaybookRunHandler) createIncidentFromDialog(w http.ResponseWriter, r *
 		name = rawName
 	}
 
-	incident, err := h.createIncident(
-		app.Incident{
+	incident, err := h.createPlaybookRun(
+		app.PlaybookRun{
 			OwnerUserID: request.UserId,
 			TeamID:      request.TeamId,
 			Name:        name,
@@ -240,7 +240,7 @@ func (h *PlaybookRunHandler) createIncidentFromDialog(w http.ResponseWriter, r *
 		request.UserId,
 	)
 	if err != nil {
-		if errors.Is(err, app.ErrMalformedIncident) {
+		if errors.Is(err, app.ErrMalformedPlaybookRun) {
 			h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to create incident", err)
 			return
 		}
@@ -267,12 +267,12 @@ func (h *PlaybookRunHandler) createIncidentFromDialog(w http.ResponseWriter, r *
 		return
 	}
 
-	h.poster.PublishWebsocketEventToUser(app.IncidentCreatedWSEvent, map[string]interface{}{
+	h.poster.PublishWebsocketEventToUser(app.PlaybookRunCreatedWSEvent, map[string]interface{}{
 		"client_id": state.ClientID,
 		"incident":  incident,
 	}, request.UserId)
 
-	if err := h.postIncidentCreatedMessage(incident, request.ChannelId); err != nil {
+	if err := h.postPlaybookRunCreatedMessage(incident, request.ChannelId); err != nil {
 		h.HandleError(w, err)
 		return
 	}
@@ -298,20 +298,20 @@ func (h *PlaybookRunHandler) addToTimelineDialog(w http.ResponseWriter, r *http.
 	}
 
 	var incidentID, summary string
-	if rawIncidentID, ok := request.Submission[app.DialogFieldIncidentKey].(string); ok {
-		incidentID = rawIncidentID
+	if rawPlaybookRunID, ok := request.Submission[app.DialogFieldPlaybookRunKey].(string); ok {
+		incidentID = rawPlaybookRunID
 	}
 	if rawSummary, ok := request.Submission[app.DialogFieldSummary].(string); ok {
 		summary = rawSummary
 	}
 
-	incident, incErr := h.playbookRunService.GetIncident(incidentID)
+	incident, incErr := h.playbookRunService.GetPlaybookRun(incidentID)
 	if incErr != nil {
 		h.HandleError(w, incErr)
 		return
 	}
 
-	if err := app.EditIncident(userID, incident.ChannelID, h.pluginAPI); err != nil {
+	if err := app.EditPlaybookRun(userID, incident.ChannelID, h.pluginAPI); err != nil {
 		return
 	}
 
@@ -330,29 +330,29 @@ func (h *PlaybookRunHandler) addToTimelineDialog(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *PlaybookRunHandler) createIncident(incident app.Incident, userID string) (*app.Incident, error) {
+func (h *PlaybookRunHandler) createPlaybookRun(incident app.PlaybookRun, userID string) (*app.PlaybookRun, error) {
 	if incident.ID != "" {
-		return nil, errors.Wrap(app.ErrMalformedIncident, "incident already has an id")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "incident already has an id")
 	}
 
 	if incident.ChannelID != "" {
-		return nil, errors.Wrap(app.ErrMalformedIncident, "incident channel already has an id")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "incident channel already has an id")
 	}
 
 	if incident.CreateAt != 0 {
-		return nil, errors.Wrap(app.ErrMalformedIncident, "incident channel already has created at date")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "incident channel already has created at date")
 	}
 
 	if incident.TeamID == "" {
-		return nil, errors.Wrap(app.ErrMalformedIncident, "missing team id of incident")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing team id of incident")
 	}
 
 	if incident.OwnerUserID == "" {
-		return nil, errors.Wrap(app.ErrMalformedIncident, "missing owner user id of incident")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing owner user id of incident")
 	}
 
 	if incident.Name == "" {
-		return nil, errors.Wrap(app.ErrMalformedIncident, "missing name of incident")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing name of incident")
 	}
 
 	// Owner should have permission to the team
@@ -373,7 +373,7 @@ func (h *PlaybookRunHandler) createIncident(incident app.Incident, userID string
 		}
 
 		incident.Checklists = pb.Checklists
-		public = pb.CreatePublicIncident
+		public = pb.CreatePublicPlaybookRun
 
 		incident.BroadcastChannelID = pb.BroadcastChannelID
 		incident.Description = pb.Description
@@ -432,16 +432,16 @@ func (h *PlaybookRunHandler) createIncident(incident app.Incident, userID string
 			return nil, errors.New("user is not a member of the channel containing the incident's original post")
 		}
 	}
-	return h.playbookRunService.CreateIncident(&incident, playbook, userID, public)
+	return h.playbookRunService.CreatePlaybookRun(&incident, playbook, userID, public)
 }
 
 func (h *PlaybookRunHandler) getRequesterInfo(userID string) (app.RequesterInfo, error) {
 	return app.GetRequesterInfo(userID, h.pluginAPI)
 }
 
-// getIncidents handles the GET /incidents endpoint.
-func (h *PlaybookRunHandler) getIncidents(w http.ResponseWriter, r *http.Request) {
-	filterOptions, err := parseIncidentsFilterOptions(r.URL)
+// getPlaybookRuns handles the GET /incidents endpoint.
+func (h *PlaybookRunHandler) getPlaybookRuns(w http.ResponseWriter, r *http.Request) {
+	filterOptions, err := parsePlaybookRunsFilterOptions(r.URL)
 	if err != nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "Bad parameter", err)
 		return
@@ -466,7 +466,7 @@ func (h *PlaybookRunHandler) getIncidents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	results, err := h.playbookRunService.GetIncidents(requesterInfo, *filterOptions)
+	results, err := h.playbookRunService.GetPlaybookRuns(requesterInfo, *filterOptions)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -475,19 +475,19 @@ func (h *PlaybookRunHandler) getIncidents(w http.ResponseWriter, r *http.Request
 	ReturnJSON(w, results, http.StatusOK)
 }
 
-// getIncident handles the /incidents/{id} endpoint.
-func (h *PlaybookRunHandler) getIncident(w http.ResponseWriter, r *http.Request) {
+// getPlaybookRun handles the /incidents/{id} endpoint.
+func (h *PlaybookRunHandler) getPlaybookRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToGet, err := h.playbookRunService.GetIncident(incidentID)
+	incidentToGet, err := h.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
-	if err := app.ViewIncidentFromChannelID(userID, incidentToGet.ChannelID, h.pluginAPI); err != nil {
+	if err := app.ViewPlaybookRunFromChannelID(userID, incidentToGet.ChannelID, h.pluginAPI); err != nil {
 		h.HandleErrorWithCode(w, http.StatusForbidden, "User doesn't have permissions to incident.", nil)
 		return
 	}
@@ -495,25 +495,25 @@ func (h *PlaybookRunHandler) getIncident(w http.ResponseWriter, r *http.Request)
 	ReturnJSON(w, incidentToGet, http.StatusOK)
 }
 
-// getIncidentMetadata handles the /incidents/{id}/metadata endpoint.
-func (h *PlaybookRunHandler) getIncidentMetadata(w http.ResponseWriter, r *http.Request) {
+// getPlaybookRunMetadata handles the /incidents/{id}/metadata endpoint.
+func (h *PlaybookRunHandler) getPlaybookRunMetadata(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToGet, incErr := h.playbookRunService.GetIncident(incidentID)
+	incidentToGet, incErr := h.playbookRunService.GetPlaybookRun(incidentID)
 	if incErr != nil {
 		h.HandleError(w, incErr)
 		return
 	}
 
-	if err := app.ViewIncidentFromChannelID(userID, incidentToGet.ChannelID, h.pluginAPI); err != nil {
+	if err := app.ViewPlaybookRunFromChannelID(userID, incidentToGet.ChannelID, h.pluginAPI); err != nil {
 		h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized",
 			errors.Errorf("userid: %s does not have permissions to view the incident details", userID))
 		return
 	}
 
-	incidentMetadata, err := h.playbookRunService.GetIncidentMetadata(incidentID)
+	incidentMetadata, err := h.playbookRunService.GetPlaybookRunMetadata(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -522,20 +522,20 @@ func (h *PlaybookRunHandler) getIncidentMetadata(w http.ResponseWriter, r *http.
 	ReturnJSON(w, incidentMetadata, http.StatusOK)
 }
 
-// getIncidentByChannel handles the /incidents/channel/{channel_id} endpoint.
-func (h *PlaybookRunHandler) getIncidentByChannel(w http.ResponseWriter, r *http.Request) {
+// getPlaybookRunByChannel handles the /incidents/channel/{channel_id} endpoint.
+func (h *PlaybookRunHandler) getPlaybookRunByChannel(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	channelID := vars["channel_id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	if err := app.ViewIncidentFromChannelID(userID, channelID, h.pluginAPI); err != nil {
+	if err := app.ViewPlaybookRunFromChannelID(userID, channelID, h.pluginAPI); err != nil {
 		h.log.Warnf("User %s does not have permissions to get incident for channel %s", userID, channelID)
 		h.HandleErrorWithCode(w, http.StatusNotFound, "Not found",
 			errors.Errorf("incident for channel id %s not found", channelID))
 		return
 	}
 
-	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(channelID)
+	incidentID, err := h.playbookRunService.GetPlaybookRunIDForChannel(channelID)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			h.HandleErrorWithCode(w, http.StatusNotFound, "Not found",
@@ -547,7 +547,7 @@ func (h *PlaybookRunHandler) getIncidentByChannel(w http.ResponseWriter, r *http
 		return
 	}
 
-	incidentToGet, err := h.playbookRunService.GetIncident(incidentID)
+	incidentToGet, err := h.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -573,7 +573,7 @@ func (h *PlaybookRunHandler) getOwners(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	options := app.IncidentFilterOptions{
+	options := app.PlaybookRunFilterOptions{
 		TeamID: teamID,
 	}
 
@@ -597,7 +597,7 @@ func (h *PlaybookRunHandler) getOwners(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PlaybookRunHandler) getChannels(w http.ResponseWriter, r *http.Request) {
-	filterOptions, err := parseIncidentsFilterOptions(r.URL)
+	filterOptions, err := parsePlaybookRunsFilterOptions(r.URL)
 	if err != nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "Bad parameter", err)
 		return
@@ -619,7 +619,7 @@ func (h *PlaybookRunHandler) getChannels(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	incidents, err := h.playbookRunService.GetIncidents(requesterInfo, *filterOptions)
+	incidents, err := h.playbookRunService.GetPlaybookRuns(requesterInfo, *filterOptions)
 	if err != nil {
 		h.HandleError(w, errors.Wrapf(err, "failed to get owners"))
 		return
@@ -646,14 +646,14 @@ func (h *PlaybookRunHandler) changeOwner(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	incident, err := h.playbookRunService.GetIncident(vars["id"])
+	incident, err := h.playbookRunService.GetPlaybookRun(vars["id"])
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
 	// Check if the target user (params.OwnerID) has permissions
-	if err := app.EditIncident(params.OwnerID, incident.ChannelID, h.pluginAPI); err != nil {
+	if err := app.EditPlaybookRun(params.OwnerID, incident.ChannelID, h.pluginAPI); err != nil {
 		if errors.Is(err, app.ErrNoPermissions) {
 			h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized",
 				errors.Errorf("userid: %s does not have permissions to incident channel; cannot be made owner", params.OwnerID))
@@ -676,7 +676,7 @@ func (h *PlaybookRunHandler) status(w http.ResponseWriter, r *http.Request) {
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToModify, err := h.playbookRunService.GetIncident(incidentID)
+	incidentToModify, err := h.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -739,7 +739,7 @@ func (h *PlaybookRunHandler) updateStatusDialog(w http.ResponseWriter, r *http.R
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToModify, err := h.playbookRunService.GetIncident(incidentID)
+	incidentToModify, err := h.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
@@ -814,14 +814,14 @@ func (h *PlaybookRunHandler) reminderButtonUpdate(w http.ResponseWriter, r *http
 		return
 	}
 
-	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(requestData.ChannelId)
+	incidentID, err := h.playbookRunService.GetPlaybookRunIDForChannel(requestData.ChannelId)
 	if err != nil {
 		h.HandleErrorWithCode(w, http.StatusInternalServerError, "error getting incident",
 			errors.Wrapf(err, "reminderButtonUpdate failed to find incidentID for channelID: %s", requestData.ChannelId))
 		return
 	}
 
-	if err = app.EditIncident(requestData.UserId, requestData.ChannelId, h.pluginAPI); err != nil {
+	if err = app.EditPlaybookRun(requestData.UserId, requestData.ChannelId, h.pluginAPI); err != nil {
 		if errors.Is(err, app.ErrNoPermissions) {
 			ReturnJSON(w, nil, http.StatusForbidden)
 			return
@@ -847,14 +847,14 @@ func (h *PlaybookRunHandler) reminderButtonDismiss(w http.ResponseWriter, r *htt
 		return
 	}
 
-	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(requestData.ChannelId)
+	incidentID, err := h.playbookRunService.GetPlaybookRunIDForChannel(requestData.ChannelId)
 	if err != nil {
 		h.log.Errorf("reminderButtonDismiss: no incident for requestData's channelID: %s", requestData.ChannelId)
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "no incident for requestData's channelID", err)
 		return
 	}
 
-	if err = app.EditIncident(requestData.UserId, requestData.ChannelId, h.pluginAPI); err != nil {
+	if err = app.EditPlaybookRun(requestData.UserId, requestData.ChannelId, h.pluginAPI); err != nil {
 		if errors.Is(err, app.ErrNoPermissions) {
 			ReturnJSON(w, nil, http.StatusForbidden)
 			return
@@ -876,13 +876,13 @@ func (h *PlaybookRunHandler) noRetrospectiveButton(w http.ResponseWriter, r *htt
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentToCancelRetro, err := h.playbookRunService.GetIncident(incidentID)
+	incidentToCancelRetro, err := h.playbookRunService.GetPlaybookRun(incidentID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
-	if err = app.EditIncident(userID, incidentToCancelRetro.ChannelID, h.pluginAPI); err != nil {
+	if err = app.EditPlaybookRun(userID, incidentToCancelRetro.ChannelID, h.pluginAPI); err != nil {
 		if errors.Is(err, app.ErrNoPermissions) {
 			ReturnJSON(w, nil, http.StatusForbidden)
 			return
@@ -931,13 +931,13 @@ func (h *PlaybookRunHandler) getChecklistAutocompleteItem(w http.ResponseWriter,
 	channelID := query.Get("channel_id")
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(channelID)
+	incidentID, err := h.playbookRunService.GetPlaybookRunIDForChannel(channelID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
-	if err = app.ViewIncidentFromChannelID(userID, channelID, h.pluginAPI); err != nil {
+	if err = app.ViewPlaybookRunFromChannelID(userID, channelID, h.pluginAPI); err != nil {
 		h.HandleErrorWithCode(w, http.StatusForbidden, "user does not have permissions", err)
 		return
 	}
@@ -956,13 +956,13 @@ func (h *PlaybookRunHandler) getChecklistAutocomplete(w http.ResponseWriter, r *
 	channelID := query.Get("channel_id")
 	userID := r.Header.Get("Mattermost-User-ID")
 
-	incidentID, err := h.playbookRunService.GetIncidentIDForChannel(channelID)
+	incidentID, err := h.playbookRunService.GetPlaybookRunIDForChannel(channelID)
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
-	if err = app.ViewIncidentFromChannelID(userID, channelID, h.pluginAPI); err != nil {
+	if err = app.ViewPlaybookRunFromChannelID(userID, channelID, h.pluginAPI); err != nil {
 		h.HandleErrorWithCode(w, http.StatusForbidden, "user does not have permissions", err)
 		return
 	}
@@ -1232,7 +1232,7 @@ func (h *PlaybookRunHandler) reorderChecklist(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *PlaybookRunHandler) postIncidentCreatedMessage(incident *app.Incident, channelID string) error {
+func (h *PlaybookRunHandler) postPlaybookRunCreatedMessage(incident *app.PlaybookRun, channelID string) error {
 	channel, err := h.pluginAPI.Channel.Get(incident.ChannelID)
 	if err != nil {
 		return err
@@ -1290,8 +1290,8 @@ func (h *PlaybookRunHandler) publishRetrospective(w http.ResponseWriter, r *http
 	w.WriteHeader(http.StatusOK)
 }
 
-// parseIncidentsFilterOptions is only for parsing. Put validation logic in app.validateOptions.
-func parseIncidentsFilterOptions(u *url.URL) (*app.IncidentFilterOptions, error) {
+// parsePlaybookRunsFilterOptions is only for parsing. Put validation logic in app.validateOptions.
+func parsePlaybookRunsFilterOptions(u *url.URL) (*app.PlaybookRunFilterOptions, error) {
 	teamID := u.Query().Get("team_id")
 	if teamID == "" {
 		return nil, errors.New("bad parameter 'team_id'; 'team_id' is required")
@@ -1327,7 +1327,7 @@ func parseIncidentsFilterOptions(u *url.URL) (*app.IncidentFilterOptions, error)
 
 	playbookID := u.Query().Get("playbook_id")
 
-	options := app.IncidentFilterOptions{
+	options := app.PlaybookRunFilterOptions{
 		TeamID:     teamID,
 		Page:       page,
 		PerPage:    perPage,

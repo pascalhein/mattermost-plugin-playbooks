@@ -16,14 +16,14 @@ type PlaybookRunService struct {
 }
 
 // Get an incident.
-func (s *PlaybookRunService) Get(ctx context.Context, incidentID string) (*Incident, error) {
+func (s *PlaybookRunService) Get(ctx context.Context, incidentID string) (*PlaybookRun, error) {
 	incidentURL := fmt.Sprintf("incidents/%s", incidentID)
 	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(Incident)
+	incident := new(PlaybookRun)
 	resp, err := s.client.do(ctx, req, incident)
 	if err != nil {
 		return nil, err
@@ -34,14 +34,14 @@ func (s *PlaybookRunService) Get(ctx context.Context, incidentID string) (*Incid
 }
 
 // GetByChannelID gets an incident by ChannelID.
-func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID string) (*Incident, error) {
+func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID string) (*PlaybookRun, error) {
 	channelURL := fmt.Sprintf("incidents/channel/%s", channelID)
 	req, err := s.client.newRequest(http.MethodGet, channelURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(Incident)
+	incident := new(PlaybookRun)
 	resp, err := s.client.do(ctx, req, incident)
 	if err != nil {
 		return nil, err
@@ -52,14 +52,14 @@ func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID strin
 }
 
 // Get an incident's metadata.
-func (s *PlaybookRunService) GetMetadata(ctx context.Context, incidentID string) (*IncidentMetadata, error) {
+func (s *PlaybookRunService) GetMetadata(ctx context.Context, incidentID string) (*PlaybookRunMetadata, error) {
 	incidentURL := fmt.Sprintf("incidents/%s/metadata", incidentID)
 	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(IncidentMetadata)
+	incident := new(PlaybookRunMetadata)
 	resp, err := s.client.do(ctx, req, incident)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (s *PlaybookRunService) GetMetadata(ctx context.Context, incidentID string)
 }
 
 // List the incidents.
-func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts IncidentListOptions) (*GetIncidentsResults, error) {
+func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts PlaybookRunListOptions) (*GetPlaybookRunsResults, error) {
 	incidentURL := "incidents"
 	incidentURL, err := addOptions(incidentURL, opts)
 	if err != nil {
@@ -86,7 +86,7 @@ func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts I
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
-	result := &GetIncidentsResults{}
+	result := &GetPlaybookRunsResults{}
 	resp, err := s.client.do(ctx, req, result)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
@@ -97,14 +97,14 @@ func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts I
 }
 
 // Create an incident.
-func (s *PlaybookRunService) Create(ctx context.Context, opts IncidentCreateOptions) (*Incident, error) {
+func (s *PlaybookRunService) Create(ctx context.Context, opts PlaybookRunCreateOptions) (*PlaybookRun, error) {
 	incidentURL := "incidents"
 	req, err := s.client.newRequest(http.MethodPost, incidentURL, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(Incident)
+	incident := new(PlaybookRun)
 	resp, err := s.client.do(ctx, req, incident)
 	if err != nil {
 		return nil, err

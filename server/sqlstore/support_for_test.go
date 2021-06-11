@@ -463,7 +463,7 @@ func createChannels(t testing.TB, store *SQLStore, channels []model.Channel) {
 	require.NoError(t, err)
 }
 
-func createIncidentChannel(t testing.TB, store *SQLStore, incident *app.Incident) {
+func createPlaybookRunChannel(t testing.TB, store *SQLStore, incident *app.PlaybookRun) {
 	t.Helper()
 
 	if incident.CreateAt == 0 {

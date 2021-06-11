@@ -21,7 +21,7 @@ func ExamplePlaybookRunService_Get() {
 	}
 
 	incidentID := "h4n3h7s1qjf5pkis4dn6cuxgwa"
-	incident, err := c.Incidents.Get(ctx, incidentID)
+	incident, err := c.PlaybookRuns.Get(ctx, incidentID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,9 +51,9 @@ func ExamplePlaybookRunService_List() {
 		log.Fatal(err)
 	}
 
-	var incidents []client.Incident
+	var incidents []client.PlaybookRun
 	for page := 0; ; page++ {
-		result, err := c.Incidents.List(ctx, page, 100, client.IncidentListOptions{
+		result, err := c.PlaybookRuns.List(ctx, page, 100, client.PlaybookRunListOptions{
 			TeamID:    teams[0].Id,
 			Sort:      client.SortByCreateAt,
 			Direction: client.SortDesc,

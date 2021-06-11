@@ -25,18 +25,18 @@ func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 				WithName("incident 1").
 				WithCreateAt(createAt).
 				WithChecklists([]int{8}).
-				ToIncident()
+				ToPlaybookRun()
 
-			incident, err := iStore.CreateIncident(inc01)
+			incident, err := iStore.CreatePlaybookRun(inc01)
 			require.NoError(t, err)
 
-			createIncidentChannel(t, store, inc01)
+			createPlaybookRunChannel(t, store, inc01)
 
 			event1 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt,
 				EventAt:       1234,
-				EventType:     app.IncidentCreated,
+				EventType:     app.PlaybookRunCreated,
 				Summary:       "this is a summary",
 				Details:       "these are the details",
 				PostID:        "testpostID",
@@ -47,7 +47,7 @@ func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			event2 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt + 1,
 				EventAt:       1235,
 				EventType:     app.AssigneeChanged,
@@ -61,7 +61,7 @@ func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			event3 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt + 2,
 				EventAt:       1236,
 				EventType:     app.StatusUpdated,
@@ -75,7 +75,7 @@ func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			event4 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt + 3,
 				EventAt:       123734,
 				EventType:     app.StatusUpdated,
@@ -88,14 +88,14 @@ func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 			_, err = iStore.CreateTimelineEvent(event4)
 			require.NoError(t, err)
 
-			retIncident, err := iStore.GetIncident(incident.ID)
+			retPlaybookRun, err := iStore.GetPlaybookRun(incident.ID)
 			require.NoError(t, err)
 
-			require.Len(t, retIncident.TimelineEvents, 4)
-			require.Equal(t, *event1, retIncident.TimelineEvents[0])
-			require.Equal(t, *event2, retIncident.TimelineEvents[1])
-			require.Equal(t, *event3, retIncident.TimelineEvents[2])
-			require.Equal(t, *event4, retIncident.TimelineEvents[3])
+			require.Len(t, retPlaybookRun.TimelineEvents, 4)
+			require.Equal(t, *event1, retPlaybookRun.TimelineEvents[0])
+			require.Equal(t, *event2, retPlaybookRun.TimelineEvents[1])
+			require.Equal(t, *event3, retPlaybookRun.TimelineEvents[2])
+			require.Equal(t, *event4, retPlaybookRun.TimelineEvents[3])
 		})
 	}
 }
@@ -114,18 +114,18 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 				WithName("incident 1").
 				WithCreateAt(createAt).
 				WithChecklists([]int{8}).
-				ToIncident()
+				ToPlaybookRun()
 
-			incident, err := iStore.CreateIncident(inc01)
+			incident, err := iStore.CreatePlaybookRun(inc01)
 			require.NoError(t, err)
 
-			createIncidentChannel(t, store, inc01)
+			createPlaybookRunChannel(t, store, inc01)
 
 			event1 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt,
 				EventAt:       createAt,
-				EventType:     app.IncidentCreated,
+				EventType:     app.PlaybookRunCreated,
 				PostID:        "testpostID",
 				SubjectUserID: "testuserID",
 			}
@@ -133,7 +133,7 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			event2 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt + 1,
 				EventAt:       createAt + 1,
 				EventType:     app.AssigneeChanged,
@@ -144,7 +144,7 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			event3 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt + 2,
 				EventAt:       createAt + 2,
 				EventType:     app.StatusUpdated,
@@ -158,7 +158,7 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			event4 := &app.TimelineEvent{
-				IncidentID:    incident.ID,
+				PlaybookRunID: incident.ID,
 				CreateAt:      createAt + 3,
 				EventAt:       createAt + 3,
 				EventType:     app.StatusUpdated,
@@ -168,14 +168,14 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 			_, err = iStore.CreateTimelineEvent(event4)
 			require.NoError(t, err)
 
-			retIncident, err := iStore.GetIncident(incident.ID)
+			retPlaybookRun, err := iStore.GetPlaybookRun(incident.ID)
 			require.NoError(t, err)
 
-			require.Len(t, retIncident.TimelineEvents, 4)
-			require.Equal(t, *event1, retIncident.TimelineEvents[0])
-			require.Equal(t, *event2, retIncident.TimelineEvents[1])
-			require.Equal(t, *event3, retIncident.TimelineEvents[2])
-			require.Equal(t, *event4, retIncident.TimelineEvents[3])
+			require.Len(t, retPlaybookRun.TimelineEvents, 4)
+			require.Equal(t, *event1, retPlaybookRun.TimelineEvents[0])
+			require.Equal(t, *event2, retPlaybookRun.TimelineEvents[1])
+			require.Equal(t, *event3, retPlaybookRun.TimelineEvents[2])
+			require.Equal(t, *event4, retPlaybookRun.TimelineEvents[3])
 
 			event3.DeleteAt = model.GetMillis()
 			event3.EventType = app.AssigneeChanged
@@ -191,12 +191,12 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 			err = iStore.UpdateTimelineEvent(event4)
 			require.NoError(t, err)
 
-			retIncident, err = iStore.GetIncident(incident.ID)
+			retPlaybookRun, err = iStore.GetPlaybookRun(incident.ID)
 			require.NoError(t, err)
 
-			require.Len(t, retIncident.TimelineEvents, 2)
-			require.Equal(t, *event1, retIncident.TimelineEvents[0])
-			require.Equal(t, *event2, retIncident.TimelineEvents[1])
+			require.Len(t, retPlaybookRun.TimelineEvents, 2)
+			require.Equal(t, *event1, retPlaybookRun.TimelineEvents[0])
+			require.Equal(t, *event2, retPlaybookRun.TimelineEvents[1])
 		})
 	}
 }

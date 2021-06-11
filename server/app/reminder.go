@@ -13,7 +13,7 @@ import (
 )
 
 type Reminder struct {
-	IncidentID string `json:"incident_id"`
+	PlaybookRunID string `json:"incident_id"`
 }
 
 const RetrospectivePrefix = "retro_"
@@ -28,7 +28,7 @@ func (s *PlaybookRunServiceImpl) HandleReminder(key string) {
 }
 
 func (s *PlaybookRunServiceImpl) handleReminderToFillRetro(incidentID string) {
-	incidentToRemind, err := s.GetIncident(incidentID)
+	incidentToRemind, err := s.GetPlaybookRun(incidentID)
 	if err != nil {
 		s.logger.Errorf(errors.Wrapf(err, "handleReminderToFillRetro failed to get incident id: %s", incidentID).Error())
 		return
@@ -61,7 +61,7 @@ func (s *PlaybookRunServiceImpl) handleReminderToFillRetro(incidentID string) {
 }
 
 func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(incidentID string) {
-	incidentToModify, err := s.GetIncident(incidentID)
+	incidentToModify, err := s.GetPlaybookRun(incidentID)
 	if err != nil {
 		s.logger.Errorf(errors.Wrapf(err, "HandleReminder failed to get incident id: %s", incidentID).Error())
 		return
@@ -106,7 +106,7 @@ func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(incidentID string) {
 	}
 
 	incidentToModify.ReminderPostID = post.Id
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		s.logger.Errorf(errors.Wrapf(err, "error updating with reminder post id, incident id: %s", incidentToModify.ID).Error())
 	}
 }
@@ -128,7 +128,7 @@ func (s *PlaybookRunServiceImpl) RemoveReminder(incidentID string) {
 
 // RemoveReminderPost will remove the reminder post in the incident channel (if any).
 func (s *PlaybookRunServiceImpl) RemoveReminderPost(incidentID string) error {
-	incidentToModify, err := s.store.GetIncident(incidentID)
+	incidentToModify, err := s.store.GetPlaybookRun(incidentID)
 	if err != nil {
 		return errors.Wrapf(err, "failed to retrieve incident")
 	}
@@ -137,7 +137,7 @@ func (s *PlaybookRunServiceImpl) RemoveReminderPost(incidentID string) error {
 }
 
 // removeReminderPost will remove the reminder post in the incident channel (if any).
-func (s *PlaybookRunServiceImpl) removeReminderPost(incidentToModify *Incident) error {
+func (s *PlaybookRunServiceImpl) removeReminderPost(incidentToModify *PlaybookRun) error {
 	if incidentToModify.ReminderPostID == "" {
 		return nil
 	}
@@ -156,7 +156,7 @@ func (s *PlaybookRunServiceImpl) removeReminderPost(incidentToModify *Incident) 
 	}
 
 	incidentToModify.ReminderPostID = ""
-	if err = s.store.UpdateIncident(incidentToModify); err != nil {
+	if err = s.store.UpdatePlaybookRun(incidentToModify); err != nil {
 		return errors.Wrapf(err, "error updating incident removing reminder post id")
 	}
 
