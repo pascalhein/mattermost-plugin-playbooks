@@ -21,8 +21,8 @@ import (
 	"github.com/mattermost/mattermost-plugin-incident-collaboration/server/config"
 )
 
-// IncidentHandler is the API handler.
-type IncidentHandler struct {
+// PlaybookRunHandler is the API handler.
+type PlaybookRunHandler struct {
 	*ErrorHandler
 	config             config.Service
 	playbookRunService app.PlaybookRunService
@@ -32,10 +32,10 @@ type IncidentHandler struct {
 	log                bot.Logger
 }
 
-// NewIncidentHandler Creates a new Plugin API handler.
-func NewIncidentHandler(router *mux.Router, playbookRunService app.PlaybookRunService, playbookService app.PlaybookService,
-	api *pluginapi.Client, poster bot.Poster, log bot.Logger, configService config.Service) *IncidentHandler {
-	handler := &IncidentHandler{
+// NewPlaybookRunHandler Creates a new Plugin API handler.
+func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRunService, playbookService app.PlaybookService,
+	api *pluginapi.Client, poster bot.Poster, log bot.Logger, configService config.Service) *PlaybookRunHandler {
+	handler := &PlaybookRunHandler{
 		ErrorHandler:       &ErrorHandler{log: log},
 		playbookRunService: playbookRunService,
 		playbookService:    playbookService,
@@ -96,7 +96,7 @@ func NewIncidentHandler(router *mux.Router, playbookRunService app.PlaybookRunSe
 	return handler
 }
 
-func (h *IncidentHandler) checkEditPermissions(next http.Handler) http.Handler {
+func (h *PlaybookRunHandler) checkEditPermissions(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		userID := r.Header.Get("Mattermost-User-ID")
@@ -121,7 +121,7 @@ func (h *IncidentHandler) checkEditPermissions(next http.Handler) http.Handler {
 }
 
 // createIncidentFromPost handles the POST /incidents endpoint
-func (h *IncidentHandler) createIncidentFromPost(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) createIncidentFromPost(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
 	var incidentCreateOptions client.IncidentCreateOptions
@@ -171,7 +171,7 @@ func (h *IncidentHandler) createIncidentFromPost(w http.ResponseWriter, r *http.
 }
 
 // Note that this currently does nothing. This is temporary given the removal of stages. Will be used by status.
-func (h *IncidentHandler) updateIncident(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) updateIncident(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	//userID := r.Header.Get("Mattermost-User-ID")
@@ -195,7 +195,7 @@ func (h *IncidentHandler) updateIncident(w http.ResponseWriter, r *http.Request)
 
 // createIncidentFromDialog handles the interactive dialog submission when a user presses confirm on
 // the create incident dialog.
-func (h *IncidentHandler) createIncidentFromDialog(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) createIncidentFromDialog(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
 	request := model.SubmitDialogRequestFromJson(r.Body)
@@ -283,7 +283,7 @@ func (h *IncidentHandler) createIncidentFromDialog(w http.ResponseWriter, r *htt
 
 // addToTimelineDialog handles the interactive dialog submission when a user clicks the post action
 // menu option "Add to incident timeline".
-func (h *IncidentHandler) addToTimelineDialog(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) addToTimelineDialog(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
 	request := model.SubmitDialogRequestFromJson(r.Body)
@@ -330,7 +330,7 @@ func (h *IncidentHandler) addToTimelineDialog(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *IncidentHandler) createIncident(incident app.Incident, userID string) (*app.Incident, error) {
+func (h *PlaybookRunHandler) createIncident(incident app.Incident, userID string) (*app.Incident, error) {
 	if incident.ID != "" {
 		return nil, errors.Wrap(app.ErrMalformedIncident, "incident already has an id")
 	}
@@ -435,12 +435,12 @@ func (h *IncidentHandler) createIncident(incident app.Incident, userID string) (
 	return h.playbookRunService.CreateIncident(&incident, playbook, userID, public)
 }
 
-func (h *IncidentHandler) getRequesterInfo(userID string) (app.RequesterInfo, error) {
+func (h *PlaybookRunHandler) getRequesterInfo(userID string) (app.RequesterInfo, error) {
 	return app.GetRequesterInfo(userID, h.pluginAPI)
 }
 
 // getIncidents handles the GET /incidents endpoint.
-func (h *IncidentHandler) getIncidents(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getIncidents(w http.ResponseWriter, r *http.Request) {
 	filterOptions, err := parseIncidentsFilterOptions(r.URL)
 	if err != nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "Bad parameter", err)
@@ -476,7 +476,7 @@ func (h *IncidentHandler) getIncidents(w http.ResponseWriter, r *http.Request) {
 }
 
 // getIncident handles the /incidents/{id} endpoint.
-func (h *IncidentHandler) getIncident(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getIncident(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -496,7 +496,7 @@ func (h *IncidentHandler) getIncident(w http.ResponseWriter, r *http.Request) {
 }
 
 // getIncidentMetadata handles the /incidents/{id}/metadata endpoint.
-func (h *IncidentHandler) getIncidentMetadata(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getIncidentMetadata(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -523,7 +523,7 @@ func (h *IncidentHandler) getIncidentMetadata(w http.ResponseWriter, r *http.Req
 }
 
 // getIncidentByChannel handles the /incidents/channel/{channel_id} endpoint.
-func (h *IncidentHandler) getIncidentByChannel(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getIncidentByChannel(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	channelID := vars["channel_id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -557,7 +557,7 @@ func (h *IncidentHandler) getIncidentByChannel(w http.ResponseWriter, r *http.Re
 }
 
 // getOwners handles the /incidents/owners api endpoint.
-func (h *IncidentHandler) getOwners(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getOwners(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("team_id")
 	if teamID == "" {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "Bad parameter: team_id", errors.New("team_id required"))
@@ -596,7 +596,7 @@ func (h *IncidentHandler) getOwners(w http.ResponseWriter, r *http.Request) {
 	ReturnJSON(w, owners, http.StatusOK)
 }
 
-func (h *IncidentHandler) getChannels(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getChannels(w http.ResponseWriter, r *http.Request) {
 	filterOptions, err := parseIncidentsFilterOptions(r.URL)
 	if err != nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "Bad parameter", err)
@@ -634,7 +634,7 @@ func (h *IncidentHandler) getChannels(w http.ResponseWriter, r *http.Request) {
 }
 
 // changeOwner handles the /incidents/{id}/change-owner api endpoint.
-func (h *IncidentHandler) changeOwner(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) changeOwner(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -672,7 +672,7 @@ func (h *IncidentHandler) changeOwner(w http.ResponseWriter, r *http.Request) {
 }
 
 // updateStatusD handles the POST /incidents/{id}/status endpoint, user has edit permissions
-func (h *IncidentHandler) status(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) status(w http.ResponseWriter, r *http.Request) {
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -735,7 +735,7 @@ func (h *IncidentHandler) status(w http.ResponseWriter, r *http.Request) {
 
 // updateStatusDialog handles the POST /incidents/{id}/update-status-dialog endpoint, called when a
 // user submits the Update Status dialog.
-func (h *IncidentHandler) updateStatusDialog(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) updateStatusDialog(w http.ResponseWriter, r *http.Request) {
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -807,7 +807,7 @@ func (h *IncidentHandler) updateStatusDialog(w http.ResponseWriter, r *http.Requ
 
 // reminderButtonUpdate handles the POST /incidents/{id}/reminder/button-update endpoint, called when a
 // user clicks on the reminder interactive button
-func (h *IncidentHandler) reminderButtonUpdate(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) reminderButtonUpdate(w http.ResponseWriter, r *http.Request) {
 	requestData := model.PostActionIntegrationRequestFromJson(r.Body)
 	if requestData == nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "missing request data", nil)
@@ -840,7 +840,7 @@ func (h *IncidentHandler) reminderButtonUpdate(w http.ResponseWriter, r *http.Re
 
 // reminderButtonDismiss handles the POST /incidents/{id}/reminder/button-dismiss endpoint, called when a
 // user clicks on the reminder interactive button
-func (h *IncidentHandler) reminderButtonDismiss(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) reminderButtonDismiss(w http.ResponseWriter, r *http.Request) {
 	requestData := model.PostActionIntegrationRequestFromJson(r.Body)
 	if requestData == nil {
 		h.HandleErrorWithCode(w, http.StatusBadRequest, "missing request data", nil)
@@ -872,7 +872,7 @@ func (h *IncidentHandler) reminderButtonDismiss(w http.ResponseWriter, r *http.R
 	ReturnJSON(w, nil, http.StatusOK)
 }
 
-func (h *IncidentHandler) noRetrospectiveButton(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) noRetrospectiveButton(w http.ResponseWriter, r *http.Request) {
 	incidentID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -901,7 +901,7 @@ func (h *IncidentHandler) noRetrospectiveButton(w http.ResponseWriter, r *http.R
 
 // removeTimelineEvent handles the DELETE /incidents/{id}/timeline/{eventID} endpoint.
 // User has been authenticated to edit the incident.
-func (h *IncidentHandler) removeTimelineEvent(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) removeTimelineEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -916,7 +916,7 @@ func (h *IncidentHandler) removeTimelineEvent(w http.ResponseWriter, r *http.Req
 }
 
 // checkAndSendMessageOnJoin handles the GET /incident/{id}/check_and_send_message_on_join/{channel_id} endpoint.
-func (h *IncidentHandler) checkAndSendMessageOnJoin(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) checkAndSendMessageOnJoin(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	channelID := vars["channel_id"]
@@ -926,7 +926,7 @@ func (h *IncidentHandler) checkAndSendMessageOnJoin(w http.ResponseWriter, r *ht
 	ReturnJSON(w, map[string]interface{}{"viewed": hasViewed}, http.StatusOK)
 }
 
-func (h *IncidentHandler) getChecklistAutocompleteItem(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getChecklistAutocompleteItem(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	channelID := query.Get("channel_id")
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -951,7 +951,7 @@ func (h *IncidentHandler) getChecklistAutocompleteItem(w http.ResponseWriter, r 
 	ReturnJSON(w, data, http.StatusOK)
 }
 
-func (h *IncidentHandler) getChecklistAutocomplete(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) getChecklistAutocomplete(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	channelID := query.Get("channel_id")
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -976,7 +976,7 @@ func (h *IncidentHandler) getChecklistAutocomplete(w http.ResponseWriter, r *htt
 	ReturnJSON(w, data, http.StatusOK)
 }
 
-func (h *IncidentHandler) itemSetState(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) itemSetState(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1012,7 +1012,7 @@ func (h *IncidentHandler) itemSetState(w http.ResponseWriter, r *http.Request) {
 	ReturnJSON(w, map[string]interface{}{}, http.StatusOK)
 }
 
-func (h *IncidentHandler) itemSetAssignee(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) itemSetAssignee(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1043,7 +1043,7 @@ func (h *IncidentHandler) itemSetAssignee(w http.ResponseWriter, r *http.Request
 	ReturnJSON(w, map[string]interface{}{}, http.StatusOK)
 }
 
-func (h *IncidentHandler) itemRun(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) itemRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1067,7 +1067,7 @@ func (h *IncidentHandler) itemRun(w http.ResponseWriter, r *http.Request) {
 	ReturnJSON(w, map[string]interface{}{"trigger_id": triggerID}, http.StatusOK)
 }
 
-func (h *IncidentHandler) addChecklistItem(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) addChecklistItem(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1099,7 +1099,7 @@ func (h *IncidentHandler) addChecklistItem(w http.ResponseWriter, r *http.Reques
 }
 
 // addChecklistItemDialog handles the interactive dialog submission when a user clicks add new task
-func (h *IncidentHandler) addChecklistItemDialog(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) addChecklistItemDialog(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
@@ -1149,7 +1149,7 @@ func (h *IncidentHandler) addChecklistItemDialog(w http.ResponseWriter, r *http.
 
 }
 
-func (h *IncidentHandler) itemDelete(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) itemDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1172,7 +1172,7 @@ func (h *IncidentHandler) itemDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *IncidentHandler) itemEdit(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) itemEdit(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1205,7 +1205,7 @@ func (h *IncidentHandler) itemEdit(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *IncidentHandler) reorderChecklist(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) reorderChecklist(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	checklistNum, err := strconv.Atoi(vars["checklist"])
@@ -1232,7 +1232,7 @@ func (h *IncidentHandler) reorderChecklist(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *IncidentHandler) postIncidentCreatedMessage(incident *app.Incident, channelID string) error {
+func (h *PlaybookRunHandler) postIncidentCreatedMessage(incident *app.Incident, channelID string) error {
 	channel, err := h.pluginAPI.Channel.Get(incident.ChannelID)
 	if err != nil {
 		return err
@@ -1246,7 +1246,7 @@ func (h *IncidentHandler) postIncidentCreatedMessage(incident *app.Incident, cha
 	return nil
 }
 
-func (h *IncidentHandler) updateRetrospective(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) updateRetrospective(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -1268,7 +1268,7 @@ func (h *IncidentHandler) updateRetrospective(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *IncidentHandler) publishRetrospective(w http.ResponseWriter, r *http.Request) {
+func (h *PlaybookRunHandler) publishRetrospective(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incidentID := vars["id"]
 	userID := r.Header.Get("Mattermost-User-ID")

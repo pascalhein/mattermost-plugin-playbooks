@@ -65,7 +65,7 @@ func TestIncidents(t *testing.T) {
 		handler = NewHandler(client, configService, logger)
 		playbookService = mock_app.NewMockPlaybookService(mockCtrl)
 		playbookRunService = mock_app.NewMockPlaybookRunService(mockCtrl)
-		NewIncidentHandler(handler.APIRouter, playbookRunService, playbookService, client, poster, logger, configService)
+		NewPlaybookRunHandler(handler.APIRouter, playbookRunService, playbookService, client, poster, logger, configService)
 	}
 
 	setDefaultExpectations := func(t *testing.T) {
@@ -797,7 +797,7 @@ func TestIncidents(t *testing.T) {
 		handler = NewHandler(client, configService, logger)
 		playbookService = mock_app.NewMockPlaybookService(mockCtrl)
 		playbookRunService = mock_app.NewMockPlaybookRunService(mockCtrl)
-		NewIncidentHandler(handler.APIRouter, playbookRunService, playbookService, client, poster, logger, configService)
+		NewPlaybookRunHandler(handler.APIRouter, playbookRunService, playbookService, client, poster, logger, configService)
 
 		configService.EXPECT().
 			IsAtLeastE10Licensed().

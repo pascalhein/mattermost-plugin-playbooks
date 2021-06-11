@@ -162,7 +162,7 @@ func (p *Plugin) OnActivate() error {
 		p.bot,
 		p.config,
 	)
-	api.NewIncidentHandler(
+	api.NewPlaybookRunHandler(
 		p.handler.APIRouter,
 		p.playbookRunService,
 		p.playbookService,
