@@ -81,7 +81,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 	channel09 := model.Channel{Id: model.NewId(), Type: "P", CreateAt: 556, DeleteAt: 0}
 
 	inc01 := *NewBuilder(nil).
-		WithName("incident 1 - wheel cat aliens wheelbarrow").
+		WithName("pr 1 - wheel cat aliens wheelbarrow").
 		WithDescription("this is a description, not very long, but it can be up to 2048 bytes").
 		WithChannel(&channel01). // public
 		WithOwnerUserID(owner1.UserID).
@@ -92,7 +92,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc02 := *NewBuilder(nil).
-		WithName("incident 2 - horse staple battery aliens shotgun mouse shotput").
+		WithName("pr 2 - horse staple battery aliens shotgun mouse shotput").
 		WithChannel(&channel02). // public
 		WithOwnerUserID(owner2.UserID).
 		WithTeamID(team1id).
@@ -102,7 +102,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc03 := *NewBuilder(nil).
-		WithName("incident 3 - Horse stapler battery shotgun mouse shotput").
+		WithName("pr 3 - Horse stapler battery shotgun mouse shotput").
 		WithChannel(&channel03). // public
 		WithOwnerUserID(owner1.UserID).
 		WithTeamID(team1id).
@@ -113,7 +113,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc04 := *NewBuilder(nil).
-		WithName("incident 4 - titanic terminatoraliens").
+		WithName("pr 4 - titanic terminatoraliens").
 		WithChannel(&channel04). // private
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team1id).
@@ -123,7 +123,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc05 := *NewBuilder(nil).
-		WithName("incident 5 - titanic terminator aliens mouse").
+		WithName("pr 5 - titanic terminator aliens mouse").
 		WithChannel(&channel05). // private
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team1id).
@@ -132,7 +132,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc06 := *NewBuilder(nil).
-		WithName("incident 6 - ubik high castle electric sheep").
+		WithName("pr 6 - ubik high castle electric sheep").
 		WithChannel(&channel06). // public
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team2id).
@@ -141,7 +141,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc07 := *NewBuilder(nil).
-		WithName("incident 7 - ubik high castle electric sheep").
+		WithName("pr 7 - ubik high castle electric sheep").
 		WithChannel(&channel07). // private
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team2id).
@@ -150,7 +150,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc08 := *NewBuilder(nil).
-		WithName("incident 8 - ziggürat!").
+		WithName("pr 8 - ziggürat!").
 		WithChannel(&channel08). // private
 		WithOwnerUserID(owner4.UserID).
 		WithTeamID(team3id).
@@ -159,7 +159,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		ToPlaybookRun()
 
 	inc09 := *NewBuilder(nil).
-		WithName("incident 9 - Ziggürat!").
+		WithName("pr 9 - Ziggürat!").
 		WithChannel(&channel09). // private
 		WithOwnerUserID(owner4.UserID).
 		WithTeamID(team3id).
@@ -734,7 +734,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 			ExpectedErr: nil,
 		},
 		{
-			Name: "team1 - Alice (in no channels but member of team (because request must have made it through the API team membership test to the store), can see public incidents)",
+			Name: "team1 - Alice (in no channels but member of team (because request must have made it through the API team membership test to the store), can see public playbook runs)",
 			RequesterInfo: app.RequesterInfo{
 				UserID: alice.ID,
 			},
@@ -774,7 +774,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 			ExpectedErr: nil,
 		},
 		{
-			Name: "team1 - Admin gets incidents with John as member",
+			Name: "team1 - Admin gets playbook runs with John as member",
 			RequesterInfo: app.RequesterInfo{
 				UserID:  lucy.ID,
 				IsAdmin: true,
@@ -796,7 +796,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 			ExpectedErr: nil,
 		},
 		{
-			Name: "team1 - Admin gets incidents with Jane as member",
+			Name: "team1 - Admin gets playbook runs with Jane as member",
 			RequesterInfo: app.RequesterInfo{
 				UserID:  lucy.ID,
 				IsAdmin: true,
@@ -818,7 +818,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 			ExpectedErr: nil,
 		},
 		{
-			Name: "team1 - John gets its own incidents",
+			Name: "team1 - John gets its own playbook runs",
 			RequesterInfo: app.RequesterInfo{
 				UserID: john.ID,
 			},
@@ -839,7 +839,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 			ExpectedErr: nil,
 		},
 		{
-			Name: "team1 - Jane gets its own incidents",
+			Name: "team1 - Jane gets its own playbook runs",
 			RequesterInfo: app.RequesterInfo{
 				UserID: jane.ID,
 			},
@@ -924,7 +924,7 @@ func TestGetPlaybookRuns(t *testing.T) {
 		addUsersToChannels(t, store, []userInfo{jane}, []string{channel03.Id, channel04.Id, channel05.Id})
 		makeAdmin(t, store, lucy)
 
-		t.Run("zero incidents", func(t *testing.T) {
+		t.Run("zero playbook runs", func(t *testing.T) {
 			result, err := playbookRunStore.GetPlaybookRuns(app.RequesterInfo{
 				UserID: lucy.ID,
 			},
@@ -990,7 +990,7 @@ func TestCreateAndGetPlaybookRun(t *testing.T) {
 				ExpectedErr: nil,
 			},
 			{
-				Name:        "Base incident",
+				Name:        "Base playbook run",
 				PlaybookRun: NewBuilder(t).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
@@ -1005,7 +1005,7 @@ func TestCreateAndGetPlaybookRun(t *testing.T) {
 				ExpectedErr: nil,
 			},
 			{
-				Name:        "Deleted incident",
+				Name:        "Deleted playbook run",
 				PlaybookRun: NewBuilder(t).WithDeleteAt(model.GetMillis()).ToPlaybookRun(),
 				ExpectedErr: nil,
 			},
@@ -1022,7 +1022,7 @@ func TestCreateAndGetPlaybookRun(t *testing.T) {
 			{
 				Name:        "PlaybookRun should not be nil",
 				PlaybookRun: nil,
-				ExpectedErr: errors.New("incident is nil"),
+				ExpectedErr: errors.New("playbook run is nil"),
 			},
 			{
 				Name:        "PlaybookRun /can/ contain checklists with no items",
@@ -1060,7 +1060,7 @@ func TestCreateAndGetPlaybookRun(t *testing.T) {
 	}
 }
 
-// TestGetPlaybookRun only tests getting a non-existent incident, since getting existing incidents
+// TestGetPlaybookRun only tests getting a non-existent playbook run, since getting existing playbook runs
 // is tested in TestCreateAndGetPlaybookRun above.
 func TestGetPlaybookRun(t *testing.T) {
 	for _, driverName := range driverNames {
@@ -1074,9 +1074,9 @@ func TestGetPlaybookRun(t *testing.T) {
 			ExpectedErr error
 		}{
 			{
-				Name:        "Get a non-existing incident",
+				Name:        "Get a non-existing playbook run",
 				ID:          "nonexisting",
-				ExpectedErr: errors.New("incident with id 'nonexisting' does not exist: not found"),
+				ExpectedErr: errors.New("playbook run with id 'nonexisting' does not exist: not found"),
 			},
 			{
 				Name:        "Get without ID",
@@ -1146,12 +1146,12 @@ func TestUpdatePlaybookRun(t *testing.T) {
 			ExpectedErr error
 		}{
 			{
-				Name:        "nil incident",
+				Name:        "nil playbook run",
 				PlaybookRun: NewBuilder(t).ToPlaybookRun(),
 				Update: func(old app.PlaybookRun) *app.PlaybookRun {
 					return nil
 				},
-				ExpectedErr: errors.New("incident is nil"),
+				ExpectedErr: errors.New("playbook run is nil"),
 			},
 			{
 				Name:        "id should not be empty",
@@ -1281,7 +1281,7 @@ func TestStressTestGetPlaybookRunsStats(t *testing.T) {
 	// For stats:
 	numReps := 30
 
-	// so we don't start returning pages with 0 incidents:
+	// so we don't start returning pages with 0 playbook runs:
 	require.LessOrEqual(t, numReps*perPage, numPlaybookRuns)
 
 	for _, driverName := range driverNames {
@@ -1332,7 +1332,7 @@ func createPlaybookRunsAndPosts(t testing.TB, store *SQLStore, playbookRunStore 
 		inc := NewBuilder(t).
 			WithTeamID(teamID).
 			WithCreateAt(int64(100000 + i)).
-			WithName(fmt.Sprintf("incident %d", i)).
+			WithName(fmt.Sprintf("playbook run %d", i)).
 			WithChecklists([]int{1}).
 			ToPlaybookRun()
 		ret, err := playbookRunStore.CreatePlaybookRun(inc)
@@ -1364,7 +1364,7 @@ func TestGetPlaybookRunIDForChannel(t *testing.T) {
 		playbookRunStore := setupPlaybookRunStore(t, db)
 		setupChannelsTable(t, db)
 
-		t.Run("retrieve existing incidentID", func(t *testing.T) {
+		t.Run("retrieve existing playbookRunID", func(t *testing.T) {
 			playbookRun1 := NewBuilder(t).ToPlaybookRun()
 			playbookRun2 := NewBuilder(t).ToPlaybookRun()
 
@@ -1383,12 +1383,12 @@ func TestGetPlaybookRunIDForChannel(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, returned2.ID, id2)
 		})
-		t.Run("fail to retrieve non-existing incidentID", func(t *testing.T) {
+		t.Run("fail to retrieve non-existing playbookRunID", func(t *testing.T) {
 			id1, err := playbookRunStore.GetPlaybookRunIDForChannel("nonexistingid")
 			require.Error(t, err)
 			require.Equal(t, "", id1)
 			require.True(t, strings.HasPrefix(err.Error(),
-				"channel with id (nonexistingid) does not have an incident"))
+				"channel with id (nonexistingid) does not have a playbook run"))
 		})
 	}
 }
@@ -1450,7 +1450,7 @@ func TestGetOwners(t *testing.T) {
 	channels := []model.Channel{channel01, channel02, channel03, channel04, channel05, channel06, channel07, channel08, channel09}
 
 	inc01 := *NewBuilder(nil).
-		WithName("incident 1 - wheel cat aliens wheelbarrow").
+		WithName("pr 1 - wheel cat aliens wheelbarrow").
 		WithDescription("this is a description, not very long, but it can be up to 2048 bytes").
 		WithChannel(&channel01). // public
 		WithOwnerUserID(owner1.UserID).
@@ -1460,7 +1460,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc02 := *NewBuilder(nil).
-		WithName("incident 2 - horse staple battery aliens shotgun mouse shotputmouse").
+		WithName("pr 2 - horse staple battery aliens shotgun mouse shotputmouse").
 		WithChannel(&channel02). // public
 		WithOwnerUserID(owner2.UserID).
 		WithTeamID(team1id).
@@ -1469,7 +1469,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc03 := *NewBuilder(nil).
-		WithName("incident 3 - Horse stapler battery shotgun mouse shotputmouse").
+		WithName("pr 3 - Horse stapler battery shotgun mouse shotputmouse").
 		WithChannel(&channel03). // public
 		WithOwnerUserID(owner1.UserID).
 		WithTeamID(team1id).
@@ -1478,7 +1478,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc04 := *NewBuilder(nil).
-		WithName("incident 4 - titanic terminatoraliens").
+		WithName("pr 4 - titanic terminatoraliens").
 		WithChannel(&channel04). // private
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team1id).
@@ -1487,7 +1487,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc05 := *NewBuilder(nil).
-		WithName("incident 5 - titanic terminator aliens mouse").
+		WithName("pr 5 - titanic terminator aliens mouse").
 		WithChannel(&channel05). // private
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team1id).
@@ -1496,7 +1496,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc06 := *NewBuilder(nil).
-		WithName("incident 6 - ubik high castle electric sheep").
+		WithName("pr 6 - ubik high castle electric sheep").
 		WithChannel(&channel06). // public
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team2id).
@@ -1505,7 +1505,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc07 := *NewBuilder(nil).
-		WithName("incident 7 - ubik high castle electric sheep").
+		WithName("pr 7 - ubik high castle electric sheep").
 		WithChannel(&channel07). // private
 		WithOwnerUserID(owner3.UserID).
 		WithTeamID(team2id).
@@ -1514,7 +1514,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc08 := *NewBuilder(nil).
-		WithName("incident 8 - ziggürat!").
+		WithName("pr 8 - ziggürat!").
 		WithChannel(&channel08). // private
 		WithOwnerUserID(owner4.UserID).
 		WithTeamID(team3id).
@@ -1523,7 +1523,7 @@ func TestGetOwners(t *testing.T) {
 		ToPlaybookRun()
 
 	inc09 := *NewBuilder(nil).
-		WithName("incident 9 - Ziggürat!").
+		WithName("pr 9 - Ziggürat!").
 		WithChannel(&channel09). // private
 		WithOwnerUserID(owner4.UserID).
 		WithTeamID(team3id).
@@ -1585,7 +1585,7 @@ func TestGetOwners(t *testing.T) {
 			ExpectedErr: nil,
 		},
 		{
-			Name: "team1 - Alice (in no channels but member of team (because must have made it through API team membership test), can see public incidents)",
+			Name: "team1 - Alice (in no channels but member of team (because must have made it through API team membership test), can see public playbook runs)",
 			RequesterInfo: app.RequesterInfo{
 				UserID: "Alice",
 			},
@@ -1712,7 +1712,7 @@ func TestNukeDB(t *testing.T) {
 		playbookRunStore := setupPlaybookRunStore(t, db)
 		playbookStore := setupPlaybookStore(t, db)
 
-		t.Run("nuke db with a few incidents in it", func(t *testing.T) {
+		t.Run("nuke db with a few playbook runs in it", func(t *testing.T) {
 			for i := 0; i < 10; i++ {
 				newPlaybookRun := NewBuilder(t).ToPlaybookRun()
 				_, err := playbookRunStore.CreatePlaybookRun(newPlaybookRun)
@@ -1849,7 +1849,7 @@ func setupPlaybookRunStore(t *testing.T, db *sqlx.DB) app.PlaybookRunStore {
 	return NewPlaybookRunStore(pluginAPIClient, logger, sqlStore)
 }
 
-// PlaybookRunBuilder is a utility to build incidents with a default base.
+// PlaybookRunBuilder is a utility to build playbook runs with a default base.
 // Use it as:
 // NewBuilder.WithName("name").WithXYZ(xyz)....ToPlaybookRun()
 type PlaybookRunBuilder struct {
@@ -1861,7 +1861,7 @@ func NewBuilder(t testing.TB) *PlaybookRunBuilder {
 	return &PlaybookRunBuilder{
 		t: t,
 		playbookRun: &app.PlaybookRun{
-			Name:          "base incident",
+			Name:          "base playbook run",
 			OwnerUserID:   model.NewId(),
 			TeamID:        model.NewId(),
 			ChannelID:     model.NewId(),
@@ -1956,7 +1956,7 @@ func (ib *PlaybookRunBuilder) WithCurrentStatus(status string) *PlaybookRunBuild
 func (ib *PlaybookRunBuilder) WithChannel(channel *model.Channel) *PlaybookRunBuilder {
 	ib.playbookRun.ChannelID = channel.Id
 
-	// Consider the incident name as authoritative.
+	// Consider the playbook run name as authoritative.
 	channel.DisplayName = ib.playbookRun.Name
 
 	return ib

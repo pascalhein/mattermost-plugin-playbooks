@@ -184,8 +184,6 @@ func (p *Plugin) OnActivate() error {
 		return errors.Wrapf(err, "failed register commands")
 	}
 
-	p.API.LogDebug("Incident collaboration plugin Activated")
-
 	// prevent a recursive OnConfigurationChange
 	go func() {
 		// Remove the prepackaged old version of the plugin

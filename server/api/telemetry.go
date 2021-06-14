@@ -75,7 +75,7 @@ type TrackerPayload struct {
 }
 
 // telemetryForPlaybookRun handles the /telemetry/incident/{id}?action=the_action endpoint. The frontend
-// can use this endpoint to track events that occur in the context of an incident
+// can use this endpoint to track events that occur in the context of a playbook run.
 func (h *TelemetryHandler) telemetryForPlaybookRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]

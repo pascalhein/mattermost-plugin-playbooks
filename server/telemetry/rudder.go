@@ -144,7 +144,7 @@ func playbookRunProperties(playbookRun *app.PlaybookRun, userID string) map[stri
 	}
 }
 
-// CreatePlaybookRun tracks the creation of the incident passed.
+// CreatePlaybookRun tracks the creation of the playbook run passed.
 func (t *RudderTelemetry) CreatePlaybookRun(playbookRun *app.PlaybookRun, userID string, public bool) {
 	properties := playbookRunProperties(playbookRun, userID)
 	properties["Action"] = actionCreate
@@ -152,14 +152,14 @@ func (t *RudderTelemetry) CreatePlaybookRun(playbookRun *app.PlaybookRun, userID
 	t.track(eventPlaybookRun, properties)
 }
 
-// EndPlaybookRun tracks the end of the incident passed.
+// EndPlaybookRun tracks the end of the playbook run passed.
 func (t *RudderTelemetry) EndPlaybookRun(playbookRun *app.PlaybookRun, userID string) {
 	properties := playbookRunProperties(playbookRun, userID)
 	properties["Action"] = actionEnd
 	t.track(eventPlaybookRun, properties)
 }
 
-// RestartPlaybookRun tracks the restart of the incident.
+// RestartPlaybookRun tracks the restart of the playbook run.
 func (t *RudderTelemetry) RestartPlaybookRun(playbookRun *app.PlaybookRun, userID string) {
 	properties := playbookRunProperties(playbookRun, userID)
 	properties["Action"] = actionRestart
@@ -214,7 +214,7 @@ func taskProperties(playbookRunID, userID string, task app.ChecklistItem) map[st
 }
 
 // AddTask tracks the creation of a new checklist item by the user
-// identified by userID in the incident identified by incidentID.
+// identified by userID in the given playbook run.
 func (t *RudderTelemetry) AddTask(playbookRunID, userID string, task app.ChecklistItem) {
 	properties := taskProperties(playbookRunID, userID, task)
 	properties["Action"] = actionAddTask
@@ -222,7 +222,7 @@ func (t *RudderTelemetry) AddTask(playbookRunID, userID string, task app.Checkli
 }
 
 // RemoveTask tracks the removal of a checklist item by the user
-// identified by userID in the incident identified by incidentID.
+// identified by userID in the given playbook run.
 func (t *RudderTelemetry) RemoveTask(playbookRunID, userID string, task app.ChecklistItem) {
 	properties := taskProperties(playbookRunID, userID, task)
 	properties["Action"] = actionRemoveTask
@@ -230,7 +230,7 @@ func (t *RudderTelemetry) RemoveTask(playbookRunID, userID string, task app.Chec
 }
 
 // RenameTask tracks the update of a checklist item by the user
-// identified by userID in the incident identified by incidentID.
+// identified by userID in the given playbook run.
 func (t *RudderTelemetry) RenameTask(playbookRunID, userID string, task app.ChecklistItem) {
 	properties := taskProperties(playbookRunID, userID, task)
 	properties["Action"] = actionRenameTask
@@ -238,7 +238,7 @@ func (t *RudderTelemetry) RenameTask(playbookRunID, userID string, task app.Chec
 }
 
 // ModifyCheckedState tracks the checking and unchecking of items by the user
-// identified by userID in the incident identified by incidentID.
+// identified by userID in the given playbook run.
 func (t *RudderTelemetry) ModifyCheckedState(playbookRunID, userID string, task app.ChecklistItem, wasOwner bool) {
 	properties := taskProperties(playbookRunID, userID, task)
 	properties["Action"] = actionModifyTaskState
@@ -249,7 +249,7 @@ func (t *RudderTelemetry) ModifyCheckedState(playbookRunID, userID string, task 
 }
 
 // SetAssignee tracks the changing of an assignee on an item by the user
-// identified by userID in the incident identified by incidentID.
+// identified by userID in the given playbook run.
 func (t *RudderTelemetry) SetAssignee(playbookRunID, userID string, task app.ChecklistItem) {
 	properties := taskProperties(playbookRunID, userID, task)
 	properties["Action"] = actionSetAssigneeForTask
@@ -257,7 +257,7 @@ func (t *RudderTelemetry) SetAssignee(playbookRunID, userID string, task app.Che
 }
 
 // MoveTask tracks the movement of checklist items by the user
-// identified by userID in the incident identified by incidentID.
+// identified by userID in the given playbook run.
 func (t *RudderTelemetry) MoveTask(playbookRunID, userID string, task app.ChecklistItem) {
 	properties := taskProperties(playbookRunID, userID, task)
 	properties["Action"] = actionMoveTask

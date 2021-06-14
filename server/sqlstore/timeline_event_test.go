@@ -22,7 +22,7 @@ func TestPlaybookRunStore_CreateTimelineEvent(t *testing.T) {
 		t.Run("Save and retrieve 4 timeline events", func(t *testing.T) {
 			createAt := model.GetMillis()
 			inc01 := NewBuilder(nil).
-				WithName("incident 1").
+				WithName("playbook run 1").
 				WithCreateAt(createAt).
 				WithChecklists([]int{8}).
 				ToPlaybookRun()
@@ -111,7 +111,7 @@ func TestPlaybookRunStore_UpdateTimelineEvent(t *testing.T) {
 		t.Run("Save 4 and delete 2 timeline events", func(t *testing.T) {
 			createAt := model.GetMillis()
 			inc01 := NewBuilder(nil).
-				WithName("incident 1").
+				WithName("playbook run 1").
 				WithCreateAt(createAt).
 				WithChecklists([]int{8}).
 				ToPlaybookRun()

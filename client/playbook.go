@@ -1,6 +1,6 @@
 package client
 
-// Playbook represents the planning before an incident type is initiated.
+// Playbook represents the planning before a playbook run is initiated.
 type Playbook struct {
 	ID                          string      `json:"id"`
 	Title                       string      `json:"title"`

@@ -106,7 +106,7 @@ func applyPlaybookRunFilterOptionsSort(builder sq.SelectBuilder, options app.Pla
 	return builder, nil
 }
 
-// NewPlaybookRunStore creates a new store for incident ServiceImpl.
+// NewPlaybookRunStore creates a new store for playbook run ServiceImpl.
 func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLStore) app.PlaybookRunStore {
 	// When adding a Playbook Run column #1: add to this select
 	playbookRunSelect := sqlStore.builder.
@@ -162,7 +162,7 @@ func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQ
 	}
 }
 
-// GetPlaybookRuns returns filtered incidents and the total count before paging.
+// GetPlaybookRuns returns filtered playbook runs and the total count before paging.
 func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, options app.PlaybookRunFilterOptions) (*app.GetPlaybookRunsResults, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
@@ -243,7 +243,7 @@ func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, opti
 
 	var rawPlaybookRuns []sqlPlaybookRun
 	if err = s.store.selectBuilder(tx, &rawPlaybookRuns, queryForResults); err != nil {
-		return nil, errors.Wrap(err, "failed to query for incidents")
+		return nil, errors.Wrap(err, "failed to query for playbook runs")
 	}
 
 	var total int
@@ -276,7 +276,7 @@ func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, opti
 
 	err = s.store.selectBuilder(tx, &statusPosts, postInfoSelect)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, errors.Wrap(err, "failed to get incidentStatusPosts")
+		return nil, errors.Wrap(err, "failed to get playbook run status posts")
 	}
 
 	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, playbookRunIDs)
@@ -299,10 +299,10 @@ func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, opti
 	}, nil
 }
 
-// CreatePlaybookRun creates a new incident. If incident has an ID, that ID will be used.
+// CreatePlaybookRun creates a new playbook run. If playbook run has an ID, that ID will be used.
 func (s *playbookRunStore) CreatePlaybookRun(playbookRun *app.PlaybookRun) (*app.PlaybookRun, error) {
 	if playbookRun == nil {
-		return nil, errors.New("incident is nil")
+		return nil, errors.New("playbook run is nil")
 	}
 	playbookRun = playbookRun.Clone()
 
@@ -355,16 +355,16 @@ func (s *playbookRunStore) CreatePlaybookRun(playbookRun *app.PlaybookRun) (*app
 		}))
 
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to store new incident")
+		return nil, errors.Wrapf(err, "failed to store new playbook run")
 	}
 
 	return playbookRun, nil
 }
 
-// UpdatePlaybookRun updates an incident.
+// UpdatePlaybookRun updates a playbook run.
 func (s *playbookRunStore) UpdatePlaybookRun(playbookRun *app.PlaybookRun) error {
 	if playbookRun == nil {
-		return errors.New("incident is nil")
+		return errors.New("playbook run is nil")
 	}
 	if playbookRun.ID == "" {
 		return errors.New("ID should not be empty")
@@ -402,7 +402,7 @@ func (s *playbookRunStore) UpdatePlaybookRun(playbookRun *app.PlaybookRun) error
 		Where(sq.Eq{"ID": rawPlaybookRun.ID}))
 
 	if err != nil {
-		return errors.Wrapf(err, "failed to update incident with id '%s'", rawPlaybookRun.ID)
+		return errors.Wrapf(err, "failed to update playbook run with id '%s'", rawPlaybookRun.ID)
 	}
 
 	return nil
@@ -413,7 +413,7 @@ func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 		return errors.New("status post is nil")
 	}
 	if statusPost.PlaybookRunID == "" {
-		return errors.New("needs incident ID")
+		return errors.New("needs playbook run ID")
 	}
 	if statusPost.PostID == "" {
 		return errors.New("needs post ID")
@@ -448,7 +448,7 @@ func (s *playbookRunStore) UpdateStatus(statusPost *app.SQLStatusPost) error {
 // CreateTimelineEvent creates the timeline event
 func (s *playbookRunStore) CreateTimelineEvent(event *app.TimelineEvent) (*app.TimelineEvent, error) {
 	if event.PlaybookRunID == "" {
-		return nil, errors.New("needs incident ID")
+		return nil, errors.New("needs playbook run ID")
 	}
 	if event.EventType == "" {
 		return nil, errors.New("needs event type")
@@ -492,7 +492,7 @@ func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 		return errors.New("needs event ID")
 	}
 	if event.PlaybookRunID == "" {
-		return errors.New("needs incident ID")
+		return errors.New("needs playbook run ID")
 	}
 	if event.EventType == "" {
 		return errors.New("needs event type")
@@ -526,7 +526,7 @@ func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 	return nil
 }
 
-// GetPlaybookRun gets an incident by ID.
+// GetPlaybookRun gets a playbook run by ID.
 func (s *playbookRunStore) GetPlaybookRun(playbookRunID string) (*app.PlaybookRun, error) {
 	if playbookRunID == "" {
 		return nil, errors.New("ID cannot be empty")
@@ -541,9 +541,9 @@ func (s *playbookRunStore) GetPlaybookRun(playbookRunID string) (*app.PlaybookRu
 	var rawPlaybookRun sqlPlaybookRun
 	err = s.store.getBuilder(tx, &rawPlaybookRun, s.playbookRunSelect.Where(sq.Eq{"i.ID": playbookRunID}))
 	if err == sql.ErrNoRows {
-		return nil, errors.Wrapf(app.ErrNotFound, "incident with id '%s' does not exist", playbookRunID)
+		return nil, errors.Wrapf(app.ErrNotFound, "playbook run with id '%s' does not exist", playbookRunID)
 	} else if err != nil {
-		return nil, errors.Wrapf(err, "failed to get incident by id '%s'", playbookRunID)
+		return nil, errors.Wrapf(err, "failed to get playbook run by id '%s'", playbookRunID)
 	}
 
 	playbookRun, err := s.toPlaybookRun(rawPlaybookRun)
@@ -559,7 +559,7 @@ func (s *playbookRunStore) GetPlaybookRun(playbookRunID string) (*app.PlaybookRu
 
 	err = s.store.selectBuilder(tx, &statusPosts, postInfoSelect)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, errors.Wrapf(err, "failed to get incidentStatusPosts for incident with id '%s'", playbookRunID)
+		return nil, errors.Wrapf(err, "failed to get playbook run status posts for playbook run with id '%s'", playbookRunID)
 	}
 
 	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, []string{playbookRunID})
@@ -595,7 +595,7 @@ func (s *playbookRunStore) getTimelineEventsForPlaybookRun(q sqlx.Queryer, playb
 	return timelineEvents, nil
 }
 
-// GetTimelineEvent returns the timeline event for incidentID by the timeline event ID.
+// GetTimelineEvent returns the timeline event by id for the given playbook run.
 func (s *playbookRunStore) GetTimelineEvent(playbookRunID, eventID string) (*app.TimelineEvent, error) {
 	var event app.TimelineEvent
 
@@ -604,15 +604,15 @@ func (s *playbookRunStore) GetTimelineEvent(playbookRunID, eventID string) (*app
 
 	err := s.store.getBuilder(s.store.db, &event, timelineEventSelect)
 	if err == sql.ErrNoRows {
-		return nil, errors.Wrapf(app.ErrNotFound, "timeline event with id (%s) does not exist for incident with id (%s)", eventID, playbookRunID)
+		return nil, errors.Wrapf(app.ErrNotFound, "timeline event with id (%s) does not exist for playbook run with id (%s)", eventID, playbookRunID)
 	} else if err != nil {
-		return nil, errors.Wrapf(err, "failed to get timeline event with id (%s) for incident with id (%s)", eventID, playbookRunID)
+		return nil, errors.Wrapf(err, "failed to get timeline event with id (%s) for playbook run with id (%s)", eventID, playbookRunID)
 	}
 
 	return &event, nil
 }
 
-// GetPlaybookRunIDForChannel gets the incidentID associated with the given channelID.
+// GetPlaybookRunIDForChannel gets the playbook run ID associated with the given channel ID.
 func (s *playbookRunStore) GetPlaybookRunIDForChannel(channelID string) (string, error) {
 	query := s.queryBuilder.
 		Select("i.ID").
@@ -622,16 +622,16 @@ func (s *playbookRunStore) GetPlaybookRunIDForChannel(channelID string) (string,
 	var id string
 	err := s.store.getBuilder(s.store.db, &id, query)
 	if err == sql.ErrNoRows {
-		return "", errors.Wrapf(app.ErrNotFound, "channel with id (%s) does not have an incident", channelID)
+		return "", errors.Wrapf(app.ErrNotFound, "channel with id (%s) does not have a playbook run", channelID)
 	} else if err != nil {
-		return "", errors.Wrapf(err, "failed to get incident by channelID '%s'", channelID)
+		return "", errors.Wrapf(err, "failed to get playbook run by channelID '%s'", channelID)
 	}
 
 	return id, nil
 }
 
-// GetAllPlaybookRunMembersCount returns the count of all members of an incident since the
-// beginning of the incident, excluding bots.
+// GetAllPlaybookRunMembersCount returns the count of all members of an playbook run's channel
+// since the beginning of the playbook run, excluding bots.
 func (s *playbookRunStore) GetAllPlaybookRunMembersCount(channelID string) (int64, error) {
 	query := s.queryBuilder.
 		Select("COUNT(DISTINCT cmh.UserId)").
@@ -648,7 +648,7 @@ func (s *playbookRunStore) GetAllPlaybookRunMembersCount(channelID string) (int6
 	return numMembers, nil
 }
 
-// GetOwners returns the owners of the incidents selected by options
+// GetOwners returns the owners of the playbook runs selected by options
 func (s *playbookRunStore) GetOwners(requesterInfo app.RequesterInfo, options app.PlaybookRunFilterOptions) ([]app.OwnerInfo, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
@@ -669,7 +669,7 @@ func (s *playbookRunStore) GetOwners(requesterInfo app.RequesterInfo, options ap
 	return owners, nil
 }
 
-// NukeDB removes all incident related data.
+// NukeDB removes all playbook run related data.
 func (s *playbookRunStore) NukeDB() (err error) {
 	tx, err := s.store.db.Beginx()
 	if err != nil {
@@ -794,7 +794,7 @@ func (s *playbookRunStore) buildPermissionsExpr(info app.RequesterInfo) sq.Sqliz
 func (s *playbookRunStore) toPlaybookRun(rawPlaybookRun sqlPlaybookRun) (*app.PlaybookRun, error) {
 	playbookRun := rawPlaybookRun.PlaybookRun
 	if err := json.Unmarshal(rawPlaybookRun.ChecklistsJSON, &playbookRun.Checklists); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal checklists json for incident id: %s", rawPlaybookRun.ID)
+		return nil, errors.Wrapf(err, "failed to unmarshal checklists json for playbook run id: %s", rawPlaybookRun.ID)
 	}
 
 	playbookRun.InvitedUserIDs = []string(nil)
@@ -814,7 +814,7 @@ func toSQLPlaybookRun(playbookRun app.PlaybookRun) (*sqlPlaybookRun, error) {
 	newChecklists := populateChecklistIDs(playbookRun.Checklists)
 	checklistsJSON, err := checklistsToJSON(newChecklists)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal checklist json for incident id: '%s'", playbookRun.ID)
+		return nil, errors.Wrapf(err, "failed to marshal checklist json for playbook run id: '%s'", playbookRun.ID)
 	}
 
 	return &sqlPlaybookRun{
@@ -847,7 +847,7 @@ func populateChecklistIDs(checklists []app.Checklist) []app.Checklist {
 	return newChecklists
 }
 
-// An incident needs to assign unique ids to its checklist items
+// A playbook run needs to assign unique ids to its checklist items
 func checklistsToJSON(checklists []app.Checklist) (json.RawMessage, error) {
 	checklistsJSON, err := json.Marshal(checklists)
 	if err != nil {

@@ -18,19 +18,19 @@ const (
 	StatusArchived = "Archived"
 )
 
-// PlaybookRun holds the detailed information of an incident.
+// PlaybookRun holds the detailed information of an playbook run.
 //
-// NOTE: when adding a column to the db, search for "When adding an Incident column" to see where
+// NOTE: when adding a column to the db, search for "When adding an Playbook Run column" to see where
 // that column needs to be added in the sqlstore code.
 type PlaybookRun struct {
 	ID                                   string          `json:"id"`
-	Name                                 string          `json:"name"` // Retrieved from incident channel
+	Name                                 string          `json:"name"` // Retrieved from playbook run channel
 	Description                          string          `json:"description"`
 	OwnerUserID                          string          `json:"owner_user_id"`
 	ReporterUserID                       string          `json:"reporter_user_id"`
 	TeamID                               string          `json:"team_id"`
 	ChannelID                            string          `json:"channel_id"`
-	CreateAt                             int64           `json:"create_at"` // Retrieved from incident channel
+	CreateAt                             int64           `json:"create_at"` // Retrieved from playbook run channel
 	EndAt                                int64           `json:"end_at"`
 	DeleteAt                             int64           `json:"delete_at"` // Retrieved from incidet channel
 	ActiveStage                          int             `json:"active_stage"`
@@ -109,7 +109,7 @@ func (i *PlaybookRun) IsActive() bool {
 }
 
 func (i *PlaybookRun) ResolvedAt() int64 {
-	// Backwards compatibility for incidents with old status updates
+	// Backwards compatibility for playbook runs with old status updates
 	if len(i.StatusPosts) > 0 && i.StatusPosts[len(i.StatusPosts)-1].Status == "" {
 		return i.EndAt
 	}
@@ -143,8 +143,8 @@ type StatusPost struct {
 type UpdateOptions struct {
 }
 
-// StatusUpdateOptions encapsulates the fields that can be set when updating an incident's status
-// NOTE: changes made to this should be reflected in the client/incident StatusUpdateOptions struct
+// StatusUpdateOptions encapsulates the fields that can be set when updating an playbook run's status
+// NOTE: changes made to this should be reflected in the client package.
 type StatusUpdateOptions struct {
 	Status      string        `json:"status"`
 	Description string        `json:"description"`
@@ -152,7 +152,7 @@ type StatusUpdateOptions struct {
 	Reminder    time.Duration `json:"reminder"`
 }
 
-// Metadata tracks ancillary metadata about an incident.
+// Metadata tracks ancillary metadata about a playbook run.
 type Metadata struct {
 	ChannelName        string `json:"channel_name"`
 	ChannelDisplayName string `json:"channel_display_name"`
@@ -191,7 +191,7 @@ type TimelineEvent struct {
 }
 
 // GetPlaybookRunsResults collects the results of the GetPlaybookRuns call: the list of PlaybookRuns matching
-// the HeaderFilterOptions, and the TotalCount of the matching incidents before paging was applied.
+// the HeaderFilterOptions, and the TotalCount of the matching playbook runs before paging was applied.
 type GetPlaybookRunsResults struct {
 	TotalCount int           `json:"total_count"`
 	PageCount  int           `json:"page_count"`
@@ -236,7 +236,7 @@ type OwnerInfo struct {
 	Username string `json:"username"`
 }
 
-// DialogState holds the start incident interactive dialog's state as it appears in the client
+// DialogState holds the start playbook run interactive dialog's state as it appears in the client
 // and is submitted back to the server.
 type DialogState struct {
 	PostID   string `json:"post_id"`
@@ -247,52 +247,52 @@ type DialogStateAddToTimeline struct {
 	PostID string `json:"post_id"`
 }
 
-// PlaybookRunService is the incident/service interface.
+// PlaybookRunService is the playbook run service interface.
 type PlaybookRunService interface {
-	// GetPlaybookRuns returns filtered incidents and the total count before paging.
+	// GetPlaybookRuns returns filtered playbook runs and the total count before paging.
 	GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error)
 
-	// CreatePlaybookRun creates a new incident. userID is the user who initiated the CreatePlaybookRun.
+	// CreatePlaybookRun creates a new playbook run. userID is the user who initiated the CreatePlaybookRun.
 	CreatePlaybookRun(playbookRun *PlaybookRun, playbook *Playbook, userID string, public bool) (*PlaybookRun, error)
 
-	// OpenCreatePlaybookRunDialog opens an interactive dialog to start a new incident.
+	// OpenCreatePlaybookRunDialog opens an interactive dialog to start a new playbook run.
 	OpenCreatePlaybookRunDialog(teamID, ownerID, triggerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) error
 
-	// OpenUpdateStatusDialog opens an interactive dialog so the user can update the incident's status.
+	// OpenUpdateStatusDialog opens an interactive dialog so the user can update the playbook run's status.
 	OpenUpdateStatusDialog(playbookRunID, triggerID string) error
 
-	// OpenAddToTimelineDialog opens an interactive dialog so the user can add a post to the incident timeline.
+	// OpenAddToTimelineDialog opens an interactive dialog so the user can add a post to the playbook run timeline.
 	OpenAddToTimelineDialog(requesterInfo RequesterInfo, postID, teamID, triggerID string) error
 
-	// OpenAddChecklistItemDialog opens an interactive dialog so the user can add a post to the incident timeline.
+	// OpenAddChecklistItemDialog opens an interactive dialog so the user can add a post to the playbook run timeline.
 	OpenAddChecklistItemDialog(triggerID, playbookRunID string, checklist int) error
 
-	// AddPostToTimeline adds an event based on a post to an incident's timeline.
+	// AddPostToTimeline adds an event based on a post to a playbook run's timeline.
 	AddPostToTimeline(playbookRunID, userID, postID, summary string) error
 
 	// RemoveTimelineEvent removes the timeline event (sets the DeleteAt to the current time).
 	RemoveTimelineEvent(playbookRunID, userID, eventID string) error
 
-	// UpdateStatus updates an incident's status.
+	// UpdateStatus updates a playbook run's status.
 	UpdateStatus(playbookRunID, userID string, options StatusUpdateOptions) error
 
-	// GetPlaybookRun gets an incident by ID. Returns error if it could not be found.
+	// GetPlaybookRun gets a playbook run by ID. Returns error if it could not be found.
 	GetPlaybookRun(playbookRunID string) (*PlaybookRun, error)
 
-	// GetPlaybookRunMetadata gets ancillary metadata about an incident.
+	// GetPlaybookRunMetadata gets ancillary metadata about a playbook run.
 	GetPlaybookRunMetadata(playbookRunID string) (*Metadata, error)
 
-	// GetPlaybookRunIDForChannel get the incidentID associated with this channel. Returns ErrNotFound
-	// if there is no incident associated with this channel.
+	// GetPlaybookRunIDForChannel get the playbookRunID associated with this channel. Returns ErrNotFound
+	// if there is no playbook run associated with this channel.
 	GetPlaybookRunIDForChannel(channelID string) (string, error)
 
-	// GetOwners returns all the owners of incidents selected
+	// GetOwners returns all the owners of playbook runs selected
 	GetOwners(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) ([]OwnerInfo, error)
 
-	// IsOwner returns true if the userID is the owner for incidentID.
+	// IsOwner returns true if the userID is the owner for playbookRunID.
 	IsOwner(playbookRunID string, userID string) bool
 
-	// ChangeOwner processes a request from userID to change the owner for incidentID
+	// ChangeOwner processes a request from userID to change the owner for playbookRunID
 	// to ownerID. Changing to the same ownerID is a no-op.
 	ChangeOwner(playbookRunID string, userID string, ownerID string) error
 
@@ -322,29 +322,29 @@ type PlaybookRunService interface {
 	// MoveChecklistItem moves a checklist item from one position to anouther
 	MoveChecklistItem(playbookRunID, userID string, checklistNumber int, itemNumber int, newLocation int) error
 
-	// GetChecklistItemAutocomplete returns the list of checklist items for incidentID to be used in autocomplete
+	// GetChecklistItemAutocomplete returns the list of checklist items for playbookRunID to be used in autocomplete
 	GetChecklistItemAutocomplete(playbookRunID string) ([]model.AutocompleteListItem, error)
 
-	// GetChecklistAutocomplete returns the list of checklists for incidentID to be used in autocomplete
+	// GetChecklistAutocomplete returns the list of checklists for playbookRunID to be used in autocomplete
 	GetChecklistAutocomplete(playbookRunID string) ([]model.AutocompleteListItem, error)
 
-	// NukeDB removes all incident related data.
+	// NukeDB removes all playbook run related data.
 	NukeDB() error
 
 	// SetReminder sets a reminder. After timeInMinutes in the future, the owner will be
-	// reminded to update the incident's status.
+	// reminded to update the playbook run's status.
 	SetReminder(playbookRunID string, timeInMinutes time.Duration) error
 
-	// RemoveReminder removes the pending reminder for incidentID (if any).
+	// RemoveReminder removes the pending reminder for playbookRunID (if any).
 	RemoveReminder(playbookRunID string)
 
 	// HandleReminder is the handler for all reminder events.
 	HandleReminder(key string)
 
-	// RemoveReminderPost will remove the reminder in the incident channel (if any).
+	// RemoveReminderPost will remove the reminder in the playbook run channel (if any).
 	RemoveReminderPost(playbookRunID string) error
 
-	// ChangeCreationDate changes the creation date of the specified incident.
+	// ChangeCreationDate changes the creation date of the specified playbook run.
 	ChangeCreationDate(playbookRunID string, creationTimestamp time.Time) error
 
 	// UserHasJoinedChannel is called when userID has joined channelID. If actorID is not blank, userID
@@ -355,7 +355,7 @@ type PlaybookRunService interface {
 	// was removed from the channel by actorID.
 	UserHasLeftChannel(userID, channelID, actorID string)
 
-	// UpdateRetrospective updates the retrospective for the given incident.
+	// UpdateRetrospective updates the retrospective for the given playbook run.
 	UpdateRetrospective(playbookRunID, userID, newRetrospective string) error
 
 	// PublishRetrospective publishes the retrospective.
@@ -365,25 +365,25 @@ type PlaybookRunService interface {
 	CancelRetrospective(playbookRunID, userID string) error
 
 	// CheckAndSendMessageOnJoin checks if userID has viewed channelID and sends
-	// incident.MessageOnJoin if it exists. Returns true if the message was sent.
+	// playbooRun.MessageOnJoin if it exists. Returns true if the message was sent.
 	CheckAndSendMessageOnJoin(userID, playbookRunID, channelID string) bool
 }
 
 // PlaybookRunStore defines the methods the PlaybookRunServiceImpl needs from the interfaceStore.
 type PlaybookRunStore interface {
-	// GetPlaybookRuns returns filtered incidents and the total count before paging.
+	// GetPlaybookRuns returns filtered playbook runs and the total count before paging.
 	GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error)
 
-	// CreatePlaybookRun creates a new incident. If incident has an ID, that ID will be used.
+	// CreatePlaybookRun creates a new playbook run. If playbook run has an ID, that ID will be used.
 	CreatePlaybookRun(playbookRun *PlaybookRun) (*PlaybookRun, error)
 
-	// UpdatePlaybookRun updates an incident.
+	// UpdatePlaybookRun updates a playbook run.
 	UpdatePlaybookRun(playbookRun *PlaybookRun) error
 
-	// UpdateStatus updates the status of an incident.
+	// UpdateStatus updates the status of a playbook run.
 	UpdateStatus(statusPost *SQLStatusPost) error
 
-	// GetTimelineEvent returns the timeline event for incidentID by the timeline event ID.
+	// GetTimelineEvent returns the timeline event for playbookRunID by the timeline event ID.
 	GetTimelineEvent(playbookRunID, eventID string) (*TimelineEvent, error)
 
 	// CreateTimelineEvent inserts the timeline event into the DB and returns the new event ID
@@ -392,24 +392,24 @@ type PlaybookRunStore interface {
 	// UpdateTimelineEvent updates an existing timeline event
 	UpdateTimelineEvent(event *TimelineEvent) error
 
-	// GetPlaybookRun gets an incident by ID.
+	// GetPlaybookRun gets a playbook run by ID.
 	GetPlaybookRun(playbookRunID string) (*PlaybookRun, error)
 
-	// GetPlaybookRunByChannel gets an incident associated with the given channel id.
+	// GetPlaybookRunByChannel gets a playbook run associated with the given channel id.
 	GetPlaybookRunIDForChannel(channelID string) (string, error)
 
 	// GetAllPlaybookRunMembersCount returns the count of all members of the
-	// incident associated with the given channel id since the beginning of the
-	// incident, excluding bots.
+	// playbook run associated with the given channel id since the beginning of the
+	// playbook run, excluding bots.
 	GetAllPlaybookRunMembersCount(channelID string) (int64, error)
 
-	// GetOwners returns the owners of the incidents selected by options
+	// GetOwners returns the owners of the playbook runs selected by options
 	GetOwners(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) ([]OwnerInfo, error)
 
-	// NukeDB removes all incident related data.
+	// NukeDB removes all playbook run related data.
 	NukeDB() error
 
-	// ChangeCreationDate changes the creation date of the specified incident.
+	// ChangeCreationDate changes the creation date of the specified playbook run.
 	ChangeCreationDate(playbookRunID string, creationTimestamp time.Time) error
 
 	// HasViewedChannel returns true if userID has viewed channelID
@@ -423,19 +423,19 @@ type PlaybookRunStore interface {
 // PlaybookRunTelemetry defines the methods that the PlaybookRunServiceImpl needs from the RudderTelemetry.
 // Unless otherwise noted, userID is the user initiating the event.
 type PlaybookRunTelemetry interface {
-	// CreatePlaybookRun tracks the creation of a new incident.
+	// CreatePlaybookRun tracks the creation of a new playbook run.
 	CreatePlaybookRun(playbookRun *PlaybookRun, userID string, public bool)
 
-	// EndPlaybookRun tracks the end of an incident.
+	// EndPlaybookRun tracks the end of a playbook run.
 	EndPlaybookRun(playbookRun *PlaybookRun, userID string)
 
-	// RestartPlaybookRun tracks the restart of an incident.
+	// RestartPlaybookRun tracks the restart of a playbook run.
 	RestartPlaybookRun(playbookRun *PlaybookRun, userID string)
 
 	// ChangeOwner tracks changes in owner.
 	ChangeOwner(playbookRun *PlaybookRun, userID string)
 
-	// UpdateStatus tracks when an incident's status has been updated
+	// UpdateStatus tracks when a playbook run's status has been updated
 	UpdateStatus(playbookRun *PlaybookRun, userID string)
 
 	// FrontendTelemetryForPlaybookRun tracks an event originating from the frontend
@@ -511,7 +511,7 @@ type PlaybookRunFilterOptions struct {
 	// OwnerID filters by owner's Mattermost user ID. Defaults to blank (no filter).
 	OwnerID string `url:"owner_user_id,omitempty"`
 
-	// MemberID filters incidents that have this member. Defaults to blank (no filter).
+	// MemberID filters playbook runs that have this member. Defaults to blank (no filter).
 	MemberID string `url:"member_id,omitempty"`
 
 	// SearchTerm returns results of the search term and respecting the other header filter options.
@@ -519,7 +519,7 @@ type PlaybookRunFilterOptions struct {
 	// not returned in relevance order).
 	SearchTerm string `url:"search_term,omitempty"`
 
-	// PlaybookID filters incidents that are derived from this playbook id.
+	// PlaybookID filters playbook runs that are derived from this playbook id.
 	// Defaults to blank (no filter).
 	PlaybookID string `url:"playbook_id,omitempty"`
 }

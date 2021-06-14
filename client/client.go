@@ -36,7 +36,7 @@ type Client struct {
 	// User agent used when communicating with the Incident Collaboration API.
 	UserAgent string
 
-	// PlaybookRuns is a collection of methods used to interact with incidents.
+	// PlaybookRuns is a collection of methods used to interact with playbook runs.
 	PlaybookRuns *PlaybookRunService
 	// Playbooks is a collection of methods used to interact with playbooks.
 	Playbooks *PlaybooksService

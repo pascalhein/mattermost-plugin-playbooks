@@ -26,7 +26,7 @@ func ExamplePlaybookRunService_Get() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Incident Name: %s\n", playbookRun.Name)
+	fmt.Printf("Playbook Run Name: %s\n", playbookRun.Name)
 }
 
 func ExamplePlaybookRunService_List() {
@@ -69,6 +69,6 @@ func ExamplePlaybookRunService_List() {
 	}
 
 	for _, playbookRun := range playbookRuns {
-		fmt.Printf("Incident Name: %s\n", playbookRun.Name)
+		fmt.Printf("Playbook Run Name: %s\n", playbookRun.Name)
 	}
 }

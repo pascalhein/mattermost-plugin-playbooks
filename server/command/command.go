@@ -263,7 +263,7 @@ func (r *Runner) actionCheck(args []string) {
 			r.postCommandResponse("You can only check/uncheck an item from within the incident's channel.")
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -291,7 +291,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 			r.postCommandResponse("You can only add an item from within the incident's channel.")
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -338,7 +338,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 			r.postCommandResponse("You can only remove an item from within the incident's channel.")
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -365,13 +365,13 @@ func (r *Runner) actionShowOwner([]string) {
 		r.postCommandResponse("You can only see the owner from within the incident's channel.")
 		return
 	} else if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident for channel %s: %v", r.args.ChannelId, err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run for channel %s: %v", r.args.ChannelId, err)
 		return
 	}
 
 	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -392,13 +392,13 @@ func (r *Runner) actionChangeOwner(args []string) {
 		r.postCommandResponse("You can only change the owner from within the incident's channel.")
 		return
 	} else if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident for channel %s: %v", r.args.ChannelId, err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run for channel %s: %v", r.args.ChannelId, err)
 		return
 	}
 
 	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -444,13 +444,13 @@ func (r *Runner) actionAnnounce(args []string) {
 			r.postCommandResponse("You can only announce from within the incident's channel.")
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
 	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -462,7 +462,7 @@ func (r *Runner) actionAnnounce(args []string) {
 
 	playbookRunChannel, err := r.pluginAPI.Channel.Get(currentPlaybookRun.ChannelID)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident channel: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run channel: %v", err)
 		return
 	}
 
@@ -520,7 +520,7 @@ func (r *Runner) actionList() {
 
 	result, err := r.playbookRunService.GetPlaybookRuns(requesterInfo, options)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving the incidents: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving the playbook runs: %v", err)
 		return
 	}
 
@@ -534,13 +534,13 @@ func (r *Runner) actionList() {
 	for i, playbookRun := range result.Items {
 		owner, err := r.pluginAPI.User.Get(playbookRun.OwnerUserID)
 		if err != nil {
-			r.warnUserAndLogErrorf("Error retrieving owner of incident '%s': %v", playbookRun.Name, err)
+			r.warnUserAndLogErrorf("Error retrieving owner of playbook run '%s': %v", playbookRun.Name, err)
 			return
 		}
 
 		channel, err := r.pluginAPI.Channel.Get(playbookRun.ChannelID)
 		if err != nil {
-			r.warnUserAndLogErrorf("Error retrieving channel of incident '%s': %v", playbookRun.Name, err)
+			r.warnUserAndLogErrorf("Error retrieving channel of playbook run '%s': %v", playbookRun.Name, err)
 			return
 		}
 
@@ -568,7 +568,7 @@ func (r *Runner) actionInfo() {
 		r.postCommandResponse("You can only see the details of an incident from within the incident's channel.")
 		return
 	} else if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -586,7 +586,7 @@ func (r *Runner) actionInfo() {
 
 	playbookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -645,7 +645,7 @@ func (r *Runner) actionUpdate() {
 			r.postCommandResponse("You can only update an incident from within the incident's channel.")
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -654,7 +654,7 @@ func (r *Runner) actionUpdate() {
 			r.postCommandResponse(fmt.Sprintf("userID `%s` is not an admin or channel member", r.args.UserId))
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -710,13 +710,13 @@ func (r *Runner) actionTimeline() {
 			r.postCommandResponse("You can only run the timeline command from within an incident channel.")
 			return
 		}
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
 	playbookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
+		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
 		return
 	}
 
@@ -1106,18 +1106,18 @@ func (r *Runner) actionTestCreate(params []string) {
 	)
 
 	if err != nil {
-		r.warnUserAndLogErrorf("unable to create incident: %v", err)
+		r.warnUserAndLogErrorf("unable to create playbook run: %v", err)
 		return
 	}
 
 	if err = r.playbookRunService.ChangeCreationDate(playbookRun.ID, creationTimestamp); err != nil {
-		r.warnUserAndLogErrorf("unable to change date of recently created incident: %v", err)
+		r.warnUserAndLogErrorf("unable to change date of recently created playbook run: %v", err)
 		return
 	}
 
 	channel, err := r.pluginAPI.Channel.Get(playbookRun.ChannelID)
 	if err != nil {
-		r.warnUserAndLogErrorf("unable to retrieve information of incident's channel: %v", err)
+		r.warnUserAndLogErrorf("unable to retrieve information of playbook run's channel: %v", err)
 		return
 	}
 
@@ -1256,10 +1256,10 @@ var playbookRunNames = []string{
 	"MM HA sync errors",
 }
 
-// generateTestData generates `numActivePlaybookRuns` ongoing incidents and
-// `numEndedPlaybookRuns` ended incidents, whose creation timestamp lies randomly
+// generateTestData generates `numActivePlaybookRuns` ongoing playbook runs and
+// `numEndedPlaybookRuns` ended playbook runs, whose creation timestamp lies randomly
 // between the `begin` and `end` timestamps.
-// All incidents are created with a playbook randomly picked from the ones the
+// All playbook runs are created with a playbook randomly picked from the ones the
 // user is a member of, and the randomness is controlled by the `seed` parameter
 // to create reproducible results if needed.
 func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns int, begin, end time.Time, seed int64) {
@@ -1318,7 +1318,7 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 		playbook := playbooks[rand.Intn(len(playbooks))]
 
 		playbookRunName := playbookRunNames[rand.Intn(len(playbookRunNames))]
-		// Give a company name to 1/3 of the incidents created
+		// Give a company name to 1/3 of the playbook runs created
 		if rand.Intn(3) == 0 {
 			companyName := fakeCompanyNames[rand.Intn(len(fakeCompanyNames))]
 			playbookRunName = fmt.Sprintf("[%s] %s", companyName, playbookRunName)
@@ -1338,7 +1338,7 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 		)
 
 		if err != nil {
-			r.warnUserAndLogErrorf("Error creating incident: %v", err)
+			r.warnUserAndLogErrorf("Error creating playbook run: %v", err)
 			return
 		}
 
@@ -1351,7 +1351,7 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 
 		channel, err := r.pluginAPI.Channel.Get(playbookRun.ChannelID)
 		if err != nil {
-			r.warnUserAndLogErrorf("Error retrieveing incident's channel: %v", err)
+			r.warnUserAndLogErrorf("Error retrieveing playbook run's channel: %v", err)
 			return
 		}
 
@@ -1370,7 +1370,7 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 			Message: "This is now archived.",
 		})
 		if err != nil {
-			r.warnUserAndLogErrorf("Error ending the incident: %v", err)
+			r.warnUserAndLogErrorf("Error ending the playbook run: %v", err)
 			return
 		}
 	}

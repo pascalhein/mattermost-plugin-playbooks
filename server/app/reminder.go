@@ -30,7 +30,7 @@ func (s *PlaybookRunServiceImpl) HandleReminder(key string) {
 func (s *PlaybookRunServiceImpl) handleReminderToFillRetro(playbookRunID string) {
 	playbookRunToRemind, err := s.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		s.logger.Errorf(errors.Wrapf(err, "handleReminderToFillRetro failed to get incident id: %s", playbookRunID).Error())
+		s.logger.Errorf(errors.Wrapf(err, "handleReminderToFillRetro failed to get playbook run id: %s", playbookRunID).Error())
 		return
 	}
 
@@ -46,7 +46,7 @@ func (s *PlaybookRunServiceImpl) handleReminderToFillRetro(playbookRunID string)
 	}
 
 	if err = s.postRetrospectiveReminder(playbookRunToRemind, false); err != nil {
-		s.logger.Errorf(errors.Wrapf(err, "couldn't post incident reminder").Error())
+		s.logger.Errorf(errors.Wrapf(err, "couldn't post reminder").Error())
 		return
 	}
 
@@ -63,7 +63,7 @@ func (s *PlaybookRunServiceImpl) handleReminderToFillRetro(playbookRunID string)
 func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(playbookRunID string) {
 	playbookRunToModify, err := s.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		s.logger.Errorf(errors.Wrapf(err, "HandleReminder failed to get incident id: %s", playbookRunID).Error())
+		s.logger.Errorf(errors.Wrapf(err, "HandleReminder failed to get playbook run id: %s", playbookRunID).Error())
 		return
 	}
 
@@ -107,12 +107,12 @@ func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(playbookRunID string
 
 	playbookRunToModify.ReminderPostID = post.Id
 	if err = s.store.UpdatePlaybookRun(playbookRunToModify); err != nil {
-		s.logger.Errorf(errors.Wrapf(err, "error updating with reminder post id, incident id: %s", playbookRunToModify.ID).Error())
+		s.logger.Errorf(errors.Wrapf(err, "error updating with reminder post id, playbook run id: %s", playbookRunToModify.ID).Error())
 	}
 }
 
 // SetReminder sets a reminder. After timeInMinutes in the future, the owner will be
-// reminded to update the incident's status.
+// reminded to update the playbook run's status.
 func (s *PlaybookRunServiceImpl) SetReminder(playbookRunID string, fromNow time.Duration) error {
 	if _, err := s.scheduler.ScheduleOnce(playbookRunID, time.Now().Add(fromNow)); err != nil {
 		return errors.Wrap(err, "unable to schedule reminder")
@@ -121,22 +121,22 @@ func (s *PlaybookRunServiceImpl) SetReminder(playbookRunID string, fromNow time.
 	return nil
 }
 
-// RemoveReminder removes the pending reminder for incidentID (if any).
+// RemoveReminder removes the pending reminder for the given playbook run, if any.
 func (s *PlaybookRunServiceImpl) RemoveReminder(playbookRunID string) {
 	s.scheduler.Cancel(playbookRunID)
 }
 
-// RemoveReminderPost will remove the reminder post in the incident channel (if any).
+// RemoveReminderPost removes the reminder post in the channel for the given playbook run, if any.
 func (s *PlaybookRunServiceImpl) RemoveReminderPost(playbookRunID string) error {
 	playbookRunToModify, err := s.store.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		return errors.Wrapf(err, "failed to retrieve incident")
+		return errors.Wrapf(err, "failed to retrieve playbook run")
 	}
 
 	return s.removeReminderPost(playbookRunToModify)
 }
 
-// removeReminderPost will remove the reminder post in the incident channel (if any).
+// removeReminderPost removes the reminder post in the channel for the given playbook run, if any.
 func (s *PlaybookRunServiceImpl) removeReminderPost(playbookRunToModify *PlaybookRun) error {
 	if playbookRunToModify.ReminderPostID == "" {
 		return nil
@@ -157,7 +157,7 @@ func (s *PlaybookRunServiceImpl) removeReminderPost(playbookRunToModify *Playboo
 
 	playbookRunToModify.ReminderPostID = ""
 	if err = s.store.UpdatePlaybookRun(playbookRunToModify); err != nil {
-		return errors.Wrapf(err, "error updating incident removing reminder post id")
+		return errors.Wrapf(err, "failed to update playbook run after removing reminder post id")
 	}
 
 	return nil

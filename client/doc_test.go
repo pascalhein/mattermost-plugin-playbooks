@@ -29,5 +29,5 @@ func Example() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Incident Name: %s\n", playbookRun.Name)
+	fmt.Printf("Playbook Run Name: %s\n", playbookRun.Name)
 }

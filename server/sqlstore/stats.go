@@ -70,7 +70,7 @@ func (s *StatsStore) TotalActivePlaybookRuns(filters *StatsFilters) int {
 
 	var total int
 	if err := s.store.getBuilder(s.store.db, &total, query); err != nil {
-		s.log.Warnf("Error retrieving stat total active incidents %w", err)
+		s.log.Warnf("Error retrieving stat total active %w", err)
 		return -1
 	}
 
@@ -87,7 +87,7 @@ func (s *StatsStore) TotalInProgressPlaybookRuns(filters *StatsFilters) int {
 
 	var total int
 	if err := s.store.getBuilder(s.store.db, &total, query); err != nil {
-		s.log.Warnf("Error retrieving stat total in progress incidents %w", err)
+		s.log.Warnf("Error retrieving stat total in progress %w", err)
 		return -1
 	}
 
@@ -131,7 +131,7 @@ func (s *StatsStore) RunsFinishedBetweenDays(filters *StatsFilters, startDay, en
 
 	var total int
 	if err := s.store.getBuilder(s.store.db, &total, query); err != nil {
-		s.log.Warnf("Error retrieving stat total in progress incidents %w", err)
+		s.log.Warnf("Error retrieving stat total in progress %w", err)
 		return -1
 	}
 
@@ -148,7 +148,7 @@ func (s *StatsStore) AverageDurationActivePlaybookRunsMinutes(filters *StatsFilt
 
 	var averageCreateAt float64
 	if err := s.store.getBuilder(s.store.db, &averageCreateAt, query); err != nil {
-		s.log.Warnf("Error retrieving stat duration active incidents %w", err)
+		s.log.Warnf("Error retrieving stat duration active %w", err)
 		return -1
 	}
 
@@ -243,7 +243,7 @@ func (s *StatsStore) ActiveRunsPerDayLastXDays(x int, filters *StatsFilters) ([]
 
 	q := s.store.builder.Select()
 	for i := 0; i < x; i++ {
-		// an incident was active if it was created before the end of the day and ended after the
+		// a playbook run was active if it was created before the end of the day and ended after the
 		// start of the day (or still active)
 		if s.store.db.DriverName() == model.DATABASE_DRIVER_MYSQL {
 			q = q.Column(`
@@ -297,7 +297,7 @@ func (s *StatsStore) ActiveParticipantsPerDayLastXDays(x int, filters *StatsFilt
 		// COUNT( DISTINCT( CASE: the CASE will return the userId if the row satisfies the conditions,
 		// therefore COUNT( DISTINCT will return the number of unique userIds
 		//
-		// first two lines of the WHEN: an incident was active if it was created before the
+		// first two lines of the WHEN: a playbook run was active if it was created before the
 		// end of the day and ended after the start of the day (or still active)
 		//
 		// second two lines: a user was active in the same way--if they joined before the
@@ -375,7 +375,7 @@ func (s *StatsStore) performQueryForXCols(q sq.SelectBuilder, x int) ([]int, err
 func (s *StatsStore) CountActivePlaybookRunsByDay(filters *StatsFilters) []int {
 	now := model.GetMillis()
 
-	// Get the number of incidents started on each day
+	// Get the number of playbook runs started on each day
 	startQuery := s.store.builder.
 		Select(fmt.Sprintf("COUNT(i.Id) as Count, FLOOR((%v - i.CreateAt) / 86400000) as DayStarted", now)).
 		From("IR_Incident as i").
@@ -398,7 +398,7 @@ func (s *StatsStore) CountActivePlaybookRunsByDay(filters *StatsFilters) []int {
 		started[dcStart.DayStarted] = dcStart.Count
 	}
 
-	// Get the number of incidents ended on each day
+	// Get the number of playbook runs ended on each day
 	endQuery := s.store.builder.
 		Select(fmt.Sprintf("COUNT(i.Id) as Count, FLOOR((%v - i.EndAt) / 86400000) as DayEnded", now)).
 		From("IR_Incident as i").
@@ -422,7 +422,7 @@ func (s *StatsStore) CountActivePlaybookRunsByDay(filters *StatsFilters) []int {
 		ended[dcEnd.DayEnded] = dcEnd.Count
 	}
 
-	// Get the current number of active incidents
+	// Get the current number of active playbook runs.
 	activeNowQuery := s.store.builder.
 		Select("COUNT(i.Id)").
 		From("IR_Incident as i").
@@ -436,7 +436,7 @@ func (s *StatsStore) CountActivePlaybookRunsByDay(filters *StatsFilters) []int {
 		return []int{}
 	}
 
-	// Derive the number of active incidents by starting with the currently active incidents
+	// Derive the number of active playbook runs by starting with the currently active playbook runs
 	// and using the tables above to calculate the number for each day.
 	days := make([]int, 14)
 	days[0] = activeNow
@@ -447,8 +447,8 @@ func (s *StatsStore) CountActivePlaybookRunsByDay(filters *StatsFilters) []int {
 	return days
 }
 
-// Inefficient. Calculates the number of people in the incident using
-// today's number of people in the incident, but counts it when the incident was created.
+// Inefficient. Calculates the number of people in the playbook run using
+// today's number of people in the playbook run, but counts it when the playbook run was created.
 func (s *StatsStore) UniquePeopleInPlaybookRuns(filters *StatsFilters) []int {
 	query := s.store.builder.
 		Select("COUNT(DISTINCT cm.UserId)").
@@ -459,7 +459,7 @@ func (s *StatsStore) UniquePeopleInPlaybookRuns(filters *StatsFilters) []int {
 
 	peopleInPlaybookRuns, err := s.MovingWindowQueryActive(query, 14)
 	if err != nil {
-		s.log.Warnf("Unable to get people in incidents %w", err)
+		s.log.Warnf("Unable to get people in playbook runs %w", err)
 		return []int{}
 	}
 
@@ -467,7 +467,7 @@ func (s *StatsStore) UniquePeopleInPlaybookRuns(filters *StatsFilters) []int {
 }
 
 // Average times from CreateAt to the first non-"Reported" update for the last number of days.
-// Averages are for incidents created on that day. Days with no created incidents use the last day.
+// Averages are for playbook runs created on that day. Days with no created playbook runs use the last day.
 func (s *StatsStore) AverageStartToActive(filters *StatsFilters) []int {
 	daysToQuery := 42
 	firstNonReportedStatusPost := `(
@@ -517,7 +517,7 @@ func (s *StatsStore) AverageStartToActive(filters *StatsFilters) []int {
 }
 
 // Average times from CreateAt to EndAt for the last number of days.
-// Averages are for incidents created on that day. Days with no created incidents use the last day.
+// Averages are for playbook runs created on that day. Days with no created playbook runs use the last day.
 func (s *StatsStore) AverageStartToResolved(filters *StatsFilters) []int {
 	daysToQuery := 42
 	now := model.GetMillis()

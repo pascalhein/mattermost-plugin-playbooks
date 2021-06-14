@@ -2,7 +2,7 @@ package client
 
 import "time"
 
-// PlaybookRun represents an incident.
+// PlaybookRun represents a playbook run.
 type PlaybookRun struct {
 	ID                      string          `json:"id"`
 	Name                    string          `json:"name"`
@@ -29,7 +29,7 @@ type PlaybookRun struct {
 	TimelineEvents          []TimelineEvent `json:"timeline_events"`
 }
 
-// StatusPost is information added to the incident when selecting from the db and sent to the
+// StatusPost is information added to the playbook run when selecting from the db and sent to the
 // client; it is not saved to the db.
 type StatusPost struct {
 	ID       string `json:"id"`
@@ -37,7 +37,7 @@ type StatusPost struct {
 	DeleteAt int64  `json:"delete_at"`
 }
 
-// PlaybookRunMetadata tracks ancillary metadata about an incident.
+// PlaybookRunMetadata tracks ancillary metadata about a playbook run.
 type PlaybookRunMetadata struct {
 	ChannelName        string `json:"channel_name"`
 	ChannelDisplayName string `json:"channel_display_name"`
@@ -58,7 +58,7 @@ const (
 	RanSlashCommand    TimelineEventType = "ran_slash_command"
 )
 
-// TimelineEvent represents an event recorded to an incident's timeline.
+// TimelineEvent represents an event recorded to a playbook run's timeline.
 type TimelineEvent struct {
 	ID            string            `json:"id"`
 	PlaybookRunID string            `json:"incident_id"`
@@ -129,7 +129,7 @@ const (
 // PlaybookRunListOptions specifies the optional parameters to the
 // PlaybookRunService.List method.
 type PlaybookRunListOptions struct {
-	// TeamID filters incidents to those in the given team.
+	// TeamID filters playbook runs to those in the given team.
 	TeamID string `url:"team_id,omitempty"`
 
 	Sort      Sort          `url:"sort,omitempty"`
@@ -141,7 +141,7 @@ type PlaybookRunListOptions struct {
 	// OwnerID filters by owner's Mattermost user ID. Defaults to blank (no filter).
 	OwnerID string `url:"owner_user_id,omitempty"`
 
-	// MemberID filters incidents that have this member. Defaults to blank (no filter).
+	// MemberID filters playbook runs that have this member. Defaults to blank (no filter).
 	MemberID string `url:"member_id,omitempty"`
 
 	// SearchTerm returns results of the search term and respecting the other header filter options.
@@ -149,7 +149,7 @@ type PlaybookRunListOptions struct {
 	// not returned in relevance order).
 	SearchTerm string `url:"search_term,omitempty"`
 
-	// PlaybookID filters incidents that are derived from this playbook id.
+	// PlaybookID filters playbook runs that are derived from this playbook id.
 	// Defaults to blank (no filter).
 	PlaybookID string `url:"playbook_id,omitempty"`
 }
@@ -162,7 +162,7 @@ type PlaybookRunList struct {
 	Items      []*PlaybookRun
 }
 
-// Status is the type used to specify the activity status of the incident.
+// Status is the type used to specify the activity status of the playbook run.
 type Status string
 
 const (
@@ -180,7 +180,7 @@ type GetPlaybookRunsResults struct {
 	Disabled   bool          `json:"disabled"`
 }
 
-// StatusUpdateOptions are the fields required to update an incident's status
+// StatusUpdateOptions are the fields required to update a playbook run's status
 type StatusUpdateOptions struct {
 	Status            Status `json:"status"`
 	Description       string `json:"description"`

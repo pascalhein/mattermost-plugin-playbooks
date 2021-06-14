@@ -12,9 +12,7 @@ func TestPlaybookRun_MarshalJSON(t *testing.T) {
 	testPlaybookRun := &PlaybookRun{}
 	result, err := json.Marshal(testPlaybookRun)
 	require.NoError(t, err)
-	// Should not contain null. Triggering this?
-	// Add your new nullable thing to one of the MarshalJSONs in incident/incident.go
-	require.NotContains(t, string(result), "null")
+	require.NotContains(t, string(result), "null", "update MarshalJSON to initialize nil slices")
 }
 
 func TestPlaybookRun_LastResovedAt(t *testing.T) {

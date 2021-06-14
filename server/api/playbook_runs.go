@@ -126,7 +126,7 @@ func (h *PlaybookRunHandler) createPlaybookRunFromPost(w http.ResponseWriter, r 
 
 	var playbookRunCreateOptions client.PlaybookRunCreateOptions
 	if err := json.NewDecoder(r.Body).Decode(&playbookRunCreateOptions); err != nil {
-		h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to decode incident create options", err)
+		h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to decode playbook run create options", err)
 		return
 	}
 
@@ -148,17 +148,17 @@ func (h *PlaybookRunHandler) createPlaybookRunFromPost(w http.ResponseWriter, r 
 	)
 
 	if errors.Is(err, app.ErrPermission) {
-		h.HandleErrorWithCode(w, http.StatusForbidden, "unable to create incident", err)
+		h.HandleErrorWithCode(w, http.StatusForbidden, "unable to create playbook run", err)
 		return
 	}
 
 	if errors.Is(err, app.ErrMalformedPlaybookRun) {
-		h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to create incident", err)
+		h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to create playbook run", err)
 		return
 	}
 
 	if err != nil {
-		h.HandleError(w, errors.Wrapf(err, "unable to create incident"))
+		h.HandleError(w, errors.Wrapf(err, "unable to create playbook run"))
 		return
 	}
 
@@ -194,7 +194,7 @@ func (h *PlaybookRunHandler) updatePlaybookRun(w http.ResponseWriter, r *http.Re
 }
 
 // createPlaybookRunFromDialog handles the interactive dialog submission when a user presses confirm on
-// the create incident dialog.
+// the create playbook run dialog.
 func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -241,7 +241,7 @@ func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, 
 	)
 	if err != nil {
 		if errors.Is(err, app.ErrMalformedPlaybookRun) {
-			h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to create incident", err)
+			h.HandleErrorWithCode(w, http.StatusBadRequest, "unable to create playbook run", err)
 			return
 		}
 
@@ -332,27 +332,27 @@ func (h *PlaybookRunHandler) addToTimelineDialog(w http.ResponseWriter, r *http.
 
 func (h *PlaybookRunHandler) createPlaybookRun(playbookRun app.PlaybookRun, userID string) (*app.PlaybookRun, error) {
 	if playbookRun.ID != "" {
-		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "incident already has an id")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "playbook run already has an id")
 	}
 
 	if playbookRun.ChannelID != "" {
-		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "incident channel already has an id")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "playbook run channel already has an id")
 	}
 
 	if playbookRun.CreateAt != 0 {
-		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "incident channel already has created at date")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "playbook run channel already has created at date")
 	}
 
 	if playbookRun.TeamID == "" {
-		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing team id of incident")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing team id of playbook run")
 	}
 
 	if playbookRun.OwnerUserID == "" {
-		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing owner user id of incident")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing owner user id of playbook run")
 	}
 
 	if playbookRun.Name == "" {
-		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing name of incident")
+		return nil, errors.Wrap(app.ErrMalformedPlaybookRun, "missing name of playbook run")
 	}
 
 	// Owner should have permission to the team
@@ -426,10 +426,10 @@ func (h *PlaybookRunHandler) createPlaybookRun(playbookRun app.PlaybookRun, user
 	if playbookRun.PostID != "" {
 		post, err := h.pluginAPI.Post.GetPost(playbookRun.PostID)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get incident original post")
+			return nil, errors.Wrapf(err, "failed to get playbook run original post")
 		}
 		if !app.MemberOfChannelID(userID, post.ChannelId, h.pluginAPI) {
-			return nil, errors.New("user is not a member of the channel containing the incident's original post")
+			return nil, errors.New("user is not a member of the channel containing the playbook run's original post")
 		}
 	}
 	return h.playbookRunService.CreatePlaybookRun(&playbookRun, playbook, userID, public)
@@ -488,7 +488,7 @@ func (h *PlaybookRunHandler) getPlaybookRun(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := app.ViewPlaybookRunFromChannelID(userID, playbookRunToGet.ChannelID, h.pluginAPI); err != nil {
-		h.HandleErrorWithCode(w, http.StatusForbidden, "User doesn't have permissions to incident.", nil)
+		h.HandleErrorWithCode(w, http.StatusForbidden, "User doesn't have permissions to playbook run.", nil)
 		return
 	}
 
@@ -509,7 +509,7 @@ func (h *PlaybookRunHandler) getPlaybookRunMetadata(w http.ResponseWriter, r *ht
 
 	if err := app.ViewPlaybookRunFromChannelID(userID, playbookRunToGet.ChannelID, h.pluginAPI); err != nil {
 		h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized",
-			errors.Errorf("userid: %s does not have permissions to view the incident details", userID))
+			errors.Errorf("userid: %s does not have permissions to view the playbook run details", userID))
 		return
 	}
 
@@ -529,9 +529,9 @@ func (h *PlaybookRunHandler) getPlaybookRunByChannel(w http.ResponseWriter, r *h
 	userID := r.Header.Get("Mattermost-User-ID")
 
 	if err := app.ViewPlaybookRunFromChannelID(userID, channelID, h.pluginAPI); err != nil {
-		h.log.Warnf("User %s does not have permissions to get incident for channel %s", userID, channelID)
+		h.log.Warnf("User %s does not have permissions to get playbook run for channel %s", userID, channelID)
 		h.HandleErrorWithCode(w, http.StatusNotFound, "Not found",
-			errors.Errorf("incident for channel id %s not found", channelID))
+			errors.Errorf("playbook run for channel id %s not found", channelID))
 		return
 	}
 
@@ -539,7 +539,7 @@ func (h *PlaybookRunHandler) getPlaybookRunByChannel(w http.ResponseWriter, r *h
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			h.HandleErrorWithCode(w, http.StatusNotFound, "Not found",
-				errors.Errorf("incident for channel id %s not found", channelID))
+				errors.Errorf("playbook run for channel id %s not found", channelID))
 
 			return
 		}
@@ -656,7 +656,7 @@ func (h *PlaybookRunHandler) changeOwner(w http.ResponseWriter, r *http.Request)
 	if err := app.EditPlaybookRun(params.OwnerID, playbookRun.ChannelID, h.pluginAPI); err != nil {
 		if errors.Is(err, app.ErrNoPermissions) {
 			h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized",
-				errors.Errorf("userid: %s does not have permissions to incident channel; cannot be made owner", params.OwnerID))
+				errors.Errorf("userid: %s does not have permissions to playbook run channel; cannot be made owner", params.OwnerID))
 			return
 		}
 		h.HandleError(w, err)
@@ -683,7 +683,7 @@ func (h *PlaybookRunHandler) status(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !app.CanPostToChannel(userID, playbookRunToModify.ChannelID, h.pluginAPI) {
-		h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", fmt.Errorf("user %s cannot post to incident channel %s", userID, playbookRunToModify.ChannelID))
+		h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", fmt.Errorf("user %s cannot post to playbook run channel %s", userID, playbookRunToModify.ChannelID))
 		return
 	}
 
@@ -746,7 +746,7 @@ func (h *PlaybookRunHandler) updateStatusDialog(w http.ResponseWriter, r *http.R
 	}
 
 	if !app.CanPostToChannel(userID, playbookRunToModify.ChannelID, h.pluginAPI) {
-		h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", fmt.Errorf("user %s cannot post to incident channel %s", userID, playbookRunToModify.ChannelID))
+		h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", fmt.Errorf("user %s cannot post to playbook run channel %s", userID, playbookRunToModify.ChannelID))
 		return
 	}
 
@@ -816,8 +816,8 @@ func (h *PlaybookRunHandler) reminderButtonUpdate(w http.ResponseWriter, r *http
 
 	playbookRunID, err := h.playbookRunService.GetPlaybookRunIDForChannel(requestData.ChannelId)
 	if err != nil {
-		h.HandleErrorWithCode(w, http.StatusInternalServerError, "error getting incident",
-			errors.Wrapf(err, "reminderButtonUpdate failed to find incidentID for channelID: %s", requestData.ChannelId))
+		h.HandleErrorWithCode(w, http.StatusInternalServerError, "error getting playbook run",
+			errors.Wrapf(err, "reminderButtonUpdate failed to find playbookRunID for channelID: %s", requestData.ChannelId))
 		return
 	}
 
@@ -849,8 +849,8 @@ func (h *PlaybookRunHandler) reminderButtonDismiss(w http.ResponseWriter, r *htt
 
 	playbookRunID, err := h.playbookRunService.GetPlaybookRunIDForChannel(requestData.ChannelId)
 	if err != nil {
-		h.log.Errorf("reminderButtonDismiss: no incident for requestData's channelID: %s", requestData.ChannelId)
-		h.HandleErrorWithCode(w, http.StatusBadRequest, "no incident for requestData's channelID", err)
+		h.log.Errorf("reminderButtonDismiss: no playbook run for requestData's channelID: %s", requestData.ChannelId)
+		h.HandleErrorWithCode(w, http.StatusBadRequest, "no playbook run for requestData's channelID", err)
 		return
 	}
 
@@ -900,7 +900,7 @@ func (h *PlaybookRunHandler) noRetrospectiveButton(w http.ResponseWriter, r *htt
 }
 
 // removeTimelineEvent handles the DELETE /incidents/{id}/timeline/{eventID} endpoint.
-// User has been authenticated to edit the incident.
+// User has been authenticated to edit the playbook run.
 func (h *PlaybookRunHandler) removeTimelineEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]

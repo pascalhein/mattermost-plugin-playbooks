@@ -18,7 +18,7 @@ var (
 	diagnosticID       = "dummy_diagnostic_id"
 	pluginVersion      = "dummy_plugin_version"
 	serverVersion      = "dummy_server_version"
-	dummyPlaybookRunID = "dummy_incident_id"
+	dummyPlaybookRunID = "dummy_playbook_run_id"
 	dummyUserID        = "dummy_user_id"
 )
 
@@ -211,10 +211,10 @@ func TestRudderTelemetry(t *testing.T) {
 		ExpectedAction string
 		FuncToTest     func()
 	}{
-		"create incident": {eventPlaybookRun, actionCreate, func() {
+		"create playbook run": {eventPlaybookRun, actionCreate, func() {
 			rudderClient.CreatePlaybookRun(dummyPlaybookRun, dummyUserID, true)
 		}},
-		"end incident": {eventPlaybookRun, actionEnd, func() {
+		"end playbook run": {eventPlaybookRun, actionEnd, func() {
 			rudderClient.EndPlaybookRun(dummyPlaybookRun, dummyUserID)
 		}},
 		"add checklist item": {eventTasks, actionAddTask, func() {

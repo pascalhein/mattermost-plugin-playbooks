@@ -9,13 +9,13 @@ import (
 	"net/http"
 )
 
-// PlaybookRunService handles communication with the incident related
+// PlaybookRunService handles communication with the playbook run related
 // methods of the Incident Collaboration API.
 type PlaybookRunService struct {
 	client *Client
 }
 
-// Get an incident.
+// Get a playbook run.
 func (s *PlaybookRunService) Get(ctx context.Context, playbookRunID string) (*PlaybookRun, error) {
 	playbookRunURL := fmt.Sprintf("incidents/%s", playbookRunID)
 	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
@@ -33,7 +33,7 @@ func (s *PlaybookRunService) Get(ctx context.Context, playbookRunID string) (*Pl
 	return playbookRun, nil
 }
 
-// GetByChannelID gets an incident by ChannelID.
+// GetByChannelID gets a playbook run by ChannelID.
 func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID string) (*PlaybookRun, error) {
 	channelURL := fmt.Sprintf("incidents/channel/%s", channelID)
 	req, err := s.client.newRequest(http.MethodGet, channelURL, nil)
@@ -51,7 +51,7 @@ func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID strin
 	return playbookRun, nil
 }
 
-// Get an incident's metadata.
+// Get a playbook run's metadata.
 func (s *PlaybookRunService) GetMetadata(ctx context.Context, playbookRunID string) (*PlaybookRunMetadata, error) {
 	playbookRunURL := fmt.Sprintf("incidents/%s/metadata", playbookRunID)
 	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
@@ -69,7 +69,7 @@ func (s *PlaybookRunService) GetMetadata(ctx context.Context, playbookRunID stri
 	return playbookRun, nil
 }
 
-// List the incidents.
+// List the playbook runs.
 func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts PlaybookRunListOptions) (*GetPlaybookRunsResults, error) {
 	playbookRunURL := "incidents"
 	playbookRunURL, err := addOptions(playbookRunURL, opts)
@@ -96,7 +96,7 @@ func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts P
 	return result, nil
 }
 
-// Create an incident.
+// Create a playbook run.
 func (s *PlaybookRunService) Create(ctx context.Context, opts PlaybookRunCreateOptions) (*PlaybookRun, error) {
 	playbookRunURL := "incidents"
 	req, err := s.client.newRequest(http.MethodPost, playbookRunURL, opts)

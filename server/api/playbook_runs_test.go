@@ -82,7 +82,7 @@ func TestPlaybookRuns(t *testing.T) {
 			})
 	}
 
-	t.Run("create valid incident, but it's disabled on this team", func(t *testing.T) {
+	t.Run("create valid playbook run, but it's disabled on this team", func(t *testing.T) {
 		reset(t)
 
 		configService.EXPECT().
@@ -106,7 +106,7 @@ func TestPlaybookRuns(t *testing.T) {
 		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			PlaybookID:  withid.ID,
 			Checklists:  withid.Checklists,
 		}
@@ -125,7 +125,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	})
 
-	t.Run("create valid incident from dialog", func(t *testing.T) {
+	t.Run("create valid playbook run from dialog", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -148,7 +148,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -160,7 +160,7 @@ func TestPlaybookRuns(t *testing.T) {
 		i := app.PlaybookRun{
 			OwnerUserID:     dialogRequest.UserId,
 			TeamID:          dialogRequest.TeamId,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			PlaybookID:      "playbookid1",
 			Description:     "description",
 			InvitedUserIDs:  []string{},
@@ -186,7 +186,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	})
 
-	t.Run("create valid incident from dialog with description", func(t *testing.T) {
+	t.Run("create valid playbook run from dialog with description", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -209,7 +209,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -221,7 +221,7 @@ func TestPlaybookRuns(t *testing.T) {
 		i := app.PlaybookRun{
 			OwnerUserID:     dialogRequest.UserId,
 			TeamID:          dialogRequest.TeamId,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			Description:     "description",
 			PlaybookID:      withid.ID,
 			Checklists:      withid.Checklists,
@@ -248,7 +248,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	})
 
-	t.Run("create incident from dialog - no permissions for public channels", func(t *testing.T) {
+	t.Run("create playbook run from dialog - no permissions for public channels", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -270,7 +270,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -282,7 +282,7 @@ func TestPlaybookRuns(t *testing.T) {
 		i := app.PlaybookRun{
 			OwnerUserID: dialogRequest.UserId,
 			TeamID:      dialogRequest.TeamId,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			PlaybookID:  withid.ID,
 			Checklists:  withid.Checklists,
 		}
@@ -308,14 +308,14 @@ func TestPlaybookRuns(t *testing.T) {
 
 		expectedDialogResp := model.SubmitDialogResponse{
 			Errors: map[string]string{
-				"incidentName": "You are not able to create a public channel: permissions error",
+				app.DialogFieldNameKey: "You are not able to create a public channel: permissions error",
 			},
 		}
 
 		require.Equal(t, expectedDialogResp, dialogResp)
 	})
 
-	t.Run("create incident from dialog - no permissions for public channels", func(t *testing.T) {
+	t.Run("create playbook run from dialog - no permissions for public channels", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -337,7 +337,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -349,7 +349,7 @@ func TestPlaybookRuns(t *testing.T) {
 		i := app.PlaybookRun{
 			OwnerUserID: dialogRequest.UserId,
 			TeamID:      dialogRequest.TeamId,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			PlaybookID:  withid.ID,
 			Checklists:  withid.Checklists,
 		}
@@ -375,14 +375,14 @@ func TestPlaybookRuns(t *testing.T) {
 
 		expectedDialogResp := model.SubmitDialogResponse{
 			Errors: map[string]string{
-				"incidentName": "You are not able to create a private channel: permissions error",
+				app.DialogFieldNameKey: "You are not able to create a private channel: permissions error",
 			},
 		}
 
 		require.Equal(t, expectedDialogResp, dialogResp)
 	})
 
-	t.Run("create incident from dialog - dialog request userID doesn't match requester's id", func(t *testing.T) {
+	t.Run("create playbook run from dialog - dialog request userID doesn't match requester's id", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -405,7 +405,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -417,7 +417,7 @@ func TestPlaybookRuns(t *testing.T) {
 		i := app.PlaybookRun{
 			OwnerUserID: dialogRequest.UserId,
 			TeamID:      dialogRequest.TeamId,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			PlaybookID:  withid.ID,
 			Checklists:  withid.Checklists,
 		}
@@ -440,7 +440,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, "interactive dialog's userID must be the same as the requester's userID", res.Error)
 	})
 
-	t.Run("create valid incident with missing playbookID from dialog", func(t *testing.T) {
+	t.Run("create valid playbook run with missing playbookID from dialog", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -452,7 +452,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -477,7 +477,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 	})
 
-	t.Run("create incident from dialog -- user does not have permission for the original postID's channel", func(t *testing.T) {
+	t.Run("create playbook run from dialog -- user does not have permission for the original postID's channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -501,7 +501,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  `{"post_id": "privatePostID"}`,
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -527,7 +527,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 	})
 
-	t.Run("create incident from dialog -- user is not a member of the playbook", func(t *testing.T) {
+	t.Run("create playbook run from dialog -- user is not a member of the playbook", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -550,7 +550,7 @@ func TestPlaybookRuns(t *testing.T) {
 			State:  "{}",
 			Submission: map[string]interface{}{
 				app.DialogFieldPlaybookIDKey: "playbookid1",
-				app.DialogFieldNameKey:       "incidentName",
+				app.DialogFieldNameKey:       "playbookRunName",
 			},
 		}
 
@@ -576,7 +576,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 	})
 
-	t.Run("create valid incident", func(t *testing.T) {
+	t.Run("create valid playbook run", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -596,7 +596,7 @@ func TestPlaybookRuns(t *testing.T) {
 		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			Description:     "description",
 			PlaybookID:      testPlaybook.ID,
 			Checklists:      testPlaybook.Checklists,
@@ -610,7 +610,7 @@ func TestPlaybookRuns(t *testing.T) {
 			Times(1)
 
 		retI := testPlaybookRun
-		retI.ID = "incidentID"
+		retI.ID = "playbookRunID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
@@ -632,7 +632,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
-	t.Run("create valid incident, invite users enabled", func(t *testing.T) {
+	t.Run("create valid playbook run, invite users enabled", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -652,7 +652,7 @@ func TestPlaybookRuns(t *testing.T) {
 		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			Description:     "description",
 			PlaybookID:      testPlaybook.ID,
 			Checklists:      testPlaybook.Checklists,
@@ -666,7 +666,7 @@ func TestPlaybookRuns(t *testing.T) {
 			Times(1)
 
 		retI := testPlaybookRun
-		retI.ID = "incidentID"
+		retI.ID = "playbookRunID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
@@ -688,7 +688,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
-	t.Run("create valid incident without playbook", func(t *testing.T) {
+	t.Run("create valid playbook run without playbook", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
@@ -696,11 +696,11 @@ func TestPlaybookRuns(t *testing.T) {
 		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 		}
 
 		retI := testPlaybookRun
-		retI.ID = "incidentID"
+		retI.ID = "playbookRunID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
@@ -720,7 +720,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
-	t.Run("create invalid incident - missing owner", func(t *testing.T) {
+	t.Run("create invalid playbook run - missing owner", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -728,7 +728,7 @@ func TestPlaybookRuns(t *testing.T) {
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
 			TeamID: teamID,
-			Name:   "incidentName",
+			Name:   "playbookRunName",
 		}
 
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
@@ -743,14 +743,14 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("create invalid incident - missing team", func(t *testing.T) {
+	t.Run("create invalid playbook run - missing team", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID: "testUserID",
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 		}
 
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
@@ -763,7 +763,7 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("create invalid incident - missing name", func(t *testing.T) {
+	t.Run("create invalid playbook run - missing name", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -787,7 +787,7 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("create incident in unlicensed server with pricing plan differentiation enabled", func(*testing.T) {
+	t.Run("create playbook run in unlicensed server with pricing plan differentiation enabled", func(*testing.T) {
 		mockCtrl = gomock.NewController(t)
 		configService = mock_config.NewMockService(mockCtrl)
 		pluginAPI = &plugintest.API{}
@@ -825,7 +825,7 @@ func TestPlaybookRuns(t *testing.T) {
 		testPlaybookRun := app.PlaybookRun{
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			Description:     "description",
 			PlaybookID:      testPlaybook.ID,
 			Checklists:      testPlaybook.Checklists,
@@ -839,7 +839,7 @@ func TestPlaybookRuns(t *testing.T) {
 			Times(1)
 
 		retI := testPlaybookRun
-		retI.ID = "incidentID"
+		retI.ID = "playbookRunID"
 		retI.ChannelID = "channelID"
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(true)
@@ -861,16 +861,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.NotEmpty(t, resultPlaybookRun.ID)
 	})
 
-	t.Run("get incident by channel id", func(t *testing.T) {
+	t.Run("get playbook run by channel id", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:              "incidentID",
+			ID:              "playbookRunID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			ChannelID:       "channelID",
 			Checklists:      []app.Checklist{},
 			StatusPosts:     []app.StatusPost{},
@@ -883,15 +883,15 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
-		playbookRunService.EXPECT().GetPlaybookRunIDForChannel("channelID").Return("incidentID", nil)
-		playbookRunService.EXPECT().GetPlaybookRun("incidentID").Return(&testPlaybookRun, nil)
+		playbookRunService.EXPECT().GetPlaybookRunIDForChannel("channelID").Return("playbookRunID", nil)
+		playbookRunService.EXPECT().GetPlaybookRun("playbookRunID").Return(&testPlaybookRun, nil)
 
 		resultPlaybookRun, err := c.PlaybookRuns.GetByChannelID(context.TODO(), testPlaybookRun.ChannelID)
 		require.NoError(t, err)
 		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
-	t.Run("get incident by channel id - not found", func(t *testing.T) {
+	t.Run("get playbook run by channel id - not found", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
@@ -899,10 +899,10 @@ func TestPlaybookRuns(t *testing.T) {
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -911,24 +911,24 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{}, nil)
 
 		playbookRunService.EXPECT().GetPlaybookRunIDForChannel("channelID").Return("", app.ErrNotFound)
-		logger.EXPECT().Warnf("User %s does not have permissions to get incident for channel %s", userID, testPlaybookRun.ChannelID)
+		logger.EXPECT().Warnf("User %s does not have permissions to get playbook run for channel %s", userID, testPlaybookRun.ChannelID)
 
 		resultPlaybookRun, err := c.PlaybookRuns.GetByChannelID(context.TODO(), testPlaybookRun.ChannelID)
 		requireErrorWithStatusCode(t, err, http.StatusNotFound)
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("get incident by channel id - not authorized", func(t *testing.T) {
+	t.Run("get playbook run by channel id - not authorized", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -945,16 +945,16 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("get private incident - not part of channel", func(t *testing.T) {
+	t.Run("get private playbook run - not part of channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 			PostID:      "",
 			PlaybookID:  "",
@@ -970,7 +970,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
@@ -978,16 +978,16 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("get private incident - part of channel", func(t *testing.T) {
+	t.Run("get private playbook run - part of channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:              "incidentID",
+			ID:              "playbookRunID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			ChannelID:       "channelID",
 			PostID:          "",
 			PlaybookID:      "",
@@ -1007,7 +1007,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil).Times(2)
 
 		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
@@ -1015,16 +1015,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
-	t.Run("get public incident - not part of channel or team", func(t *testing.T) {
+	t.Run("get public playbook run - not part of channel or team", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:              "incidentID",
+			ID:              "playbookRunID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			ChannelID:       "channelID",
 			PostID:          "",
 			PlaybookID:      "",
@@ -1044,7 +1044,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
@@ -1052,16 +1052,16 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("get public incident - not part of channel, but part of team", func(t *testing.T) {
+	t.Run("get public playbook run - not part of channel, but part of team", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:              "incidentID",
+			ID:              "playbookRunID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			ChannelID:       "channelID",
 			PostID:          "",
 			PlaybookID:      "",
@@ -1083,7 +1083,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil).Times(2)
 
 		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
@@ -1091,16 +1091,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
-	t.Run("get public incident - part of channel", func(t *testing.T) {
+	t.Run("get public playbook run - part of channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:              "incidentID",
+			ID:              "playbookRunID",
 			OwnerUserID:     "testUserID",
 			TeamID:          teamID,
-			Name:            "incidentName",
+			Name:            "playbookRunName",
 			ChannelID:       "channelID",
 			PostID:          "",
 			PlaybookID:      "",
@@ -1120,7 +1120,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil).Times(2)
 
 		resultPlaybookRun, err := c.PlaybookRuns.Get(context.TODO(), testPlaybookRun.ID)
@@ -1128,16 +1128,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, testPlaybookRun, toInternalPlaybookRun(*resultPlaybookRun))
 	})
 
-	t.Run("get private incident metadata - not part of channel", func(t *testing.T) {
+	t.Run("get private playbook run metadata - not part of channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 			PostID:      "",
 			PlaybookID:  "",
@@ -1153,7 +1153,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
@@ -1161,16 +1161,16 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRunMetadata)
 	})
 
-	t.Run("get private incident metadata - part of channel", func(t *testing.T) {
+	t.Run("get private playbook run metadata - part of channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 			PostID:      "",
 			PlaybookID:  "",
@@ -1194,11 +1194,11 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		playbookRunService.EXPECT().
-			GetPlaybookRunMetadata("incidentID").
+			GetPlaybookRunMetadata("playbookRunID").
 			Return(&testPlaybookRunMetadata, nil)
 
 		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
@@ -1206,16 +1206,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, testPlaybookRunMetadata, toInternalPlaybookRunMetadata(*resultPlaybookRunMetadata))
 	})
 
-	t.Run("get public incident metadata - not part of channel or team", func(t *testing.T) {
+	t.Run("get public playbook run metadata - not part of channel or team", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 			PostID:      "",
 			PlaybookID:  "",
@@ -1233,7 +1233,7 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
@@ -1241,16 +1241,16 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRunMetadata)
 	})
 
-	t.Run("get public incident metadata - not part of channel, but part of team", func(t *testing.T) {
+	t.Run("get public playbook run metadata - not part of channel, but part of team", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 			PostID:      "",
 			PlaybookID:  "",
@@ -1276,11 +1276,11 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		playbookRunService.EXPECT().
-			GetPlaybookRunMetadata("incidentID").
+			GetPlaybookRunMetadata("playbookRunID").
 			Return(&testPlaybookRunMetadata, nil)
 
 		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
@@ -1288,16 +1288,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, testPlaybookRunMetadata, toInternalPlaybookRunMetadata(*resultPlaybookRunMetadata))
 	})
 
-	t.Run("get public incident metadata - part of channel", func(t *testing.T) {
+	t.Run("get public playbook run metadata - part of channel", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 			PostID:      "",
 			PlaybookID:  "",
@@ -1321,11 +1321,11 @@ func TestPlaybookRuns(t *testing.T) {
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any())
 
 		playbookRunService.EXPECT().
-			GetPlaybookRun("incidentID").
+			GetPlaybookRun("playbookRunID").
 			Return(&testPlaybookRun, nil)
 
 		playbookRunService.EXPECT().
-			GetPlaybookRunMetadata("incidentID").
+			GetPlaybookRunMetadata("playbookRunID").
 			Return(&testPlaybookRunMetadata, nil)
 
 		resultPlaybookRunMetadata, err := c.PlaybookRuns.GetMetadata(context.TODO(), testPlaybookRun.ID)
@@ -1333,16 +1333,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, testPlaybookRunMetadata, toInternalPlaybookRunMetadata(*resultPlaybookRunMetadata))
 	})
 
-	t.Run("get incidents", func(t *testing.T) {
+	t.Run("get playbook runs", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		playbookRun1 := app.PlaybookRun{
-			ID:              "incidentID1",
+			ID:              "playbookRunID1",
 			OwnerUserID:     "testUserID1",
 			TeamID:          teamID,
-			Name:            "incidentName1",
+			Name:            "playbookRunName1",
 			ChannelID:       "channelID1",
 			Checklists:      []app.Checklist{},
 			StatusPosts:     []app.StatusPost{},
@@ -1377,7 +1377,7 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, expectedList, actualList)
 	})
 
-	t.Run("get empty list of incidents", func(t *testing.T) {
+	t.Run("get empty list of playbook runs", func(t *testing.T) {
 		reset(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 		setDefaultExpectations(t)
@@ -1392,7 +1392,7 @@ func TestPlaybookRuns(t *testing.T) {
 		require.Nil(t, resultPlaybookRun)
 	})
 
-	t.Run("get disabled list of incidents", func(t *testing.T) {
+	t.Run("get disabled list of playbook runs", func(t *testing.T) {
 		reset(t)
 
 		disabledTeamID := model.NewId()
@@ -1425,10 +1425,10 @@ func TestPlaybookRuns(t *testing.T) {
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1449,16 +1449,16 @@ func TestPlaybookRuns(t *testing.T) {
 		assert.Equal(t, http.StatusForbidden, resp.StatusCode)
 	})
 
-	t.Run("update incident status", func(t *testing.T) {
+	t.Run("update playbook run status", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1474,23 +1474,23 @@ func TestPlaybookRuns(t *testing.T) {
 			Description: "test description",
 			Reminder:    600 * time.Second,
 		}
-		playbookRunService.EXPECT().UpdateStatus("incidentID", "testUserID", updateOptions).Return(nil)
+		playbookRunService.EXPECT().UpdateStatus("playbookRunID", "testUserID", updateOptions).Return(nil)
 
-		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "playbookRunID", icClient.StatusActive, "test description", "test message", 600)
 		require.NoError(t, err)
 	})
 
-	t.Run("update incident status, bad status", func(t *testing.T) {
+	t.Run("update playbook run status, bad status", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1500,21 +1500,21 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", "Arrrrrrrctive", "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "playbookRunID", "Arrrrrrrctive", "test description", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 
-	t.Run("update incident status, no permission to post", func(t *testing.T) {
+	t.Run("update playbook run status, no permission to post", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1524,21 +1524,21 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(false)
 
-		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "playbookRunID", icClient.StatusActive, "test description", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusForbidden)
 	})
 
-	t.Run("update incident status, message empty", func(t *testing.T) {
+	t.Run("update playbook run status, message empty", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1548,21 +1548,21 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", icClient.StatusActive, "test description", "  \t   \r   \t  \r\r  ", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "playbookRunID", icClient.StatusActive, "test description", "  \t   \r   \t  \r\r  ", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 
-	t.Run("update incident status, status empty", func(t *testing.T) {
+	t.Run("update playbook run status, status empty", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1572,21 +1572,21 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", "\t   \r  ", "test description", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "playbookRunID", "\t   \r  ", "test description", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 
-	t.Run("update incident status, description empty", func(t *testing.T) {
+	t.Run("update playbook run status, description empty", func(t *testing.T) {
 		reset(t)
 		setDefaultExpectations(t)
 		logger.EXPECT().Warnf(gomock.Any(), gomock.Any(), gomock.Any())
 
 		teamID := model.NewId()
 		testPlaybookRun := app.PlaybookRun{
-			ID:          "incidentID",
+			ID:          "playbookRunID",
 			OwnerUserID: "testUserID",
 			TeamID:      teamID,
-			Name:        "incidentName",
+			Name:        "playbookRunName",
 			ChannelID:   "channelID",
 		}
 
@@ -1596,7 +1596,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_READ_CHANNEL).Return(true)
 		pluginAPI.On("HasPermissionToChannel", mock.Anything, mock.Anything, model.PERMISSION_CREATE_POST).Return(true)
 
-		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "incidentID", "Active", "  \r \n  ", "test message", 600)
+		err := c.PlaybookRuns.UpdateStatus(context.TODO(), "playbookRunID", "Active", "  \r \n  ", "test message", 600)
 		requireErrorWithStatusCode(t, err, http.StatusBadRequest)
 	})
 }

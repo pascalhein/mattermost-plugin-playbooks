@@ -198,13 +198,13 @@ var migrations = []Migration{
 				ChecklistsJSON json.RawMessage
 			}
 			if err := sqlStore.selectBuilder(e, &playbookRuns, getPlaybookRunsQuery); err != nil {
-				return errors.Wrapf(err, "failed getting incidents to update their ActiveStageTitle")
+				return errors.Wrapf(err, "failed getting playbook runs to update their ActiveStageTitle")
 			}
 
 			for _, playbookRun := range playbookRuns {
 				var checklists []app.Checklist
 				if err := json.Unmarshal(playbookRun.ChecklistsJSON, &checklists); err != nil {
-					return errors.Wrapf(err, "failed to unmarshal checklists json for incident id: '%s'", playbookRun.ID)
+					return errors.Wrapf(err, "failed to unmarshal checklists json for playbook run id: '%s'", playbookRun.ID)
 				}
 
 				numChecklists := len(checklists)
@@ -213,7 +213,7 @@ var migrations = []Migration{
 				}
 
 				if playbookRun.ActiveStage < 0 || playbookRun.ActiveStage >= numChecklists {
-					sqlStore.log.Warnf("index %d out of bounds, incident '%s' has %d stages: setting ActiveStageTitle to the empty string", playbookRun.ActiveStage, playbookRun.ID, numChecklists)
+					sqlStore.log.Warnf("index %d out of bounds, playbook ru n'%s' has %d stages: setting ActiveStageTitle to the empty string", playbookRun.ActiveStage, playbookRun.ID, numChecklists)
 					continue
 				}
 
@@ -223,7 +223,7 @@ var migrations = []Migration{
 					Where(sq.Eq{"ID": playbookRun.ID})
 
 				if _, err := sqlStore.execBuilder(e, playbookRunUpdate); err != nil {
-					return errors.Errorf("failed updating the ActiveStageTitle field of incident '%s'", playbookRun.ID)
+					return errors.Errorf("failed updating the ActiveStageTitle field of playbook run '%s'", playbookRun.ID)
 				}
 			}
 
