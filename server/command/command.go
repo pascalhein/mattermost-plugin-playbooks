@@ -257,7 +257,7 @@ func (r *Runner) actionCheck(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only check/uncheck an item from within the incident's channel.")
@@ -267,7 +267,7 @@ func (r *Runner) actionCheck(args []string) {
 		return
 	}
 
-	err = r.playbookRunService.ToggleCheckedState(incidentID, r.args.UserId, checklist, item)
+	err = r.playbookRunService.ToggleCheckedState(playbookRunID, r.args.UserId, checklist, item)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error checking/unchecking item: %v", err)
 	}
@@ -285,7 +285,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only add an item from within the incident's channel.")
@@ -297,7 +297,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 
 	// If we didn't get the item's text, then use the interactive dialog
 	if len(args) == 1 {
-		if err := r.playbookRunService.OpenAddChecklistItemDialog(r.args.TriggerId, incidentID, checklist); err != nil {
+		if err := r.playbookRunService.OpenAddChecklistItemDialog(r.args.TriggerId, playbookRunID, checklist); err != nil {
 			r.warnUserAndLogErrorf("Error: %v", err)
 			return
 		}
@@ -305,7 +305,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 	}
 
 	combineargs := strings.Join(args[1:], " ")
-	if err := r.playbookRunService.AddChecklistItem(incidentID, r.args.UserId, checklist, app.ChecklistItem{
+	if err := r.playbookRunService.AddChecklistItem(playbookRunID, r.args.UserId, checklist, app.ChecklistItem{
 		Title: combineargs,
 	}); err != nil {
 		r.warnUserAndLogErrorf("Error: %v", err)
@@ -332,7 +332,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only remove an item from within the incident's channel.")
@@ -342,7 +342,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 		return
 	}
 
-	err = r.playbookRunService.RemoveChecklistItem(incidentID, r.args.UserId, checklist, item)
+	err = r.playbookRunService.RemoveChecklistItem(playbookRunID, r.args.UserId, checklist, item)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error removing item: %v", err)
 	}
@@ -360,7 +360,7 @@ func (r *Runner) actionOwner(args []string) {
 }
 
 func (r *Runner) actionShowOwner([]string) {
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only see the owner from within the incident's channel.")
 		return
@@ -369,7 +369,7 @@ func (r *Runner) actionShowOwner([]string) {
 		return
 	}
 
-	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(incidentID)
+	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -387,7 +387,7 @@ func (r *Runner) actionShowOwner([]string) {
 func (r *Runner) actionChangeOwner(args []string) {
 	targetOwnerUsername := strings.TrimLeft(args[0], "@")
 
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only change the owner from within the incident's channel.")
 		return
@@ -396,7 +396,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 		return
 	}
 
-	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(incidentID)
+	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -438,7 +438,7 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only announce from within the incident's channel.")
@@ -448,7 +448,7 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(incidentID)
+	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
@@ -460,7 +460,7 @@ func (r *Runner) actionAnnounce(args []string) {
 		return
 	}
 
-	incidentChannel, err := r.pluginAPI.Channel.Get(currentPlaybookRun.ChannelID)
+	playbookRunChannel, err := r.pluginAPI.Channel.Get(currentPlaybookRun.ChannelID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident channel: %v", err)
 		return
@@ -477,7 +477,7 @@ func (r *Runner) actionAnnounce(args []string) {
 			r.postCommandResponse("Cannot post to: " + channelarg)
 			continue
 		}
-		if err := r.announceChannel(targetChannel.Id, ownerUser.Username, incidentChannel.Name); err != nil {
+		if err := r.announceChannel(targetChannel.Id, ownerUser.Username, playbookRunChannel.Name); err != nil {
 			r.postCommandResponse("Error announcing to: " + channelarg)
 		}
 	}
@@ -531,23 +531,23 @@ func (r *Runner) actionList() {
 
 	now := time.Now()
 	attachments := make([]*model.SlackAttachment, len(result.Items))
-	for i, incident := range result.Items {
-		owner, err := r.pluginAPI.User.Get(incident.OwnerUserID)
+	for i, playbookRun := range result.Items {
+		owner, err := r.pluginAPI.User.Get(playbookRun.OwnerUserID)
 		if err != nil {
-			r.warnUserAndLogErrorf("Error retrieving owner of incident '%s': %v", incident.Name, err)
+			r.warnUserAndLogErrorf("Error retrieving owner of incident '%s': %v", playbookRun.Name, err)
 			return
 		}
 
-		channel, err := r.pluginAPI.Channel.Get(incident.ChannelID)
+		channel, err := r.pluginAPI.Channel.Get(playbookRun.ChannelID)
 		if err != nil {
-			r.warnUserAndLogErrorf("Error retrieving channel of incident '%s': %v", incident.Name, err)
+			r.warnUserAndLogErrorf("Error retrieving channel of incident '%s': %v", playbookRun.Name, err)
 			return
 		}
 
 		attachments[i] = &model.SlackAttachment{
 			Pretext: fmt.Sprintf("### ~%s", channel.Name),
 			Fields: []*model.SlackAttachmentField{
-				{Title: "Duration:", Value: timeutils.DurationString(timeutils.GetTimeForMillis(incident.CreateAt), now)},
+				{Title: "Duration:", Value: timeutils.DurationString(timeutils.GetTimeForMillis(playbookRun.CreateAt), now)},
 				{Title: "Owner:", Value: fmt.Sprintf("@%s", owner.Username)},
 			},
 		}
@@ -563,7 +563,7 @@ func (r *Runner) actionList() {
 }
 
 func (r *Runner) actionInfo() {
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
 		r.postCommandResponse("You can only see the details of an incident from within the incident's channel.")
 		return
@@ -584,20 +584,20 @@ func (r *Runner) actionInfo() {
 		return
 	}
 
-	incident, err := r.playbookRunService.GetPlaybookRun(incidentID)
+	playbookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
 	}
 
-	owner, err := r.pluginAPI.User.Get(incident.OwnerUserID)
+	owner, err := r.pluginAPI.User.Get(playbookRun.OwnerUserID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving owner user: %v", err)
 		return
 	}
 
 	tasks := ""
-	for _, checklist := range incident.Checklists {
+	for _, checklist := range playbookRun.Checklists {
 		for _, item := range checklist.Items {
 			icon := ":white_large_square: "
 			timestamp := ""
@@ -611,8 +611,8 @@ func (r *Runner) actionInfo() {
 	}
 	attachment := &model.SlackAttachment{
 		Fields: []*model.SlackAttachmentField{
-			{Title: "Incident Name:", Value: fmt.Sprintf("**%s**", strings.Trim(incident.Name, " "))},
-			{Title: "Duration:", Value: timeutils.DurationString(timeutils.GetTimeForMillis(incident.CreateAt), time.Now())},
+			{Title: "Incident Name:", Value: fmt.Sprintf("**%s**", strings.Trim(playbookRun.Name, " "))},
+			{Title: "Duration:", Value: timeutils.DurationString(timeutils.GetTimeForMillis(playbookRun.CreateAt), time.Now())},
 			{Title: "Owner:", Value: fmt.Sprintf("@%s", owner.Username)},
 			{Title: "Tasks:", Value: tasks},
 		},
@@ -626,8 +626,8 @@ func (r *Runner) actionInfo() {
 	r.poster.EphemeralPost(r.args.UserId, r.args.ChannelId, post)
 }
 
-func (r *Runner) announceChannel(targetChannelID, ownerUsername, incidentChannelName string) error {
-	if _, err := r.poster.PostMessage(targetChannelID, "@%v started an incident in ~%v", ownerUsername, incidentChannelName); err != nil {
+func (r *Runner) announceChannel(targetChannelID, ownerUsername, playbookRunChannelName string) error {
+	if _, err := r.poster.PostMessage(targetChannelID, "@%v started an incident in ~%v", ownerUsername, playbookRunChannelName); err != nil {
 		return err
 	}
 
@@ -639,7 +639,7 @@ func (r *Runner) actionEnd() {
 }
 
 func (r *Runner) actionUpdate() {
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only update an incident from within the incident's channel.")
@@ -658,7 +658,7 @@ func (r *Runner) actionUpdate() {
 		return
 	}
 
-	err = r.playbookRunService.OpenUpdateStatusDialog(incidentID, r.args.TriggerId)
+	err = r.playbookRunService.OpenUpdateStatusDialog(playbookRunID, r.args.TriggerId)
 	switch {
 	case errors.Is(err, app.ErrPlaybookRunNotActive):
 		r.postCommandResponse("This incident has already been closed.")
@@ -704,7 +704,7 @@ func (r *Runner) actionAdd(args []string) {
 }
 
 func (r *Runner) actionTimeline() {
-	incidentID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
+	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
 			r.postCommandResponse("You can only run the timeline command from within an incident channel.")
@@ -714,13 +714,13 @@ func (r *Runner) actionTimeline() {
 		return
 	}
 
-	incidentToRead, err := r.playbookRunService.GetPlaybookRun(incidentID)
+	playbookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
 	if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving incident: %v", err)
 		return
 	}
 
-	if len(incidentToRead.TimelineEvents) == 0 {
+	if len(playbookRun.TimelineEvents) == 0 {
 		r.postCommandResponse("There are no timeline events to display.")
 		return
 	}
@@ -732,18 +732,18 @@ func (r *Runner) actionTimeline() {
 	}
 	postURL := fmt.Sprintf("/%s/pl/", team.Name)
 
-	message := "Timeline for **" + incidentToRead.Name + "**:\n\n" +
+	message := "Timeline for **" + playbookRun.Name + "**:\n\n" +
 		"|Event Time | Since Reported | Event |\n" +
 		"|:----------|:---------------|:------|\n"
 
 	var reported time.Time
-	for _, e := range incidentToRead.TimelineEvents {
+	for _, e := range playbookRun.TimelineEvents {
 		if e.EventType == app.PlaybookRunCreated {
 			reported = timeutils.GetTimeForMillis(e.EventAt)
 			break
 		}
 	}
-	for _, e := range incidentToRead.TimelineEvents {
+	for _, e := range playbookRun.TimelineEvents {
 		if e.EventType == app.AssigneeChanged ||
 			e.EventType == app.TaskStateModified ||
 			e.EventType == app.RanSlashCommand {
@@ -1090,11 +1090,11 @@ func (r *Runner) actionTestCreate(params []string) {
 		return
 	}
 
-	incidentName := strings.Join(params[2:], " ")
+	playbookRunName := strings.Join(params[2:], " ")
 
 	playbookRun, err := r.playbookRunService.CreatePlaybookRun(
 		&app.PlaybookRun{
-			Name:        incidentName,
+			Name:        playbookRunName,
 			OwnerUserID: r.args.UserId,
 			TeamID:      r.args.TeamId,
 			PlaybookID:  playbookID,
@@ -1213,7 +1213,7 @@ var fakeCompanyNames = []string{
 	"Stewart Corp",
 }
 
-var incidentNames = []string{
+var playbookRunNames = []string{
 	"Cluster servers are down",
 	"API performance degradation",
 	"Customers unable to login",
@@ -1313,20 +1313,20 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 	}
 
 	tableMsg := "| Incident name | Created at | Status |\n|-	|-	|-	|\n"
-	incidents := make([]*app.PlaybookRun, 0, numPlaybookRuns)
+	playbookRuns := make([]*app.PlaybookRun, 0, numPlaybookRuns)
 	for i := 0; i < numPlaybookRuns; i++ {
 		playbook := playbooks[rand.Intn(len(playbooks))]
 
-		incidentName := incidentNames[rand.Intn(len(incidentNames))]
+		playbookRunName := playbookRunNames[rand.Intn(len(playbookRunNames))]
 		// Give a company name to 1/3 of the incidents created
 		if rand.Intn(3) == 0 {
 			companyName := fakeCompanyNames[rand.Intn(len(fakeCompanyNames))]
-			incidentName = fmt.Sprintf("[%s] %s", companyName, incidentName)
+			playbookRunName = fmt.Sprintf("[%s] %s", companyName, playbookRunName)
 		}
 
-		incident, err := r.playbookRunService.CreatePlaybookRun(
+		playbookRun, err := r.playbookRunService.CreatePlaybookRun(
 			&app.PlaybookRun{
-				Name:        incidentName,
+				Name:        playbookRunName,
 				OwnerUserID: r.args.UserId,
 				TeamID:      r.args.TeamId,
 				PlaybookID:  playbook.ID,
@@ -1343,13 +1343,13 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 		}
 
 		createAt := timeutils.GetTimeForMillis(timestamps[i])
-		err = r.playbookRunService.ChangeCreationDate(incident.ID, createAt)
+		err = r.playbookRunService.ChangeCreationDate(playbookRun.ID, createAt)
 		if err != nil {
 			r.warnUserAndLogErrorf("Error changing creation date: %v", err)
 			return
 		}
 
-		channel, err := r.pluginAPI.Channel.Get(incident.ChannelID)
+		channel, err := r.pluginAPI.Channel.Get(playbookRun.ChannelID)
 		if err != nil {
 			r.warnUserAndLogErrorf("Error retrieveing incident's channel: %v", err)
 			return
@@ -1361,11 +1361,11 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 		}
 		tableMsg += fmt.Sprintf("|~%s|%s|%s|\n", channel.Name, createAt.Format("2006-01-02"), status)
 
-		incidents = append(incidents, incident)
+		playbookRuns = append(playbookRuns, playbookRun)
 	}
 
 	for i := 0; i < numEndedPlaybookRuns; i++ {
-		err := r.playbookRunService.UpdateStatus(incidents[i].ID, r.args.UserId, app.StatusUpdateOptions{
+		err := r.playbookRunService.UpdateStatus(playbookRuns[i].ID, r.args.UserId, app.StatusUpdateOptions{
 			Status:  app.StatusArchived,
 			Message: "This is now archived.",
 		})
