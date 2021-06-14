@@ -39,7 +39,7 @@ func NewTelemetryHandler(router *mux.Router, playbookRunService app.PlaybookRunS
 	startTrialRouter := telemetryRouter.PathPrefix("/start-trial").Subrouter()
 	startTrialRouter.HandleFunc("", handler.startTrial).Methods(http.MethodPost)
 
-	playbookRunTelemetryRouterAuthorized := telemetryRouter.PathPrefix("/incident").Subrouter()
+	playbookRunTelemetryRouterAuthorized := telemetryRouter.PathPrefix("/run").Subrouter()
 	playbookRunTelemetryRouterAuthorized.Use(handler.checkViewPermissions)
 	playbookRunTelemetryRouterAuthorized.HandleFunc("/{id:[A-Za-z0-9]+}", handler.telemetryForPlaybookRun).Methods(http.MethodPost)
 
@@ -74,7 +74,7 @@ type TrackerPayload struct {
 	Action string `json:"action"`
 }
 
-// telemetryForPlaybookRun handles the /telemetry/incident/{id}?action=the_action endpoint. The frontend
+// telemetryForPlaybookRun handles the /telemetry/run/{id}?action=the_action endpoint. The frontend
 // can use this endpoint to track events that occur in the context of a playbook run.
 func (h *TelemetryHandler) telemetryForPlaybookRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

@@ -115,7 +115,7 @@ func TestPlaybookRuns(t *testing.T) {
 		require.NoError(t, err)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents", bytes.NewBuffer(playbookRunJSON))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs", bytes.NewBuffer(playbookRunJSON))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -176,7 +176,7 @@ func TestPlaybookRuns(t *testing.T) {
 		playbookRunService.EXPECT().CreatePlaybookRun(&i, &withid, "testUserID", true).Return(retI, nil)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -238,7 +238,7 @@ func TestPlaybookRuns(t *testing.T) {
 		playbookRunService.EXPECT().CreatePlaybookRun(&i, &withid, "testUserID", true).Return(&retI, nil)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -293,7 +293,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PUBLIC_CHANNEL).Return(false)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -360,7 +360,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_CREATE_PRIVATE_CHANNEL).Return(false)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -425,7 +425,7 @@ func TestPlaybookRuns(t *testing.T) {
 		retI.ChannelID = "channelID"
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -467,7 +467,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToTeam", "testUserID", teamID, model.PERMISSION_VIEW_TEAM).Return(true)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -517,7 +517,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", "testUserID", "privateChannelId", model.PERMISSION_READ_CHANNEL).Return(false)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -566,7 +566,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("HasPermissionToChannel", "testUserID", "privateChannelId", model.PERMISSION_READ_CHANNEL).Return(false)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
+		testreq, err := http.NewRequest("POST", "/api/v0/runs/dialog", bytes.NewBuffer(dialogRequest.ToJson()))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -1439,7 +1439,7 @@ func TestPlaybookRuns(t *testing.T) {
 		pluginAPI.On("GetChannel", mock.Anything).Return(&model.Channel{Type: model.CHANNEL_PRIVATE}, nil)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("GET", "/api/v0/incidents/checklist-autocomplete?channel_id="+testPlaybookRun.ChannelID, nil)
+		testreq, err := http.NewRequest("GET", "/api/v0/runs/checklist-autocomplete?channel_id="+testPlaybookRun.ChannelID, nil)
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)

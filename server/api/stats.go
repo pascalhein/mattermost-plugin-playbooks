@@ -41,13 +41,13 @@ func NewStatsHandler(router *mux.Router, api *pluginapi.Client, log bot.Logger, 
 }
 
 type Stats struct {
-	TotalReportedPlaybookRuns                int `json:"total_reported_incidents"`
-	TotalActivePlaybookRuns                  int `json:"total_active_incidents"`
+	TotalReportedPlaybookRuns                int `json:"total_reported_playbook_runs"`
+	TotalActivePlaybookRuns                  int `json:"total_active_playbook_runs"`
 	TotalActiveParticipants                  int `json:"total_active_participants"`
-	AverageDurationActivePlaybookRunsMinutes int `json:"average_duration_active_incidents_minutes"`
+	AverageDurationActivePlaybookRunsMinutes int `json:"average_duration_active_playbook_runs_minutes"`
 
-	ActivePlaybookRuns     []int `json:"active_incidents"`
-	PeopleInPlaybookRuns   []int `json:"people_in_incidents"`
+	ActivePlaybookRuns     []int `json:"active_playbook_runs"`
+	PeopleInPlaybookRuns   []int `json:"people_in_playbook_runs"`
 	AverageStartToActive   []int `json:"average_start_to_active"`
 	AverageStartToResolved []int `json:"average_start_to_resolved"`
 }

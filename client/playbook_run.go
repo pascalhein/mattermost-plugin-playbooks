@@ -61,7 +61,7 @@ const (
 // TimelineEvent represents an event recorded to a playbook run's timeline.
 type TimelineEvent struct {
 	ID            string            `json:"id"`
-	PlaybookRunID string            `json:"incident_id"`
+	PlaybookRunID string            `json:"playbook_run"`
 	CreateAt      int64             `json:"create_at"`
 	DeleteAt      int64             `json:"delete_at"`
 	EventAt       int64             `json:"event_at"`

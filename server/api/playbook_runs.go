@@ -45,7 +45,7 @@ func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRu
 		config:             configService,
 	}
 
-	playbookRunsRouter := router.PathPrefix("/incidents").Subrouter()
+	playbookRunsRouter := router.PathPrefix("/runs").Subrouter()
 	playbookRunsRouter.HandleFunc("", handler.getPlaybookRuns).Methods(http.MethodGet)
 	playbookRunsRouter.HandleFunc("", handler.createPlaybookRunFromPost).Methods(http.MethodPost)
 
@@ -120,7 +120,7 @@ func (h *PlaybookRunHandler) checkEditPermissions(next http.Handler) http.Handle
 	})
 }
 
-// createPlaybookRunFromPost handles the POST /incidents endpoint
+// createPlaybookRunFromPost handles the POST /runs endpoint
 func (h *PlaybookRunHandler) createPlaybookRunFromPost(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -163,10 +163,10 @@ func (h *PlaybookRunHandler) createPlaybookRunFromPost(w http.ResponseWriter, r 
 	}
 
 	h.poster.PublishWebsocketEventToUser(app.PlaybookRunCreatedWSEvent, map[string]interface{}{
-		"incident": playbookRun,
+		"playbook_run": playbookRun,
 	}, userID)
 
-	w.Header().Add("Location", fmt.Sprintf("/api/v0/incidents/%s", playbookRun.ID))
+	w.Header().Add("Location", fmt.Sprintf("/api/v0/runs/%s", playbookRun.ID))
 	ReturnJSON(w, &playbookRun, http.StatusCreated)
 }
 
@@ -268,8 +268,8 @@ func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, 
 	}
 
 	h.poster.PublishWebsocketEventToUser(app.PlaybookRunCreatedWSEvent, map[string]interface{}{
-		"client_id": state.ClientID,
-		"incident":  playbookRun,
+		"client_id":    state.ClientID,
+		"playbook_run": playbookRun,
 	}, request.UserId)
 
 	if err := h.postPlaybookRunCreatedMessage(playbookRun, request.ChannelId); err != nil {
@@ -277,7 +277,7 @@ func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, 
 		return
 	}
 
-	w.Header().Add("Location", fmt.Sprintf("/api/v0/incidents/%s", playbookRun.ID))
+	w.Header().Add("Location", fmt.Sprintf("/api/v0/runs/%s", playbookRun.ID))
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -439,7 +439,7 @@ func (h *PlaybookRunHandler) getRequesterInfo(userID string) (app.RequesterInfo,
 	return app.GetRequesterInfo(userID, h.pluginAPI)
 }
 
-// getPlaybookRuns handles the GET /incidents endpoint.
+// getPlaybookRuns handles the GET /runs endpoint.
 func (h *PlaybookRunHandler) getPlaybookRuns(w http.ResponseWriter, r *http.Request) {
 	filterOptions, err := parsePlaybookRunsFilterOptions(r.URL)
 	if err != nil {
@@ -475,7 +475,7 @@ func (h *PlaybookRunHandler) getPlaybookRuns(w http.ResponseWriter, r *http.Requ
 	ReturnJSON(w, results, http.StatusOK)
 }
 
-// getPlaybookRun handles the /incidents/{id} endpoint.
+// getPlaybookRun handles the /runs/{id} endpoint.
 func (h *PlaybookRunHandler) getPlaybookRun(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	playbookRunID := vars["id"]
@@ -495,7 +495,7 @@ func (h *PlaybookRunHandler) getPlaybookRun(w http.ResponseWriter, r *http.Reque
 	ReturnJSON(w, playbookRunToGet, http.StatusOK)
 }
 
-// getPlaybookRunMetadata handles the /incidents/{id}/metadata endpoint.
+// getPlaybookRunMetadata handles the /runs/{id}/metadata endpoint.
 func (h *PlaybookRunHandler) getPlaybookRunMetadata(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	playbookRunID := vars["id"]
@@ -522,7 +522,7 @@ func (h *PlaybookRunHandler) getPlaybookRunMetadata(w http.ResponseWriter, r *ht
 	ReturnJSON(w, playbookRunMetadata, http.StatusOK)
 }
 
-// getPlaybookRunByChannel handles the /incidents/channel/{channel_id} endpoint.
+// getPlaybookRunByChannel handles the /runs/channel/{channel_id} endpoint.
 func (h *PlaybookRunHandler) getPlaybookRunByChannel(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	channelID := vars["channel_id"]
@@ -556,7 +556,7 @@ func (h *PlaybookRunHandler) getPlaybookRunByChannel(w http.ResponseWriter, r *h
 	ReturnJSON(w, playbookRunToGet, http.StatusOK)
 }
 
-// getOwners handles the /incidents/owners api endpoint.
+// getOwners handles the /runs/owners api endpoint.
 func (h *PlaybookRunHandler) getOwners(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("team_id")
 	if teamID == "" {
@@ -633,7 +633,7 @@ func (h *PlaybookRunHandler) getChannels(w http.ResponseWriter, r *http.Request)
 	ReturnJSON(w, channelIds, http.StatusOK)
 }
 
-// changeOwner handles the /incidents/{id}/change-owner api endpoint.
+// changeOwner handles the /runs/{id}/change-owner api endpoint.
 func (h *PlaybookRunHandler) changeOwner(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -671,7 +671,7 @@ func (h *PlaybookRunHandler) changeOwner(w http.ResponseWriter, r *http.Request)
 	ReturnJSON(w, map[string]interface{}{}, http.StatusOK)
 }
 
-// updateStatusD handles the POST /incidents/{id}/status endpoint, user has edit permissions
+// updateStatusD handles the POST /runs/{id}/status endpoint, user has edit permissions
 func (h *PlaybookRunHandler) status(w http.ResponseWriter, r *http.Request) {
 	playbookRunID := mux.Vars(r)["id"]
 	userID := r.Header.Get("Mattermost-User-ID")
@@ -733,7 +733,7 @@ func (h *PlaybookRunHandler) status(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte(`{"status":"OK"}`))
 }
 
-// updateStatusDialog handles the POST /incidents/{id}/update-status-dialog endpoint, called when a
+// updateStatusDialog handles the POST /runs/{id}/update-status-dialog endpoint, called when a
 // user submits the Update Status dialog.
 func (h *PlaybookRunHandler) updateStatusDialog(w http.ResponseWriter, r *http.Request) {
 	playbookRunID := mux.Vars(r)["id"]
@@ -805,7 +805,7 @@ func (h *PlaybookRunHandler) updateStatusDialog(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusOK)
 }
 
-// reminderButtonUpdate handles the POST /incidents/{id}/reminder/button-update endpoint, called when a
+// reminderButtonUpdate handles the POST /runs/{id}/reminder/button-update endpoint, called when a
 // user clicks on the reminder interactive button
 func (h *PlaybookRunHandler) reminderButtonUpdate(w http.ResponseWriter, r *http.Request) {
 	requestData := model.PostActionIntegrationRequestFromJson(r.Body)
@@ -838,7 +838,7 @@ func (h *PlaybookRunHandler) reminderButtonUpdate(w http.ResponseWriter, r *http
 	ReturnJSON(w, nil, http.StatusOK)
 }
 
-// reminderButtonDismiss handles the POST /incidents/{id}/reminder/button-dismiss endpoint, called when a
+// reminderButtonDismiss handles the POST /runs/{id}/reminder/button-dismiss endpoint, called when a
 // user clicks on the reminder interactive button
 func (h *PlaybookRunHandler) reminderButtonDismiss(w http.ResponseWriter, r *http.Request) {
 	requestData := model.PostActionIntegrationRequestFromJson(r.Body)
@@ -899,7 +899,7 @@ func (h *PlaybookRunHandler) noRetrospectiveButton(w http.ResponseWriter, r *htt
 	ReturnJSON(w, nil, http.StatusOK)
 }
 
-// removeTimelineEvent handles the DELETE /incidents/{id}/timeline/{eventID} endpoint.
+// removeTimelineEvent handles the DELETE /runs/{id}/timeline/{eventID} endpoint.
 // User has been authenticated to edit the playbook run.
 func (h *PlaybookRunHandler) removeTimelineEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -915,7 +915,7 @@ func (h *PlaybookRunHandler) removeTimelineEvent(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// checkAndSendMessageOnJoin handles the GET /incident/{id}/check_and_send_message_on_join/{channel_id} endpoint.
+// checkAndSendMessageOnJoin handles the GET /run/{id}/check_and_send_message_on_join/{channel_id} endpoint.
 func (h *PlaybookRunHandler) checkAndSendMessageOnJoin(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	playbookRunID := vars["id"]

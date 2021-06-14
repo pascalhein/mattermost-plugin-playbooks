@@ -17,7 +17,7 @@ type PlaybookRunService struct {
 
 // Get a playbook run.
 func (s *PlaybookRunService) Get(ctx context.Context, playbookRunID string) (*PlaybookRun, error) {
-	playbookRunURL := fmt.Sprintf("incidents/%s", playbookRunID)
+	playbookRunURL := fmt.Sprintf("runs/%s", playbookRunID)
 	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (s *PlaybookRunService) Get(ctx context.Context, playbookRunID string) (*Pl
 
 // GetByChannelID gets a playbook run by ChannelID.
 func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID string) (*PlaybookRun, error) {
-	channelURL := fmt.Sprintf("incidents/channel/%s", channelID)
+	channelURL := fmt.Sprintf("runs/channel/%s", channelID)
 	req, err := s.client.newRequest(http.MethodGet, channelURL, nil)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID strin
 
 // Get a playbook run's metadata.
 func (s *PlaybookRunService) GetMetadata(ctx context.Context, playbookRunID string) (*PlaybookRunMetadata, error) {
-	playbookRunURL := fmt.Sprintf("incidents/%s/metadata", playbookRunID)
+	playbookRunURL := fmt.Sprintf("runs/%s/metadata", playbookRunID)
 	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (s *PlaybookRunService) GetMetadata(ctx context.Context, playbookRunID stri
 
 // List the playbook runs.
 func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts PlaybookRunListOptions) (*GetPlaybookRunsResults, error) {
-	playbookRunURL := "incidents"
+	playbookRunURL := "runs"
 	playbookRunURL, err := addOptions(playbookRunURL, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build options: %w", err)
@@ -98,7 +98,7 @@ func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts P
 
 // Create a playbook run.
 func (s *PlaybookRunService) Create(ctx context.Context, opts PlaybookRunCreateOptions) (*PlaybookRun, error) {
-	playbookRunURL := "incidents"
+	playbookRunURL := "runs"
 	req, err := s.client.newRequest(http.MethodPost, playbookRunURL, opts)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (s *PlaybookRunService) Create(ctx context.Context, opts PlaybookRunCreateO
 }
 
 func (s *PlaybookRunService) UpdateStatus(ctx context.Context, playbookRunID string, status Status, description, message string, reminderInSeconds int64) error {
-	updateURL := fmt.Sprintf("incidents/%s/status", playbookRunID)
+	updateURL := fmt.Sprintf("runs/%s/status", playbookRunID)
 	opts := StatusUpdateOptions{
 		Status:            status,
 		Description:       description,
