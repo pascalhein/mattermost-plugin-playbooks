@@ -138,7 +138,7 @@ func assertPayload(t *testing.T, actual rudderPayload, expectedEvent string, exp
 	t.Helper()
 
 	playbookRunFromProperties := func(properties map[string]interface{}) *app.PlaybookRun {
-		require.Contains(t, properties, "IncidentID")
+		require.Contains(t, properties, telemetryKeyPlaybookRunID)
 		require.Contains(t, properties, "HasDescription")
 		require.Contains(t, properties, "CommanderUserID")
 		require.Contains(t, properties, "ReporterUserID")
@@ -157,7 +157,7 @@ func assertPayload(t *testing.T, actual rudderPayload, expectedEvent string, exp
 		require.Contains(t, properties, "NumTimelineEvents")
 
 		return &app.PlaybookRun{
-			ID:               properties["IncidentID"].(string),
+			ID:               properties[telemetryKeyPlaybookRunID].(string),
 			Name:             dummyPlaybookRun.Name, // not included in the tracked event
 			Description:      dummyPlaybookRun.Description,
 			OwnerUserID:      properties["CommanderUserID"].(string),
@@ -194,8 +194,8 @@ func assertPayload(t *testing.T, actual rudderPayload, expectedEvent string, exp
 	if expectedEvent == eventPlaybookRun && (expectedAction == actionCreate || expectedAction == actionEnd) {
 		require.Equal(t, dummyPlaybookRun, playbookRunFromProperties(properties))
 	} else {
-		require.Contains(t, properties, "IncidentID")
-		require.Equal(t, properties["IncidentID"], dummyPlaybookRunID)
+		require.Contains(t, properties, telemetryKeyPlaybookRunID)
+		require.Equal(t, properties[telemetryKeyPlaybookRunID], dummyPlaybookRunID)
 		require.Contains(t, properties, "UserActualID")
 		require.Equal(t, properties["UserActualID"], dummyUserID)
 	}
@@ -433,24 +433,24 @@ func TestPlaybookRunProperties(t *testing.T) {
 	require.NotContains(t, properties, "ID")
 
 	expectedProperties := map[string]interface{}{
-		"UserActualID":        dummyUserID,
-		"IncidentID":          dummyPlaybookRun.ID,
-		"HasDescription":      true,
-		"CommanderUserID":     dummyPlaybookRun.OwnerUserID,
-		"ReporterUserID":      dummyPlaybookRun.ReporterUserID,
-		"TeamID":              dummyPlaybookRun.TeamID,
-		"ChannelID":           dummyPlaybookRun.ChannelID,
-		"CreateAt":            dummyPlaybookRun.CreateAt,
-		"EndAt":               dummyPlaybookRun.EndAt,
-		"DeleteAt":            dummyPlaybookRun.DeleteAt,
-		"PostID":              dummyPlaybookRun.PostID,
-		"PlaybookID":          dummyPlaybookRun.PlaybookID,
-		"NumChecklists":       2,
-		"TotalChecklistItems": 3,
-		"NumStatusPosts":      2,
-		"CurrentStatus":       dummyPlaybookRun.CurrentStatus,
-		"PreviousReminder":    dummyPlaybookRun.PreviousReminder,
-		"NumTimelineEvents":   len(dummyPlaybookRun.TimelineEvents),
+		"UserActualID":            dummyUserID,
+		telemetryKeyPlaybookRunID: dummyPlaybookRun.ID,
+		"HasDescription":          true,
+		"CommanderUserID":         dummyPlaybookRun.OwnerUserID,
+		"ReporterUserID":          dummyPlaybookRun.ReporterUserID,
+		"TeamID":                  dummyPlaybookRun.TeamID,
+		"ChannelID":               dummyPlaybookRun.ChannelID,
+		"CreateAt":                dummyPlaybookRun.CreateAt,
+		"EndAt":                   dummyPlaybookRun.EndAt,
+		"DeleteAt":                dummyPlaybookRun.DeleteAt,
+		"PostID":                  dummyPlaybookRun.PostID,
+		"PlaybookID":              dummyPlaybookRun.PlaybookID,
+		"NumChecklists":           2,
+		"TotalChecklistItems":     3,
+		"NumStatusPosts":          2,
+		"CurrentStatus":           dummyPlaybookRun.CurrentStatus,
+		"PreviousReminder":        dummyPlaybookRun.PreviousReminder,
+		"NumTimelineEvents":       len(dummyPlaybookRun.TimelineEvents),
 	}
 
 	require.Equal(t, expectedProperties, properties)
@@ -463,14 +463,14 @@ func TestTaskProperties(t *testing.T) {
 	require.NotContains(t, properties, "ID")
 
 	expectedProperties := map[string]interface{}{
-		"IncidentID":     dummyPlaybookRunID,
-		"UserActualID":   dummyUserID,
-		"TaskID":         dummyTask.ID,
-		"State":          dummyTask.State,
-		"AssigneeID":     dummyTask.AssigneeID,
-		"HasCommand":     true,
-		"CommandLastRun": dummyTask.CommandLastRun,
-		"HasDescription": true,
+		telemetryKeyPlaybookRunID: dummyPlaybookRunID,
+		"UserActualID":            dummyUserID,
+		"TaskID":                  dummyTask.ID,
+		"State":                   dummyTask.State,
+		"AssigneeID":              dummyTask.AssigneeID,
+		"HasCommand":              true,
+		"CommandLastRun":          dummyTask.CommandLastRun,
+		"HasDescription":          true,
 	}
 
 	require.Equal(t, expectedProperties, properties)

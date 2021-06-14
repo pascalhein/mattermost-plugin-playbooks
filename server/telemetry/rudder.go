@@ -63,6 +63,9 @@ const (
 	actionStartTrialToCreatePlaybook           = "start_trial_to_create_playbook"
 	actionStartTrialToRestrictPlaybookCreation = "start_trial_to_restrict_playbook_creation"
 	actionStartTrialToRestrictPlaybookAccess   = "start_trial_to_restrict_playbook_access"
+
+	// telemetryKeyPlaybookRunID records the legacy name used to identify a playbook run via telemetry.
+	telemetryKeyPlaybookRunID = "IncidentID"
 )
 
 // NewRudder builds a new RudderTelemetry client that will send the events to
@@ -123,24 +126,24 @@ func playbookRunProperties(playbookRun *app.PlaybookRun, userID string) map[stri
 	}
 
 	return map[string]interface{}{
-		"UserActualID":        userID,
-		"IncidentID":          playbookRun.ID,
-		"HasDescription":      playbookRun.Description != "",
-		"CommanderUserID":     playbookRun.OwnerUserID,
-		"ReporterUserID":      playbookRun.ReporterUserID,
-		"TeamID":              playbookRun.TeamID,
-		"ChannelID":           playbookRun.ChannelID,
-		"CreateAt":            playbookRun.CreateAt,
-		"EndAt":               playbookRun.EndAt,
-		"DeleteAt":            playbookRun.DeleteAt,
-		"PostID":              playbookRun.PostID,
-		"PlaybookID":          playbookRun.PlaybookID,
-		"NumChecklists":       len(playbookRun.Checklists),
-		"TotalChecklistItems": totalChecklistItems,
-		"NumStatusPosts":      len(playbookRun.StatusPosts),
-		"CurrentStatus":       playbookRun.CurrentStatus,
-		"PreviousReminder":    playbookRun.PreviousReminder,
-		"NumTimelineEvents":   len(playbookRun.TimelineEvents),
+		"UserActualID":            userID,
+		telemetryKeyPlaybookRunID: playbookRun.ID,
+		"HasDescription":          playbookRun.Description != "",
+		"CommanderUserID":         playbookRun.OwnerUserID,
+		"ReporterUserID":          playbookRun.ReporterUserID,
+		"TeamID":                  playbookRun.TeamID,
+		"ChannelID":               playbookRun.ChannelID,
+		"CreateAt":                playbookRun.CreateAt,
+		"EndAt":                   playbookRun.EndAt,
+		"DeleteAt":                playbookRun.DeleteAt,
+		"PostID":                  playbookRun.PostID,
+		"PlaybookID":              playbookRun.PlaybookID,
+		"NumChecklists":           len(playbookRun.Checklists),
+		"TotalChecklistItems":     totalChecklistItems,
+		"NumStatusPosts":          len(playbookRun.StatusPosts),
+		"CurrentStatus":           playbookRun.CurrentStatus,
+		"PreviousReminder":        playbookRun.PreviousReminder,
+		"NumTimelineEvents":       len(playbookRun.TimelineEvents),
 	}
 }
 
@@ -202,14 +205,14 @@ func (t *RudderTelemetry) RemoveTimelineEvent(playbookRun *app.PlaybookRun, user
 
 func taskProperties(playbookRunID, userID string, task app.ChecklistItem) map[string]interface{} {
 	return map[string]interface{}{
-		"IncidentID":     playbookRunID,
-		"UserActualID":   userID,
-		"TaskID":         task.ID,
-		"State":          task.State,
-		"AssigneeID":     task.AssigneeID,
-		"HasCommand":     task.Command != "",
-		"CommandLastRun": task.CommandLastRun,
-		"HasDescription": task.Description != "",
+		telemetryKeyPlaybookRunID: playbookRunID,
+		"UserActualID":            userID,
+		"TaskID":                  task.ID,
+		"State":                   task.State,
+		"AssigneeID":              task.AssigneeID,
+		"HasCommand":              task.Command != "",
+		"CommandLastRun":          task.CommandLastRun,
+		"HasDescription":          task.Description != "",
 	}
 }
 
