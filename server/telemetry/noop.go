@@ -87,10 +87,10 @@ func (t *NoopTelemetry) ChangeOwner(*app.PlaybookRun, string) {
 func (t *NoopTelemetry) RunTaskSlashCommand(string, string, app.ChecklistItem) {
 }
 
-func (t *NoopTelemetry) UpdateRetrospective(incident *app.PlaybookRun, userID string) {
+func (t *NoopTelemetry) UpdateRetrospective(playbookRun *app.PlaybookRun, userID string) {
 }
 
-func (t *NoopTelemetry) PublishRetrospective(incident *app.PlaybookRun, userID string) {
+func (t *NoopTelemetry) PublishRetrospective(playbookRun *app.PlaybookRun, userID string) {
 }
 
 // StartTrialToViewTimeline does nothing.

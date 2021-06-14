@@ -38,7 +38,7 @@ type playbookRunStore struct {
 	log                  bot.Logger
 	store                *SQLStore
 	queryBuilder         sq.StatementBuilderType
-	incidentSelect       sq.SelectBuilder
+	playbookRunSelect    sq.SelectBuilder
 	statusPostsSelect    sq.SelectBuilder
 	timelineEventsSelect sq.SelectBuilder
 }
@@ -46,7 +46,7 @@ type playbookRunStore struct {
 // Ensure playbookRunStore implements the app.PlaybookRunStore interface.
 var _ app.PlaybookRunStore = (*playbookRunStore)(nil)
 
-type incidentStatusPosts []struct {
+type playbookRunStatusPosts []struct {
 	PlaybookRunID string
 	app.StatusPost
 }
@@ -109,7 +109,7 @@ func applyPlaybookRunFilterOptionsSort(builder sq.SelectBuilder, options app.Pla
 // NewPlaybookRunStore creates a new store for incident ServiceImpl.
 func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQLStore) app.PlaybookRunStore {
 	// When adding a Playbook Run column #1: add to this select
-	incidentSelect := sqlStore.builder.
+	playbookRunSelect := sqlStore.builder.
 		Select("i.ID", "c.DisplayName AS Name", "i.Description", "i.CommanderUserID AS OwnerUserID", "i.TeamID", "i.ChannelID",
 			"i.CreateAt", "i.EndAt", "i.DeleteAt", "i.PostID", "i.PlaybookID", "i.ReporterUserID", "i.CurrentStatus",
 			"i.ChecklistsJSON", "COALESCE(i.ReminderPostID, '') ReminderPostID", "i.PreviousReminder", "i.BroadcastChannelID",
@@ -156,7 +156,7 @@ func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQ
 		log:                  log,
 		store:                sqlStore,
 		queryBuilder:         sqlStore.builder,
-		incidentSelect:       incidentSelect,
+		playbookRunSelect:    playbookRunSelect,
 		statusPostsSelect:    statusPostsSelect,
 		timelineEventsSelect: timelineEventsSelect,
 	}
@@ -166,7 +166,7 @@ func NewPlaybookRunStore(pluginAPI PluginAPIClient, log bot.Logger, sqlStore *SQ
 func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, options app.PlaybookRunFilterOptions) (*app.GetPlaybookRunsResults, error) {
 	permissionsExpr := s.buildPermissionsExpr(requesterInfo)
 
-	queryForResults := s.incidentSelect.
+	queryForResults := s.playbookRunSelect.
 		Where(permissionsExpr).
 		Where(sq.Eq{"i.TeamID": options.TeamID})
 
@@ -256,30 +256,30 @@ func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, opti
 	}
 	hasMore := options.Page+1 < pageCount
 
-	incidents := make([]app.PlaybookRun, 0, len(rawPlaybookRuns))
-	incidentIDs := make([]string, 0, len(rawPlaybookRuns))
+	playbookRuns := make([]app.PlaybookRun, 0, len(rawPlaybookRuns))
+	playbookRunIDs := make([]string, 0, len(rawPlaybookRuns))
 	for _, rawPlaybookRun := range rawPlaybookRuns {
-		var incident *app.PlaybookRun
-		incident, err = s.toPlaybookRun(rawPlaybookRun)
+		var playbookRun *app.PlaybookRun
+		playbookRun, err = s.toPlaybookRun(rawPlaybookRun)
 		if err != nil {
 			return nil, err
 		}
-		incidents = append(incidents, *incident)
-		incidentIDs = append(incidentIDs, incident.ID)
+		playbookRuns = append(playbookRuns, *playbookRun)
+		playbookRunIDs = append(playbookRunIDs, playbookRun.ID)
 	}
 
-	var statusPosts incidentStatusPosts
+	var statusPosts playbookRunStatusPosts
 
 	postInfoSelect := s.statusPostsSelect.
 		OrderBy("p.CreateAt").
-		Where(sq.Eq{"sp.IncidentID": incidentIDs})
+		Where(sq.Eq{"sp.IncidentID": playbookRunIDs})
 
 	err = s.store.selectBuilder(tx, &statusPosts, postInfoSelect)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, errors.Wrap(err, "failed to get incidentStatusPosts")
 	}
 
-	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, incidentIDs)
+	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, playbookRunIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -288,29 +288,29 @@ func (s *playbookRunStore) GetPlaybookRuns(requesterInfo app.RequesterInfo, opti
 		return nil, errors.Wrap(err, "could not commit transaction")
 	}
 
-	addStatusPostsToPlaybookRuns(statusPosts, incidents)
-	addTimelineEventsToPlaybookRuns(timelineEvents, incidents)
+	addStatusPostsToPlaybookRuns(statusPosts, playbookRuns)
+	addTimelineEventsToPlaybookRuns(timelineEvents, playbookRuns)
 
 	return &app.GetPlaybookRunsResults{
 		TotalCount: total,
 		PageCount:  pageCount,
 		HasMore:    hasMore,
-		Items:      incidents,
+		Items:      playbookRuns,
 	}, nil
 }
 
 // CreatePlaybookRun creates a new incident. If incident has an ID, that ID will be used.
-func (s *playbookRunStore) CreatePlaybookRun(incident *app.PlaybookRun) (*app.PlaybookRun, error) {
-	if incident == nil {
+func (s *playbookRunStore) CreatePlaybookRun(playbookRun *app.PlaybookRun) (*app.PlaybookRun, error) {
+	if playbookRun == nil {
 		return nil, errors.New("incident is nil")
 	}
-	incident = incident.Clone()
+	playbookRun = playbookRun.Clone()
 
-	if incident.ID == "" {
-		incident.ID = model.NewId()
+	if playbookRun.ID == "" {
+		playbookRun.ID = model.NewId()
 	}
 
-	rawPlaybookRun, err := toSQLPlaybookRun(*incident)
+	rawPlaybookRun, err := toSQLPlaybookRun(*playbookRun)
 	if err != nil {
 		return nil, err
 	}
@@ -358,19 +358,19 @@ func (s *playbookRunStore) CreatePlaybookRun(incident *app.PlaybookRun) (*app.Pl
 		return nil, errors.Wrapf(err, "failed to store new incident")
 	}
 
-	return incident, nil
+	return playbookRun, nil
 }
 
 // UpdatePlaybookRun updates an incident.
-func (s *playbookRunStore) UpdatePlaybookRun(incident *app.PlaybookRun) error {
-	if incident == nil {
+func (s *playbookRunStore) UpdatePlaybookRun(playbookRun *app.PlaybookRun) error {
+	if playbookRun == nil {
 		return errors.New("incident is nil")
 	}
-	if incident.ID == "" {
+	if playbookRun.ID == "" {
 		return errors.New("ID should not be empty")
 	}
 
-	rawPlaybookRun, err := toSQLPlaybookRun(*incident)
+	rawPlaybookRun, err := toSQLPlaybookRun(*playbookRun)
 	if err != nil {
 		return err
 	}
@@ -527,8 +527,8 @@ func (s *playbookRunStore) UpdateTimelineEvent(event *app.TimelineEvent) error {
 }
 
 // GetPlaybookRun gets an incident by ID.
-func (s *playbookRunStore) GetPlaybookRun(incidentID string) (*app.PlaybookRun, error) {
-	if incidentID == "" {
+func (s *playbookRunStore) GetPlaybookRun(playbookRunID string) (*app.PlaybookRun, error) {
+	if playbookRunID == "" {
 		return nil, errors.New("ID cannot be empty")
 	}
 
@@ -539,30 +539,30 @@ func (s *playbookRunStore) GetPlaybookRun(incidentID string) (*app.PlaybookRun, 
 	defer s.store.finalizeTransaction(tx)
 
 	var rawPlaybookRun sqlPlaybookRun
-	err = s.store.getBuilder(tx, &rawPlaybookRun, s.incidentSelect.Where(sq.Eq{"i.ID": incidentID}))
+	err = s.store.getBuilder(tx, &rawPlaybookRun, s.playbookRunSelect.Where(sq.Eq{"i.ID": playbookRunID}))
 	if err == sql.ErrNoRows {
-		return nil, errors.Wrapf(app.ErrNotFound, "incident with id '%s' does not exist", incidentID)
+		return nil, errors.Wrapf(app.ErrNotFound, "incident with id '%s' does not exist", playbookRunID)
 	} else if err != nil {
-		return nil, errors.Wrapf(err, "failed to get incident by id '%s'", incidentID)
+		return nil, errors.Wrapf(err, "failed to get incident by id '%s'", playbookRunID)
 	}
 
-	incident, err := s.toPlaybookRun(rawPlaybookRun)
+	playbookRun, err := s.toPlaybookRun(rawPlaybookRun)
 	if err != nil {
 		return nil, err
 	}
 
-	var statusPosts incidentStatusPosts
+	var statusPosts playbookRunStatusPosts
 
 	postInfoSelect := s.statusPostsSelect.
-		Where(sq.Eq{"sp.IncidentID": incidentID}).
+		Where(sq.Eq{"sp.IncidentID": playbookRunID}).
 		OrderBy("p.CreateAt")
 
 	err = s.store.selectBuilder(tx, &statusPosts, postInfoSelect)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, errors.Wrapf(err, "failed to get incidentStatusPosts for incident with id '%s'", incidentID)
+		return nil, errors.Wrapf(err, "failed to get incidentStatusPosts for incident with id '%s'", playbookRunID)
 	}
 
-	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, []string{incidentID})
+	timelineEvents, err := s.getTimelineEventsForPlaybookRun(tx, []string{playbookRunID})
 	if err != nil {
 		return nil, err
 	}
@@ -572,20 +572,20 @@ func (s *playbookRunStore) GetPlaybookRun(incidentID string) (*app.PlaybookRun, 
 	}
 
 	for _, p := range statusPosts {
-		incident.StatusPosts = append(incident.StatusPosts, p.StatusPost)
+		playbookRun.StatusPosts = append(playbookRun.StatusPosts, p.StatusPost)
 	}
 
-	incident.TimelineEvents = append(incident.TimelineEvents, timelineEvents...)
+	playbookRun.TimelineEvents = append(playbookRun.TimelineEvents, timelineEvents...)
 
-	return incident, nil
+	return playbookRun, nil
 }
 
-func (s *playbookRunStore) getTimelineEventsForPlaybookRun(q sqlx.Queryer, incidentIDs []string) ([]app.TimelineEvent, error) {
+func (s *playbookRunStore) getTimelineEventsForPlaybookRun(q sqlx.Queryer, playbookRunIDs []string) ([]app.TimelineEvent, error) {
 	var timelineEvents []app.TimelineEvent
 
 	timelineEventsSelect := s.timelineEventsSelect.
 		OrderBy("te.EventAt ASC").
-		Where(sq.And{sq.Eq{"te.IncidentID": incidentIDs}, sq.Eq{"te.DeleteAt": 0}})
+		Where(sq.And{sq.Eq{"te.IncidentID": playbookRunIDs}, sq.Eq{"te.DeleteAt": 0}})
 
 	err := s.store.selectBuilder(q, &timelineEvents, timelineEventsSelect)
 	if err != nil && err != sql.ErrNoRows {
@@ -596,17 +596,17 @@ func (s *playbookRunStore) getTimelineEventsForPlaybookRun(q sqlx.Queryer, incid
 }
 
 // GetTimelineEvent returns the timeline event for incidentID by the timeline event ID.
-func (s *playbookRunStore) GetTimelineEvent(incidentID, eventID string) (*app.TimelineEvent, error) {
+func (s *playbookRunStore) GetTimelineEvent(playbookRunID, eventID string) (*app.TimelineEvent, error) {
 	var event app.TimelineEvent
 
 	timelineEventSelect := s.timelineEventsSelect.
-		Where(sq.And{sq.Eq{"te.IncidentID": incidentID}, sq.Eq{"te.ID": eventID}})
+		Where(sq.And{sq.Eq{"te.IncidentID": playbookRunID}, sq.Eq{"te.ID": eventID}})
 
 	err := s.store.getBuilder(s.store.db, &event, timelineEventSelect)
 	if err == sql.ErrNoRows {
-		return nil, errors.Wrapf(app.ErrNotFound, "timeline event with id (%s) does not exist for incident with id (%s)", eventID, incidentID)
+		return nil, errors.Wrapf(app.ErrNotFound, "timeline event with id (%s) does not exist for incident with id (%s)", eventID, playbookRunID)
 	} else if err != nil {
-		return nil, errors.Wrapf(err, "failed to get timeline event with id (%s) for incident with id (%s)", eventID, incidentID)
+		return nil, errors.Wrapf(err, "failed to get timeline event with id (%s) for incident with id (%s)", eventID, playbookRunID)
 	}
 
 	return &event, nil
@@ -688,9 +688,9 @@ func (s *playbookRunStore) NukeDB() (err error) {
 	return s.store.RunMigrations()
 }
 
-func (s *playbookRunStore) ChangeCreationDate(incidentID string, creationTimestamp time.Time) error {
+func (s *playbookRunStore) ChangeCreationDate(playbookRunID string, creationTimestamp time.Time) error {
 	updateQuery := s.queryBuilder.Update("IR_Incident").
-		Where(sq.Eq{"ID": incidentID}).
+		Where(sq.Eq{"ID": playbookRunID}).
 		Set("CreateAt", model.GetMillisForTime(creationTimestamp))
 
 	sqlResult, err := s.store.execBuilder(s.store.db, updateQuery)
@@ -792,36 +792,36 @@ func (s *playbookRunStore) buildPermissionsExpr(info app.RequesterInfo) sq.Sqliz
 }
 
 func (s *playbookRunStore) toPlaybookRun(rawPlaybookRun sqlPlaybookRun) (*app.PlaybookRun, error) {
-	incident := rawPlaybookRun.PlaybookRun
-	if err := json.Unmarshal(rawPlaybookRun.ChecklistsJSON, &incident.Checklists); err != nil {
+	playbookRun := rawPlaybookRun.PlaybookRun
+	if err := json.Unmarshal(rawPlaybookRun.ChecklistsJSON, &playbookRun.Checklists); err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal checklists json for incident id: %s", rawPlaybookRun.ID)
 	}
 
-	incident.InvitedUserIDs = []string(nil)
+	playbookRun.InvitedUserIDs = []string(nil)
 	if rawPlaybookRun.ConcatenatedInvitedUserIDs != "" {
-		incident.InvitedUserIDs = strings.Split(rawPlaybookRun.ConcatenatedInvitedUserIDs, ",")
+		playbookRun.InvitedUserIDs = strings.Split(rawPlaybookRun.ConcatenatedInvitedUserIDs, ",")
 	}
 
-	incident.InvitedGroupIDs = []string(nil)
+	playbookRun.InvitedGroupIDs = []string(nil)
 	if rawPlaybookRun.ConcatenatedInvitedGroupIDs != "" {
-		incident.InvitedGroupIDs = strings.Split(rawPlaybookRun.ConcatenatedInvitedGroupIDs, ",")
+		playbookRun.InvitedGroupIDs = strings.Split(rawPlaybookRun.ConcatenatedInvitedGroupIDs, ",")
 	}
 
-	return &incident, nil
+	return &playbookRun, nil
 }
 
-func toSQLPlaybookRun(incident app.PlaybookRun) (*sqlPlaybookRun, error) {
-	newChecklists := populateChecklistIDs(incident.Checklists)
+func toSQLPlaybookRun(playbookRun app.PlaybookRun) (*sqlPlaybookRun, error) {
+	newChecklists := populateChecklistIDs(playbookRun.Checklists)
 	checklistsJSON, err := checklistsToJSON(newChecklists)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal checklist json for incident id: '%s'", incident.ID)
+		return nil, errors.Wrapf(err, "failed to marshal checklist json for incident id: '%s'", playbookRun.ID)
 	}
 
 	return &sqlPlaybookRun{
-		PlaybookRun:                 incident,
+		PlaybookRun:                 playbookRun,
 		ChecklistsJSON:              checklistsJSON,
-		ConcatenatedInvitedUserIDs:  strings.Join(incident.InvitedUserIDs, ","),
-		ConcatenatedInvitedGroupIDs: strings.Join(incident.InvitedGroupIDs, ","),
+		ConcatenatedInvitedUserIDs:  strings.Join(playbookRun.InvitedUserIDs, ","),
+		ConcatenatedInvitedGroupIDs: strings.Join(playbookRun.InvitedGroupIDs, ","),
 	}, nil
 }
 
@@ -857,22 +857,22 @@ func checklistsToJSON(checklists []app.Checklist) (json.RawMessage, error) {
 	return checklistsJSON, nil
 }
 
-func addStatusPostsToPlaybookRuns(statusIDs incidentStatusPosts, incidents []app.PlaybookRun) {
+func addStatusPostsToPlaybookRuns(statusIDs playbookRunStatusPosts, playbookRuns []app.PlaybookRun) {
 	iToPosts := make(map[string][]app.StatusPost)
 	for _, p := range statusIDs {
 		iToPosts[p.PlaybookRunID] = append(iToPosts[p.PlaybookRunID], p.StatusPost)
 	}
-	for i, incident := range incidents {
-		incidents[i].StatusPosts = iToPosts[incident.ID]
+	for i, playbookRun := range playbookRuns {
+		playbookRuns[i].StatusPosts = iToPosts[playbookRun.ID]
 	}
 }
 
-func addTimelineEventsToPlaybookRuns(timelineEvents []app.TimelineEvent, incidents []app.PlaybookRun) {
+func addTimelineEventsToPlaybookRuns(timelineEvents []app.TimelineEvent, playbookRuns []app.PlaybookRun) {
 	iToTe := make(map[string][]app.TimelineEvent)
 	for _, te := range timelineEvents {
 		iToTe[te.PlaybookRunID] = append(iToTe[te.PlaybookRunID], te)
 	}
-	for i, incident := range incidents {
-		incidents[i].TimelineEvents = iToTe[incident.ID]
+	for i, playbookRun := range playbookRuns {
+		playbookRuns[i].TimelineEvents = iToTe[playbookRun.ID]
 	}
 }

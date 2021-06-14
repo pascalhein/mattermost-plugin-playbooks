@@ -20,13 +20,13 @@ func ExamplePlaybookRunService_Get() {
 		log.Fatal(err)
 	}
 
-	incidentID := "h4n3h7s1qjf5pkis4dn6cuxgwa"
-	incident, err := c.PlaybookRuns.Get(ctx, incidentID)
+	playbookRunID := "h4n3h7s1qjf5pkis4dn6cuxgwa"
+	playbookRun, err := c.PlaybookRuns.Get(ctx, playbookRunID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Incident Name: %s\n", incident.Name)
+	fmt.Printf("Incident Name: %s\n", playbookRun.Name)
 }
 
 func ExamplePlaybookRunService_List() {
@@ -51,7 +51,7 @@ func ExamplePlaybookRunService_List() {
 		log.Fatal(err)
 	}
 
-	var incidents []client.PlaybookRun
+	var playbookRuns []client.PlaybookRun
 	for page := 0; ; page++ {
 		result, err := c.PlaybookRuns.List(ctx, page, 100, client.PlaybookRunListOptions{
 			TeamID:    teams[0].Id,
@@ -62,13 +62,13 @@ func ExamplePlaybookRunService_List() {
 			log.Fatal(err)
 		}
 
-		incidents = append(incidents, result.Items...)
+		playbookRuns = append(playbookRuns, result.Items...)
 		if !result.HasMore {
 			break
 		}
 	}
 
-	for _, incident := range incidents {
-		fmt.Printf("Incident Name: %s\n", incident.Name)
+	for _, playbookRun := range playbookRuns {
+		fmt.Printf("Incident Name: %s\n", playbookRun.Name)
 	}
 }

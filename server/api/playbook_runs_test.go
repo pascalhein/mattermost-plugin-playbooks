@@ -111,11 +111,11 @@ func TestPlaybookRuns(t *testing.T) {
 			Checklists:  withid.Checklists,
 		}
 
-		incidentJSON, err := json.Marshal(testPlaybookRun)
+		playbookRunJSON, err := json.Marshal(testPlaybookRun)
 		require.NoError(t, err)
 
 		testrecorder := httptest.NewRecorder()
-		testreq, err := http.NewRequest("POST", "/api/v0/incidents", bytes.NewBuffer(incidentJSON))
+		testreq, err := http.NewRequest("POST", "/api/v0/incidents", bytes.NewBuffer(playbookRunJSON))
 		testreq.Header.Add("Mattermost-User-ID", "testUserID")
 		require.NoError(t, err)
 		handler.ServeHTTP(testrecorder, testreq)
@@ -1338,7 +1338,7 @@ func TestPlaybookRuns(t *testing.T) {
 		setDefaultExpectations(t)
 
 		teamID := model.NewId()
-		incident1 := app.PlaybookRun{
+		playbookRun1 := app.PlaybookRun{
 			ID:              "incidentID1",
 			OwnerUserID:     "testUserID1",
 			TeamID:          teamID,
@@ -1359,7 +1359,7 @@ func TestPlaybookRuns(t *testing.T) {
 			TotalCount: 100,
 			PageCount:  200,
 			HasMore:    true,
-			Items:      []app.PlaybookRun{incident1},
+			Items:      []app.PlaybookRun{playbookRun1},
 		}
 		playbookRunService.EXPECT().GetPlaybookRuns(gomock.Any(), gomock.Any()).Return(result, nil)
 
@@ -1372,7 +1372,7 @@ func TestPlaybookRuns(t *testing.T) {
 			TotalCount: 100,
 			PageCount:  200,
 			HasMore:    true,
-			Items:      []icClient.PlaybookRun{toAPIPlaybookRun(incident1)},
+			Items:      []icClient.PlaybookRun{toAPIPlaybookRun(playbookRun1)},
 		}
 		assert.Equal(t, expectedList, actualList)
 	})

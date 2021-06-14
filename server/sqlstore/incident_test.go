@@ -167,15 +167,15 @@ func TestGetPlaybookRuns(t *testing.T) {
 		WithChecklists([]int{2}).
 		ToPlaybookRun()
 
-	incidents := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
+	playbookRuns := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
 	createPlaybookRuns := func(store *SQLStore, playbookRunStore app.PlaybookRunStore) {
 		t.Helper()
 
-		createdPlaybookRuns := make([]app.PlaybookRun, len(incidents))
+		createdPlaybookRuns := make([]app.PlaybookRun, len(playbookRuns))
 
-		for i := range incidents {
-			createdPlaybookRun, err := playbookRunStore.CreatePlaybookRun(&incidents[i])
+		for i := range playbookRuns {
+			createdPlaybookRun, err := playbookRunStore.CreatePlaybookRun(&playbookRuns[i])
 			require.NoError(t, err)
 
 			createdPlaybookRuns[i] = *createdPlaybookRun
@@ -1319,7 +1319,7 @@ func TestStressTestGetPlaybookRunsStats(t *testing.T) {
 }
 
 func createPlaybookRunsAndPosts(t testing.TB, store *SQLStore, playbookRunStore app.PlaybookRunStore, numPlaybookRuns, maxPostsPerPlaybookRun int, teamID string) []app.PlaybookRun {
-	incidentsSorted := make([]app.PlaybookRun, 0, numPlaybookRuns)
+	playbookRunsSorted := make([]app.PlaybookRun, 0, numPlaybookRuns)
 	for i := 0; i < numPlaybookRuns; i++ {
 		numPosts := maxPostsPerPlaybookRun
 		posts := make([]*model.Post, 0, numPosts)
@@ -1338,10 +1338,10 @@ func createPlaybookRunsAndPosts(t testing.TB, store *SQLStore, playbookRunStore 
 		ret, err := playbookRunStore.CreatePlaybookRun(inc)
 		require.NoError(t, err)
 		createPlaybookRunChannel(t, store, ret)
-		incidentsSorted = append(incidentsSorted, *ret)
+		playbookRunsSorted = append(playbookRunsSorted, *ret)
 	}
 
-	return incidentsSorted
+	return playbookRunsSorted
 }
 
 func newPost(deleted bool) *model.Post {
@@ -1365,21 +1365,21 @@ func TestGetPlaybookRunIDForChannel(t *testing.T) {
 		setupChannelsTable(t, db)
 
 		t.Run("retrieve existing incidentID", func(t *testing.T) {
-			incident1 := NewBuilder(t).ToPlaybookRun()
-			incident2 := NewBuilder(t).ToPlaybookRun()
+			playbookRun1 := NewBuilder(t).ToPlaybookRun()
+			playbookRun2 := NewBuilder(t).ToPlaybookRun()
 
-			returned1, err := playbookRunStore.CreatePlaybookRun(incident1)
+			returned1, err := playbookRunStore.CreatePlaybookRun(playbookRun1)
 			require.NoError(t, err)
-			createPlaybookRunChannel(t, store, incident1)
+			createPlaybookRunChannel(t, store, playbookRun1)
 
-			returned2, err := playbookRunStore.CreatePlaybookRun(incident2)
+			returned2, err := playbookRunStore.CreatePlaybookRun(playbookRun2)
 			require.NoError(t, err)
-			createPlaybookRunChannel(t, store, incident2)
+			createPlaybookRunChannel(t, store, playbookRun2)
 
-			id1, err := playbookRunStore.GetPlaybookRunIDForChannel(incident1.ChannelID)
+			id1, err := playbookRunStore.GetPlaybookRunIDForChannel(playbookRun1.ChannelID)
 			require.NoError(t, err)
 			require.Equal(t, returned1.ID, id1)
-			id2, err := playbookRunStore.GetPlaybookRunIDForChannel(incident2.ChannelID)
+			id2, err := playbookRunStore.GetPlaybookRunIDForChannel(playbookRun2.ChannelID)
 			require.NoError(t, err)
 			require.Equal(t, returned2.ID, id2)
 		})
@@ -1531,7 +1531,7 @@ func TestGetOwners(t *testing.T) {
 		WithChecklists([]int{2}).
 		ToPlaybookRun()
 
-	incidents := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
+	playbookRuns := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
 	cases := []struct {
 		Name          string
@@ -1663,8 +1663,8 @@ func TestGetOwners(t *testing.T) {
 		_, err = db.Exec(query, args...)
 		require.NoError(t, err)
 
-		for i := range incidents {
-			_, err := playbookRunStore.CreatePlaybookRun(&incidents[i])
+		for i := range playbookRuns {
+			_, err := playbookRunStore.CreatePlaybookRun(&playbookRuns[i])
 			require.NoError(t, err)
 		}
 
@@ -1853,14 +1853,14 @@ func setupPlaybookRunStore(t *testing.T, db *sqlx.DB) app.PlaybookRunStore {
 // Use it as:
 // NewBuilder.WithName("name").WithXYZ(xyz)....ToPlaybookRun()
 type PlaybookRunBuilder struct {
-	t        testing.TB
-	incident *app.PlaybookRun
+	t           testing.TB
+	playbookRun *app.PlaybookRun
 }
 
 func NewBuilder(t testing.TB) *PlaybookRunBuilder {
 	return &PlaybookRunBuilder{
 		t: t,
-		incident: &app.PlaybookRun{
+		playbookRun: &app.PlaybookRun{
 			Name:          "base incident",
 			OwnerUserID:   model.NewId(),
 			TeamID:        model.NewId(),
@@ -1876,41 +1876,41 @@ func NewBuilder(t testing.TB) *PlaybookRunBuilder {
 }
 
 func (ib *PlaybookRunBuilder) WithName(name string) *PlaybookRunBuilder {
-	ib.incident.Name = name
+	ib.playbookRun.Name = name
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithDescription(desc string) *PlaybookRunBuilder {
-	ib.incident.Description = desc
+	ib.playbookRun.Description = desc
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithID() *PlaybookRunBuilder {
-	ib.incident.ID = model.NewId()
+	ib.playbookRun.ID = model.NewId()
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) ToPlaybookRun() *app.PlaybookRun {
-	return ib.incident
+	return ib.playbookRun
 }
 
 func (ib *PlaybookRunBuilder) WithCreateAt(createAt int64) *PlaybookRunBuilder {
-	ib.incident.CreateAt = createAt
+	ib.playbookRun.CreateAt = createAt
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithDeleteAt(deleteAt int64) *PlaybookRunBuilder {
-	ib.incident.DeleteAt = deleteAt
+	ib.playbookRun.DeleteAt = deleteAt
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithChecklists(itemsPerChecklist []int) *PlaybookRunBuilder {
-	ib.incident.Checklists = make([]app.Checklist, len(itemsPerChecklist))
+	ib.playbookRun.Checklists = make([]app.Checklist, len(itemsPerChecklist))
 
 	for i, numItems := range itemsPerChecklist {
 		var items []app.ChecklistItem
@@ -1921,7 +1921,7 @@ func (ib *PlaybookRunBuilder) WithChecklists(itemsPerChecklist []int) *PlaybookR
 			})
 		}
 
-		ib.incident.Checklists[i] = app.Checklist{
+		ib.playbookRun.Checklists[i] = app.Checklist{
 			ID:    model.NewId(),
 			Title: fmt.Sprint("Checklist ", i),
 			Items: items,
@@ -1932,38 +1932,38 @@ func (ib *PlaybookRunBuilder) WithChecklists(itemsPerChecklist []int) *PlaybookR
 }
 
 func (ib *PlaybookRunBuilder) WithOwnerUserID(id string) *PlaybookRunBuilder {
-	ib.incident.OwnerUserID = id
+	ib.playbookRun.OwnerUserID = id
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithTeamID(id string) *PlaybookRunBuilder {
-	ib.incident.TeamID = id
+	ib.playbookRun.TeamID = id
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithCurrentStatus(status string) *PlaybookRunBuilder {
-	ib.incident.CurrentStatus = status
+	ib.playbookRun.CurrentStatus = status
 
 	if status == "Resolved" || status == "Archived" {
-		ib.incident.EndAt = ib.incident.CreateAt + 100
+		ib.playbookRun.EndAt = ib.playbookRun.CreateAt + 100
 	}
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithChannel(channel *model.Channel) *PlaybookRunBuilder {
-	ib.incident.ChannelID = channel.Id
+	ib.playbookRun.ChannelID = channel.Id
 
 	// Consider the incident name as authoritative.
-	channel.DisplayName = ib.incident.Name
+	channel.DisplayName = ib.playbookRun.Name
 
 	return ib
 }
 
 func (ib *PlaybookRunBuilder) WithPlaybookID(id string) *PlaybookRunBuilder {
-	ib.incident.PlaybookID = id
+	ib.playbookRun.PlaybookID = id
 
 	return ib
 }

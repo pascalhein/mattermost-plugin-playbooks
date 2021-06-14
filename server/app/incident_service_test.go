@@ -39,12 +39,12 @@ func TestCreatePlaybookRun(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			Name:   "###",
 			TeamID: teamID,
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		pluginAPI.On("CreateChannel", mock.Anything).Return(nil, &model.AppError{Id: "model.channel.is_valid.display_name.app_error"})
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		mattermostConfig := &model.Config{}
@@ -53,7 +53,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreatePlaybookRun(incident, nil, "testUserID", true)
+		_, err := s.CreatePlaybookRun(playbookRun, nil, "testUserID", true)
 		require.Equal(t, err, app.ErrChannelDisplayNameInvalid)
 	})
 
@@ -69,12 +69,12 @@ func TestCreatePlaybookRun(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			Name:   "###",
 			TeamID: teamID,
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -83,7 +83,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreatePlaybookRun(incident, nil, "testUserID", true)
+		_, err := s.CreatePlaybookRun(playbookRun, nil, "testUserID", true)
 		require.Equal(t, err, app.ErrChannelDisplayNameInvalid)
 	})
 
@@ -99,13 +99,13 @@ func TestCreatePlaybookRun(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			Name:        "###",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		pluginAPI.On("CreateChannel", &model.Channel{
 			TeamId:      teamID,
@@ -132,7 +132,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(playbookRun, nil, "user_id", true)
 		require.NoError(t, err)
 	})
 
@@ -148,13 +148,13 @@ func TestCreatePlaybookRun(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			Name:        "###",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		pluginAPI.On("GetTeam", teamID).Return(&model.Team{Id: teamID, Name: "ad-1"}, nil)
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -163,7 +163,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(playbookRun, nil, "user_id", true)
 		require.EqualError(t, err, "failed to create incident channel: : , ")
 	})
 
@@ -179,13 +179,13 @@ func TestCreatePlaybookRun(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			Name:        "###",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -206,7 +206,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(playbookRun, nil, "user_id", true)
 		require.NoError(t, err)
 	})
 
@@ -222,13 +222,13 @@ func TestCreatePlaybookRun(t *testing.T) {
 		scheduler := mock_app.NewMockJobOnceScheduler(controller)
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			Name:        "ททททท",
 			TeamID:      teamID,
 			OwnerUserID: "user_id",
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -251,7 +251,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		_, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
+		_, err := s.CreatePlaybookRun(playbookRun, nil, "user_id", true)
 		pluginAPI.AssertExpectations(t)
 		require.NoError(t, err)
 	})
@@ -287,7 +287,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 		}))
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			ID:                   "incidentID",
 			Name:                 "Incident Name",
 			TeamID:               teamID,
@@ -295,7 +295,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 			WebhookOnCreationURL: server.URL,
 		}
 
-		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(incident, nil)
+		store.EXPECT().CreatePlaybookRun(gomock.Any()).Return(playbookRun, nil)
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 
@@ -321,7 +321,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		createdPlaybookRun, err := s.CreatePlaybookRun(incident, nil, "user_id", true)
+		createdPlaybookRun, err := s.CreatePlaybookRun(playbookRun, nil, "user_id", true)
 		require.NoError(t, err)
 
 		select {
@@ -375,7 +375,7 @@ func TestUpdateStatus(t *testing.T) {
 		}))
 
 		teamID := model.NewId()
-		incident := &app.PlaybookRun{
+		playbookRun := &app.PlaybookRun{
 			ID:                       "incident_id",
 			Name:                     "Incident Name",
 			TeamID:                   teamID,
@@ -398,14 +398,14 @@ func TestUpdateStatus(t *testing.T) {
 		store.EXPECT().CreateTimelineEvent(gomock.AssignableToTypeOf(&app.TimelineEvent{}))
 		store.EXPECT().UpdatePlaybookRun(gomock.AssignableToTypeOf(&app.PlaybookRun{})).Return(nil)
 		store.EXPECT().UpdateStatus(gomock.AssignableToTypeOf(&app.SQLStatusPost{})).Return(nil)
-		store.EXPECT().GetPlaybookRun(gomock.Any()).Return(incident, nil).Times(2)
+		store.EXPECT().GetPlaybookRun(gomock.Any()).Return(playbookRun, nil).Times(2)
 
 		configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "com.mattermost.plugin-incident-management"}).Times(2)
 
 		poster.EXPECT().PublishWebsocketEventToChannel("incident_updated", gomock.Any(), channelID)
 		poster.EXPECT().PostMessage("broadcast_channel_id", gomock.Any()).Return(&model.Post{}, nil)
 
-		scheduler.EXPECT().Cancel(incident.ID)
+		scheduler.EXPECT().Cancel(playbookRun.ID)
 
 		mattermostConfig := &model.Config{}
 		mattermostConfig.SetDefaults()
@@ -418,12 +418,12 @@ func TestUpdateStatus(t *testing.T) {
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
 
-		err := s.UpdateStatus(incident.ID, "user_id", statusUpdateOptions)
+		err := s.UpdateStatus(playbookRun.ID, "user_id", statusUpdateOptions)
 		require.NoError(t, err)
 
 		select {
 		case payload := <-webhookChan:
-			require.Equal(t, *incident, payload.PlaybookRun)
+			require.Equal(t, *playbookRun, payload.PlaybookRun)
 			require.Equal(t,
 				"http://example.com/team_name/channels/channel_name",
 				payload.ChannelURL)

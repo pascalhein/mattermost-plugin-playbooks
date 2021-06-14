@@ -16,21 +16,21 @@ type PlaybookRunService struct {
 }
 
 // Get an incident.
-func (s *PlaybookRunService) Get(ctx context.Context, incidentID string) (*PlaybookRun, error) {
-	incidentURL := fmt.Sprintf("incidents/%s", incidentID)
-	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
+func (s *PlaybookRunService) Get(ctx context.Context, playbookRunID string) (*PlaybookRun, error) {
+	playbookRunURL := fmt.Sprintf("incidents/%s", playbookRunID)
+	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(PlaybookRun)
-	resp, err := s.client.do(ctx, req, incident)
+	playbookRun := new(PlaybookRun)
+	resp, err := s.client.do(ctx, req, playbookRun)
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
 
-	return incident, nil
+	return playbookRun, nil
 }
 
 // GetByChannelID gets an incident by ChannelID.
@@ -41,47 +41,47 @@ func (s *PlaybookRunService) GetByChannelID(ctx context.Context, channelID strin
 		return nil, err
 	}
 
-	incident := new(PlaybookRun)
-	resp, err := s.client.do(ctx, req, incident)
+	playbookRun := new(PlaybookRun)
+	resp, err := s.client.do(ctx, req, playbookRun)
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
 
-	return incident, nil
+	return playbookRun, nil
 }
 
 // Get an incident's metadata.
-func (s *PlaybookRunService) GetMetadata(ctx context.Context, incidentID string) (*PlaybookRunMetadata, error) {
-	incidentURL := fmt.Sprintf("incidents/%s/metadata", incidentID)
-	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
+func (s *PlaybookRunService) GetMetadata(ctx context.Context, playbookRunID string) (*PlaybookRunMetadata, error) {
+	playbookRunURL := fmt.Sprintf("incidents/%s/metadata", playbookRunID)
+	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(PlaybookRunMetadata)
-	resp, err := s.client.do(ctx, req, incident)
+	playbookRun := new(PlaybookRunMetadata)
+	resp, err := s.client.do(ctx, req, playbookRun)
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
 
-	return incident, nil
+	return playbookRun, nil
 }
 
 // List the incidents.
 func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts PlaybookRunListOptions) (*GetPlaybookRunsResults, error) {
-	incidentURL := "incidents"
-	incidentURL, err := addOptions(incidentURL, opts)
+	playbookRunURL := "incidents"
+	playbookRunURL, err := addOptions(playbookRunURL, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build options: %w", err)
 	}
-	incidentURL, err = addPaginationOptions(incidentURL, page, perPage)
+	playbookRunURL, err = addPaginationOptions(playbookRunURL, page, perPage)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build pagination options: %w", err)
 	}
 
-	req, err := s.client.newRequest(http.MethodGet, incidentURL, nil)
+	req, err := s.client.newRequest(http.MethodGet, playbookRunURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
@@ -98,14 +98,14 @@ func (s *PlaybookRunService) List(ctx context.Context, page, perPage int, opts P
 
 // Create an incident.
 func (s *PlaybookRunService) Create(ctx context.Context, opts PlaybookRunCreateOptions) (*PlaybookRun, error) {
-	incidentURL := "incidents"
-	req, err := s.client.newRequest(http.MethodPost, incidentURL, opts)
+	playbookRunURL := "incidents"
+	req, err := s.client.newRequest(http.MethodPost, playbookRunURL, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	incident := new(PlaybookRun)
-	resp, err := s.client.do(ctx, req, incident)
+	playbookRun := new(PlaybookRun)
+	resp, err := s.client.do(ctx, req, playbookRun)
 	if err != nil {
 		return nil, err
 	}
@@ -115,11 +115,11 @@ func (s *PlaybookRunService) Create(ctx context.Context, opts PlaybookRunCreateO
 		return nil, fmt.Errorf("expected status code %d", http.StatusCreated)
 	}
 
-	return incident, nil
+	return playbookRun, nil
 }
 
-func (s *PlaybookRunService) UpdateStatus(ctx context.Context, incidentID string, status Status, description, message string, reminderInSeconds int64) error {
-	updateURL := fmt.Sprintf("incidents/%s/status", incidentID)
+func (s *PlaybookRunService) UpdateStatus(ctx context.Context, playbookRunID string, status Status, description, message string, reminderInSeconds int64) error {
+	updateURL := fmt.Sprintf("incidents/%s/status", playbookRunID)
 	opts := StatusUpdateOptions{
 		Status:            status,
 		Description:       description,

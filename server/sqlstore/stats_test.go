@@ -178,10 +178,10 @@ func TestTotalReportedPlaybookRuns(t *testing.T) {
 			WithCreateAt(123).
 			ToPlaybookRun()
 
-		incidents := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
+		playbookRuns := []app.PlaybookRun{inc01, inc02, inc03, inc04, inc05, inc06, inc07, inc08, inc09}
 
-		for i := range incidents {
-			_, err := playbookRunStore.CreatePlaybookRun(&incidents[i])
+		for i := range playbookRuns {
+			_, err := playbookRunStore.CreatePlaybookRun(&playbookRuns[i])
 			require.NoError(t, err)
 		}
 

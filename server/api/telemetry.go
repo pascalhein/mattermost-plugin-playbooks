@@ -17,21 +17,21 @@ import (
 // TelemetryHandler is the API handler.
 type TelemetryHandler struct {
 	*ErrorHandler
-	playbookRunService app.PlaybookRunService
-	incidentTelemetry  app.PlaybookRunTelemetry
-	botTelemetry       bot.Telemetry
-	pluginAPI          *pluginapi.Client
+	playbookRunService   app.PlaybookRunService
+	playbookRunTelemetry app.PlaybookRunTelemetry
+	botTelemetry         bot.Telemetry
+	pluginAPI            *pluginapi.Client
 }
 
 // NewTelemetryHandler Creates a new Plugin API handler.
 func NewTelemetryHandler(router *mux.Router, playbookRunService app.PlaybookRunService,
-	api *pluginapi.Client, log bot.Logger, incidentTelemetry app.PlaybookRunTelemetry, botTelemetry bot.Telemetry, configService config.Service) *TelemetryHandler {
+	api *pluginapi.Client, log bot.Logger, playbookRunTelemetry app.PlaybookRunTelemetry, botTelemetry bot.Telemetry, configService config.Service) *TelemetryHandler {
 	handler := &TelemetryHandler{
-		ErrorHandler:       &ErrorHandler{log: log},
-		playbookRunService: playbookRunService,
-		incidentTelemetry:  incidentTelemetry,
-		botTelemetry:       botTelemetry,
-		pluginAPI:          api,
+		ErrorHandler:         &ErrorHandler{log: log},
+		playbookRunService:   playbookRunService,
+		playbookRunTelemetry: playbookRunTelemetry,
+		botTelemetry:         botTelemetry,
+		pluginAPI:            api,
 	}
 
 	telemetryRouter := router.PathPrefix("/telemetry").Subrouter()
@@ -39,9 +39,9 @@ func NewTelemetryHandler(router *mux.Router, playbookRunService app.PlaybookRunS
 	startTrialRouter := telemetryRouter.PathPrefix("/start-trial").Subrouter()
 	startTrialRouter.HandleFunc("", handler.startTrial).Methods(http.MethodPost)
 
-	incidentTelemetryRouterAuthorized := telemetryRouter.PathPrefix("/incident").Subrouter()
-	incidentTelemetryRouterAuthorized.Use(handler.checkViewPermissions)
-	incidentTelemetryRouterAuthorized.HandleFunc("/{id:[A-Za-z0-9]+}", handler.telemetryForPlaybookRun).Methods(http.MethodPost)
+	playbookRunTelemetryRouterAuthorized := telemetryRouter.PathPrefix("/incident").Subrouter()
+	playbookRunTelemetryRouterAuthorized.Use(handler.checkViewPermissions)
+	playbookRunTelemetryRouterAuthorized.HandleFunc("/{id:[A-Za-z0-9]+}", handler.telemetryForPlaybookRun).Methods(http.MethodPost)
 
 	return handler
 }
@@ -51,13 +51,13 @@ func (h *TelemetryHandler) checkViewPermissions(next http.Handler) http.Handler 
 		vars := mux.Vars(r)
 		userID := r.Header.Get("Mattermost-User-ID")
 
-		incident, err := h.playbookRunService.GetPlaybookRun(vars["id"])
+		playbookRun, err := h.playbookRunService.GetPlaybookRun(vars["id"])
 		if err != nil {
 			h.HandleError(w, err)
 			return
 		}
 
-		if err := app.ViewPlaybookRunFromChannelID(userID, incident.ChannelID, h.pluginAPI); err != nil {
+		if err := app.ViewPlaybookRunFromChannelID(userID, playbookRun.ChannelID, h.pluginAPI); err != nil {
 			if errors.Is(err, app.ErrNoPermissions) {
 				h.HandleErrorWithCode(w, http.StatusForbidden, "Not authorized", err)
 				return
@@ -92,13 +92,13 @@ func (h *TelemetryHandler) telemetryForPlaybookRun(w http.ResponseWriter, r *htt
 		return
 	}
 
-	incident, err := h.playbookRunService.GetPlaybookRun(id)
+	playbookRun, err := h.playbookRunService.GetPlaybookRun(id)
 	if err != nil {
 		h.HandleError(w, err)
 		return
 	}
 
-	h.incidentTelemetry.FrontendTelemetryForPlaybookRun(incident, userID, params.Action)
+	h.playbookRunTelemetry.FrontendTelemetryForPlaybookRun(playbookRun, userID, params.Action)
 
 	w.WriteHeader(http.StatusNoContent)
 }

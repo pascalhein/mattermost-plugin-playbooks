@@ -62,8 +62,8 @@ func requireErrorWithStatusCode(t *testing.T, err error, statusCode int) {
 func toAPIPlaybookRun(internalPlaybookRun app.PlaybookRun) icClient.PlaybookRun {
 	var apiPlaybookRun icClient.PlaybookRun
 
-	incidentBytes, _ := json.Marshal(internalPlaybookRun)
-	err := json.Unmarshal(incidentBytes, &apiPlaybookRun)
+	playbookRunBytes, _ := json.Marshal(internalPlaybookRun)
+	err := json.Unmarshal(playbookRunBytes, &apiPlaybookRun)
 	if err != nil {
 		panic(err)
 	}
@@ -74,8 +74,8 @@ func toAPIPlaybookRun(internalPlaybookRun app.PlaybookRun) icClient.PlaybookRun 
 func toInternalPlaybookRun(apiPlaybookRun icClient.PlaybookRun) app.PlaybookRun {
 	var internalPlaybookRun app.PlaybookRun
 
-	incidentBytes, _ := json.Marshal(apiPlaybookRun)
-	err := json.Unmarshal(incidentBytes, &internalPlaybookRun)
+	playbookRunBytes, _ := json.Marshal(apiPlaybookRun)
+	err := json.Unmarshal(playbookRunBytes, &internalPlaybookRun)
 	if err != nil {
 		panic(err)
 	}
@@ -86,8 +86,8 @@ func toInternalPlaybookRun(apiPlaybookRun icClient.PlaybookRun) app.PlaybookRun 
 func toInternalPlaybookRunMetadata(apiPlaybookRunMetadata icClient.PlaybookRunMetadata) app.Metadata {
 	var internalPlaybookRunMetadata app.Metadata
 
-	incidentBytes, _ := json.Marshal(apiPlaybookRunMetadata)
-	err := json.Unmarshal(incidentBytes, &internalPlaybookRunMetadata)
+	playbookRunBytes, _ := json.Marshal(apiPlaybookRunMetadata)
+	err := json.Unmarshal(playbookRunBytes, &internalPlaybookRunMetadata)
 	if err != nil {
 		panic(err)
 	}

@@ -137,7 +137,7 @@ var dummyTask = dummyPlaybookRun.Checklists[0].Items[0]
 func assertPayload(t *testing.T, actual rudderPayload, expectedEvent string, expectedAction string) {
 	t.Helper()
 
-	incidentFromProperties := func(properties map[string]interface{}) *app.PlaybookRun {
+	playbookRunFromProperties := func(properties map[string]interface{}) *app.PlaybookRun {
 		require.Contains(t, properties, "IncidentID")
 		require.Contains(t, properties, "HasDescription")
 		require.Contains(t, properties, "CommanderUserID")
@@ -192,7 +192,7 @@ func assertPayload(t *testing.T, actual rudderPayload, expectedEvent string, exp
 	}
 
 	if expectedEvent == eventPlaybookRun && (expectedAction == actionCreate || expectedAction == actionEnd) {
-		require.Equal(t, dummyPlaybookRun, incidentFromProperties(properties))
+		require.Equal(t, dummyPlaybookRun, playbookRunFromProperties(properties))
 	} else {
 		require.Contains(t, properties, "IncidentID")
 		require.Equal(t, properties["IncidentID"], dummyPlaybookRunID)
@@ -427,7 +427,7 @@ func TestPlaybookProperties(t *testing.T) {
 }
 
 func TestPlaybookRunProperties(t *testing.T) {
-	properties := incidentProperties(dummyPlaybookRun, dummyUserID)
+	properties := playbookRunProperties(dummyPlaybookRun, dummyUserID)
 
 	// ID field is reserved by Rudder to uniquely identify every event
 	require.NotContains(t, properties, "ID")

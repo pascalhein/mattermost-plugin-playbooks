@@ -253,34 +253,34 @@ type PlaybookRunService interface {
 	GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error)
 
 	// CreatePlaybookRun creates a new incident. userID is the user who initiated the CreatePlaybookRun.
-	CreatePlaybookRun(incident *PlaybookRun, playbook *Playbook, userID string, public bool) (*PlaybookRun, error)
+	CreatePlaybookRun(playbookRun *PlaybookRun, playbook *Playbook, userID string, public bool) (*PlaybookRun, error)
 
 	// OpenCreatePlaybookRunDialog opens an interactive dialog to start a new incident.
 	OpenCreatePlaybookRunDialog(teamID, ownerID, triggerID, postID, clientID string, playbooks []Playbook, isMobileApp bool) error
 
 	// OpenUpdateStatusDialog opens an interactive dialog so the user can update the incident's status.
-	OpenUpdateStatusDialog(incidentID, triggerID string) error
+	OpenUpdateStatusDialog(playbookRunID, triggerID string) error
 
 	// OpenAddToTimelineDialog opens an interactive dialog so the user can add a post to the incident timeline.
 	OpenAddToTimelineDialog(requesterInfo RequesterInfo, postID, teamID, triggerID string) error
 
 	// OpenAddChecklistItemDialog opens an interactive dialog so the user can add a post to the incident timeline.
-	OpenAddChecklistItemDialog(triggerID, incidentID string, checklist int) error
+	OpenAddChecklistItemDialog(triggerID, playbookRunID string, checklist int) error
 
 	// AddPostToTimeline adds an event based on a post to an incident's timeline.
-	AddPostToTimeline(incidentID, userID, postID, summary string) error
+	AddPostToTimeline(playbookRunID, userID, postID, summary string) error
 
 	// RemoveTimelineEvent removes the timeline event (sets the DeleteAt to the current time).
-	RemoveTimelineEvent(incidentID, userID, eventID string) error
+	RemoveTimelineEvent(playbookRunID, userID, eventID string) error
 
 	// UpdateStatus updates an incident's status.
-	UpdateStatus(incidentID, userID string, options StatusUpdateOptions) error
+	UpdateStatus(playbookRunID, userID string, options StatusUpdateOptions) error
 
 	// GetPlaybookRun gets an incident by ID. Returns error if it could not be found.
-	GetPlaybookRun(incidentID string) (*PlaybookRun, error)
+	GetPlaybookRun(playbookRunID string) (*PlaybookRun, error)
 
 	// GetPlaybookRunMetadata gets ancillary metadata about an incident.
-	GetPlaybookRunMetadata(incidentID string) (*Metadata, error)
+	GetPlaybookRunMetadata(playbookRunID string) (*Metadata, error)
 
 	// GetPlaybookRunIDForChannel get the incidentID associated with this channel. Returns ErrNotFound
 	// if there is no incident associated with this channel.
@@ -290,62 +290,62 @@ type PlaybookRunService interface {
 	GetOwners(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) ([]OwnerInfo, error)
 
 	// IsOwner returns true if the userID is the owner for incidentID.
-	IsOwner(incidentID string, userID string) bool
+	IsOwner(playbookRunID string, userID string) bool
 
 	// ChangeOwner processes a request from userID to change the owner for incidentID
 	// to ownerID. Changing to the same ownerID is a no-op.
-	ChangeOwner(incidentID string, userID string, ownerID string) error
+	ChangeOwner(playbookRunID string, userID string, ownerID string) error
 
 	// ModifyCheckedState modifies the state of the specified checklist item
 	// Idempotent, will not perform any actions if the checklist item is already in the specified state
-	ModifyCheckedState(incidentID, userID, newState string, checklistNumber int, itemNumber int) error
+	ModifyCheckedState(playbookRunID, userID, newState string, checklistNumber int, itemNumber int) error
 
 	// ToggleCheckedState checks or unchecks the specified checklist item
-	ToggleCheckedState(incidentID, userID string, checklistNumber, itemNumber int) error
+	ToggleCheckedState(playbookRunID, userID string, checklistNumber, itemNumber int) error
 
 	// SetAssignee sets the assignee for the specified checklist item
 	// Idempotent, will not perform any actions if the checklist item is already assigned to assigneeID
-	SetAssignee(incidentID, userID, assigneeID string, checklistNumber, itemNumber int) error
+	SetAssignee(playbookRunID, userID, assigneeID string, checklistNumber, itemNumber int) error
 
 	// RunChecklistItemSlashCommand executes the slash command associated with the specified checklist item.
-	RunChecklistItemSlashCommand(incidentID, userID string, checklistNumber, itemNumber int) (string, error)
+	RunChecklistItemSlashCommand(playbookRunID, userID string, checklistNumber, itemNumber int) (string, error)
 
 	// AddChecklistItem adds an item to the specified checklist
-	AddChecklistItem(incidentID, userID string, checklistNumber int, checklistItem ChecklistItem) error
+	AddChecklistItem(playbookRunID, userID string, checklistNumber int, checklistItem ChecklistItem) error
 
 	// RemoveChecklistItem removes an item from the specified checklist
-	RemoveChecklistItem(incidentID, userID string, checklistNumber int, itemNumber int) error
+	RemoveChecklistItem(playbookRunID, userID string, checklistNumber int, itemNumber int) error
 
 	// EditChecklistItem changes the title, command and description of a specified checklist item.
-	EditChecklistItem(incidentID, userID string, checklistNumber int, itemNumber int, newTitle, newCommand, newDescription string) error
+	EditChecklistItem(playbookRunID, userID string, checklistNumber int, itemNumber int, newTitle, newCommand, newDescription string) error
 
 	// MoveChecklistItem moves a checklist item from one position to anouther
-	MoveChecklistItem(incidentID, userID string, checklistNumber int, itemNumber int, newLocation int) error
+	MoveChecklistItem(playbookRunID, userID string, checklistNumber int, itemNumber int, newLocation int) error
 
 	// GetChecklistItemAutocomplete returns the list of checklist items for incidentID to be used in autocomplete
-	GetChecklistItemAutocomplete(incidentID string) ([]model.AutocompleteListItem, error)
+	GetChecklistItemAutocomplete(playbookRunID string) ([]model.AutocompleteListItem, error)
 
 	// GetChecklistAutocomplete returns the list of checklists for incidentID to be used in autocomplete
-	GetChecklistAutocomplete(incidentID string) ([]model.AutocompleteListItem, error)
+	GetChecklistAutocomplete(playbookRunID string) ([]model.AutocompleteListItem, error)
 
 	// NukeDB removes all incident related data.
 	NukeDB() error
 
 	// SetReminder sets a reminder. After timeInMinutes in the future, the owner will be
 	// reminded to update the incident's status.
-	SetReminder(incidentID string, timeInMinutes time.Duration) error
+	SetReminder(playbookRunID string, timeInMinutes time.Duration) error
 
 	// RemoveReminder removes the pending reminder for incidentID (if any).
-	RemoveReminder(incidentID string)
+	RemoveReminder(playbookRunID string)
 
 	// HandleReminder is the handler for all reminder events.
 	HandleReminder(key string)
 
 	// RemoveReminderPost will remove the reminder in the incident channel (if any).
-	RemoveReminderPost(incidentID string) error
+	RemoveReminderPost(playbookRunID string) error
 
 	// ChangeCreationDate changes the creation date of the specified incident.
-	ChangeCreationDate(incidentID string, creationTimestamp time.Time) error
+	ChangeCreationDate(playbookRunID string, creationTimestamp time.Time) error
 
 	// UserHasJoinedChannel is called when userID has joined channelID. If actorID is not blank, userID
 	// was invited by actorID.
@@ -356,17 +356,17 @@ type PlaybookRunService interface {
 	UserHasLeftChannel(userID, channelID, actorID string)
 
 	// UpdateRetrospective updates the retrospective for the given incident.
-	UpdateRetrospective(incidentID, userID, newRetrospective string) error
+	UpdateRetrospective(playbookRunID, userID, newRetrospective string) error
 
 	// PublishRetrospective publishes the retrospective.
-	PublishRetrospective(incidentID, text, userID string) error
+	PublishRetrospective(playbookRunID, text, userID string) error
 
 	// CancelRetrospective cancels the retrospective.
-	CancelRetrospective(incidentID, userID string) error
+	CancelRetrospective(playbookRunID, userID string) error
 
 	// CheckAndSendMessageOnJoin checks if userID has viewed channelID and sends
 	// incident.MessageOnJoin if it exists. Returns true if the message was sent.
-	CheckAndSendMessageOnJoin(userID, incidentID, channelID string) bool
+	CheckAndSendMessageOnJoin(userID, playbookRunID, channelID string) bool
 }
 
 // PlaybookRunStore defines the methods the PlaybookRunServiceImpl needs from the interfaceStore.
@@ -375,16 +375,16 @@ type PlaybookRunStore interface {
 	GetPlaybookRuns(requesterInfo RequesterInfo, options PlaybookRunFilterOptions) (*GetPlaybookRunsResults, error)
 
 	// CreatePlaybookRun creates a new incident. If incident has an ID, that ID will be used.
-	CreatePlaybookRun(incident *PlaybookRun) (*PlaybookRun, error)
+	CreatePlaybookRun(playbookRun *PlaybookRun) (*PlaybookRun, error)
 
 	// UpdatePlaybookRun updates an incident.
-	UpdatePlaybookRun(incident *PlaybookRun) error
+	UpdatePlaybookRun(playbookRun *PlaybookRun) error
 
 	// UpdateStatus updates the status of an incident.
 	UpdateStatus(statusPost *SQLStatusPost) error
 
 	// GetTimelineEvent returns the timeline event for incidentID by the timeline event ID.
-	GetTimelineEvent(incidentID, eventID string) (*TimelineEvent, error)
+	GetTimelineEvent(playbookRunID, eventID string) (*TimelineEvent, error)
 
 	// CreateTimelineEvent inserts the timeline event into the DB and returns the new event ID
 	CreateTimelineEvent(event *TimelineEvent) (*TimelineEvent, error)
@@ -393,7 +393,7 @@ type PlaybookRunStore interface {
 	UpdateTimelineEvent(event *TimelineEvent) error
 
 	// GetPlaybookRun gets an incident by ID.
-	GetPlaybookRun(incidentID string) (*PlaybookRun, error)
+	GetPlaybookRun(playbookRunID string) (*PlaybookRun, error)
 
 	// GetPlaybookRunByChannel gets an incident associated with the given channel id.
 	GetPlaybookRunIDForChannel(channelID string) (string, error)
@@ -410,7 +410,7 @@ type PlaybookRunStore interface {
 	NukeDB() error
 
 	// ChangeCreationDate changes the creation date of the specified incident.
-	ChangeCreationDate(incidentID string, creationTimestamp time.Time) error
+	ChangeCreationDate(playbookRunID string, creationTimestamp time.Time) error
 
 	// HasViewedChannel returns true if userID has viewed channelID
 	HasViewedChannel(userID, channelID string) bool
@@ -424,56 +424,56 @@ type PlaybookRunStore interface {
 // Unless otherwise noted, userID is the user initiating the event.
 type PlaybookRunTelemetry interface {
 	// CreatePlaybookRun tracks the creation of a new incident.
-	CreatePlaybookRun(incident *PlaybookRun, userID string, public bool)
+	CreatePlaybookRun(playbookRun *PlaybookRun, userID string, public bool)
 
 	// EndPlaybookRun tracks the end of an incident.
-	EndPlaybookRun(incident *PlaybookRun, userID string)
+	EndPlaybookRun(playbookRun *PlaybookRun, userID string)
 
 	// RestartPlaybookRun tracks the restart of an incident.
-	RestartPlaybookRun(incident *PlaybookRun, userID string)
+	RestartPlaybookRun(playbookRun *PlaybookRun, userID string)
 
 	// ChangeOwner tracks changes in owner.
-	ChangeOwner(incident *PlaybookRun, userID string)
+	ChangeOwner(playbookRun *PlaybookRun, userID string)
 
 	// UpdateStatus tracks when an incident's status has been updated
-	UpdateStatus(incident *PlaybookRun, userID string)
+	UpdateStatus(playbookRun *PlaybookRun, userID string)
 
 	// FrontendTelemetryForPlaybookRun tracks an event originating from the frontend
-	FrontendTelemetryForPlaybookRun(incident *PlaybookRun, userID, action string)
+	FrontendTelemetryForPlaybookRun(playbookRun *PlaybookRun, userID, action string)
 
 	// AddPostToTimeline tracks userID creating a timeline event from a post.
-	AddPostToTimeline(incident *PlaybookRun, userID string)
+	AddPostToTimeline(playbookRun *PlaybookRun, userID string)
 
 	// RemoveTimelineEvent tracks userID removing a timeline event.
-	RemoveTimelineEvent(incident *PlaybookRun, userID string)
+	RemoveTimelineEvent(playbookRun *PlaybookRun, userID string)
 
 	// ModifyCheckedState tracks the checking and unchecking of items.
-	ModifyCheckedState(incidentID, userID string, task ChecklistItem, wasOwner bool)
+	ModifyCheckedState(playbookRunID, userID string, task ChecklistItem, wasOwner bool)
 
 	// SetAssignee tracks the changing of an assignee on an item.
-	SetAssignee(incidentID, userID string, task ChecklistItem)
+	SetAssignee(playbookRunID, userID string, task ChecklistItem)
 
 	// AddTask tracks the creation of a new checklist item.
-	AddTask(incidentID, userID string, task ChecklistItem)
+	AddTask(playbookRunID, userID string, task ChecklistItem)
 
 	// RemoveTask tracks the removal of a checklist item.
-	RemoveTask(incidentID, userID string, task ChecklistItem)
+	RemoveTask(playbookRunID, userID string, task ChecklistItem)
 
 	// RenameTask tracks the update of a checklist item.
-	RenameTask(incidentID, userID string, task ChecklistItem)
+	RenameTask(playbookRunID, userID string, task ChecklistItem)
 
 	// MoveTask tracks the unchecking of checked item.
-	MoveTask(incidentID, userID string, task ChecklistItem)
+	MoveTask(playbookRunID, userID string, task ChecklistItem)
 
 	// RunTaskSlashCommand tracks the execution of a slash command attached to
 	// a checklist item.
-	RunTaskSlashCommand(incidentID, userID string, task ChecklistItem)
+	RunTaskSlashCommand(playbookRunID, userID string, task ChecklistItem)
 
 	// UpdateRetrospective event
-	UpdateRetrospective(incident *PlaybookRun, userID string)
+	UpdateRetrospective(playbookRun *PlaybookRun, userID string)
 
 	// PublishRetrospective event
-	PublishRetrospective(incident *PlaybookRun, userID string)
+	PublishRetrospective(playbookRun *PlaybookRun, userID string)
 }
 
 type JobOnceScheduler interface {
