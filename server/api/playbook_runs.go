@@ -45,18 +45,18 @@ func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRu
 		config:             configService,
 	}
 
-	incidentsRouter := router.PathPrefix("/incidents").Subrouter()
-	incidentsRouter.HandleFunc("", handler.getPlaybookRuns).Methods(http.MethodGet)
-	incidentsRouter.HandleFunc("", handler.createPlaybookRunFromPost).Methods(http.MethodPost)
+	playbookRunsRouter := router.PathPrefix("/incidents").Subrouter()
+	playbookRunsRouter.HandleFunc("", handler.getPlaybookRuns).Methods(http.MethodGet)
+	playbookRunsRouter.HandleFunc("", handler.createPlaybookRunFromPost).Methods(http.MethodPost)
 
-	incidentsRouter.HandleFunc("/dialog", handler.createPlaybookRunFromDialog).Methods(http.MethodPost)
-	incidentsRouter.HandleFunc("/add-to-timeline-dialog", handler.addToTimelineDialog).Methods(http.MethodPost)
-	incidentsRouter.HandleFunc("/owners", handler.getOwners).Methods(http.MethodGet)
-	incidentsRouter.HandleFunc("/channels", handler.getChannels).Methods(http.MethodGet)
-	incidentsRouter.HandleFunc("/checklist-autocomplete", handler.getChecklistAutocomplete).Methods(http.MethodGet)
-	incidentsRouter.HandleFunc("/checklist-autocomplete-item", handler.getChecklistAutocompleteItem).Methods(http.MethodGet)
+	playbookRunsRouter.HandleFunc("/dialog", handler.createPlaybookRunFromDialog).Methods(http.MethodPost)
+	playbookRunsRouter.HandleFunc("/add-to-timeline-dialog", handler.addToTimelineDialog).Methods(http.MethodPost)
+	playbookRunsRouter.HandleFunc("/owners", handler.getOwners).Methods(http.MethodGet)
+	playbookRunsRouter.HandleFunc("/channels", handler.getChannels).Methods(http.MethodGet)
+	playbookRunsRouter.HandleFunc("/checklist-autocomplete", handler.getChecklistAutocomplete).Methods(http.MethodGet)
+	playbookRunsRouter.HandleFunc("/checklist-autocomplete-item", handler.getChecklistAutocompleteItem).Methods(http.MethodGet)
 
-	incidentRouter := incidentsRouter.PathPrefix("/{id:[A-Za-z0-9]+}").Subrouter()
+	incidentRouter := playbookRunsRouter.PathPrefix("/{id:[A-Za-z0-9]+}").Subrouter()
 	incidentRouter.HandleFunc("", handler.getPlaybookRun).Methods(http.MethodGet)
 	incidentRouter.HandleFunc("/metadata", handler.getPlaybookRunMetadata).Methods(http.MethodGet)
 
@@ -72,7 +72,7 @@ func NewPlaybookRunHandler(router *mux.Router, playbookRunService app.PlaybookRu
 	incidentRouterAuthorized.HandleFunc("/timeline/{eventID:[A-Za-z0-9]+}", handler.removeTimelineEvent).Methods(http.MethodDelete)
 	incidentRouterAuthorized.HandleFunc("/check-and-send-message-on-join/{channel_id:[A-Za-z0-9]+}", handler.checkAndSendMessageOnJoin).Methods(http.MethodGet)
 
-	channelRouter := incidentsRouter.PathPrefix("/channel").Subrouter()
+	channelRouter := playbookRunsRouter.PathPrefix("/channel").Subrouter()
 	channelRouter.HandleFunc("/{channel_id:[A-Za-z0-9]+}", handler.getPlaybookRunByChannel).Methods(http.MethodGet)
 
 	checklistsRouter := incidentRouterAuthorized.PathPrefix("/checklists").Subrouter()
