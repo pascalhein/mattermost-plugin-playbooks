@@ -6,14 +6,14 @@
 // - [*] indicates an assertion (e.g. * Check the title)
 // ***************************************************************
 
-describe('incident rhs > latest update', () => {
+describe('playbook run rhs > latest update', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     const defaultReminderMessage = '# Default reminder message';
     let teamId;
     let userId;
     let playbookId;
-    let incidentChannelId;
-    let incidentName;
+    let playbookRunChannelId;
+    let playbookRunName;
 
     before(() => {
         // # Login as user-1
@@ -47,21 +47,21 @@ describe('incident rhs > latest update', () => {
         // # Login as user-1
         cy.apiLogin('user-1');
 
-        // # Create a new incident
+        // # Create a new playbook run
         const now = Date.now();
-        const name = 'Incident (' + now + ')';
-        const channelName = 'incident-' + now;
-        cy.apiStartIncident({
+        const name = 'Playbook Run (' + now + ')';
+        const channelName = 'playbook-run-' + now;
+        cy.apiRunPlaybook({
             teamId,
             playbookId,
-            incidentName: name,
+            playbookRunName: name,
             ownerUserId: userId,
-        }).then((incident) => {
-            incidentChannelId = incident.channel_id;
-            incidentName = name;
+        }).then((playbookRun) => {
+            playbookRunChannelId = playbookRun.channel_id;
+            playbookRunName = name;
         });
 
-        // # Navigate directly to the application and the incident channel
+        // # Navigate directly to the application and the playbook run channel
         cy.visit('/ad-1/channels/' + channelName);
     });
 
@@ -91,18 +91,18 @@ describe('incident rhs > latest update', () => {
                         userId,
                         broadcastChannelId: channel.id,
                     }).then((playbook) => {
-                        // # Create a new incident
-                        const name = 'Incident (' + now + ')';
-                        const incidentChannelName = 'incident-' + now;
-                        cy.apiStartIncident({
+                        // # Create a new playbook run
+                        const name = 'Playbook Run (' + now + ')';
+                        const playbookRunChannelName = 'playbook-run-' + now;
+                        cy.apiRunPlaybook({
                             teamId,
                             playbookId: playbook.id,
-                            incidentName: name,
+                            playbookRunName: name,
                             ownerUserId: userId,
                         });
 
-                        // # Navigate to the incident channel
-                        cy.visit('/ad-1/channels/' + incidentChannelName);
+                        // # Navigate to the playbook run channel
+                        cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                         // # Run the /incident status slash command.
                         cy.executeSlashCommand('/incident update');
@@ -128,19 +128,19 @@ describe('incident rhs > latest update', () => {
                         userId,
                         broadcastChannelId: channel.id,
                     }).then((playbook) => {
-                        // # Create a new incident
+                        // # Create a new playbook run
                         const now = Date.now();
-                        const name = 'Incident (' + now + ')';
-                        const incidentChannelName = 'incident-' + now;
-                        cy.apiStartIncident({
+                        const name = 'Playbook Run (' + now + ')';
+                        const playbookRunChannelName = 'playbook-run-' + now;
+                        cy.apiRunPlaybook({
                             teamId,
                             playbookId: playbook.id,
-                            incidentName: name,
+                            playbookRunName: name,
                             ownerUserId: userId,
                         });
 
-                        // # Navigate to the incident channel
-                        cy.visit('/ad-1/channels/' + incidentChannelName);
+                        // # Navigate to the playbook run channel
+                        cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                         // # Run the /incident status slash command.
                         cy.executeSlashCommand('/incident update');
@@ -167,19 +167,19 @@ describe('incident rhs > latest update', () => {
                         userId,
                         broadcastChannelId: resp.body.id,
                     }).then((playbook) => {
-                        // # Create a new incident
+                        // # Create a new playbook run
                         const now = Date.now();
-                        const name = 'Incident (' + now + ')';
-                        const incidentChannelName = 'incident-' + now;
-                        cy.apiStartIncident({
+                        const name = 'Playbook Run (' + now + ')';
+                        const playbookRunChannelName = 'playbook-run-' + now;
+                        cy.apiRunPlaybook({
                             teamId,
                             playbookId: playbook.id,
-                            incidentName: name,
+                            playbookRunName: name,
                             ownerUserId: userId,
                         });
 
-                        // # Navigate to the incident channel
-                        cy.visit('/ad-1/channels/' + incidentChannelName);
+                        // # Navigate to the playbook run channel
+                        cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                         // # Run the /incident status slash command.
                         cy.executeSlashCommand('/incident update');
@@ -201,19 +201,19 @@ describe('incident rhs > latest update', () => {
                 title: playbookName,
                 userId,
             }).then((playbook) => {
-                // # Create a new incident
+                // # Create a new playbook run
                 const now = Date.now();
-                const name = 'Incident (' + now + ')';
-                const incidentChannelName = 'incident-' + now;
-                cy.apiStartIncident({
+                const name = 'Playbook Run (' + now + ')';
+                const playbookRunChannelName = 'playbook-run-' + now;
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId: playbook.id,
-                    incidentName: name,
+                    playbookRunName: name,
                     ownerUserId: userId,
                 });
 
-                // # Navigate to the incident channel
-                cy.visit('/ad-1/channels/' + incidentChannelName);
+                // # Navigate to the playbook run channel
+                cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                 // # Run the /incident status slash command.
                 cy.executeSlashCommand('/incident update');
@@ -515,7 +515,7 @@ describe('incident rhs > latest update', () => {
 
                 // # Write 50 posts to make sure the latest update is not loaded after a refresh
                 for (let i = 0; i < 50; i++) {
-                    cy.apiCreatePost(incidentChannelId, 'Dummy message #' + i, '', {});
+                    cy.apiCreatePost(playbookRunChannelId, 'Dummy message #' + i, '', {});
                 }
 
                 // # Reload the page so the redux store is cleared
@@ -556,7 +556,7 @@ describe('incident rhs > latest update', () => {
                     // # Delete the second status update via API
                     cy.apiDeletePost(postId).then(() => {
                         // # Get back to the original channel
-                        cy.uiSwitchChannel(incidentName);
+                        cy.uiSwitchChannel(playbookRunName);
                     });
 
                     // # Verify that the RHS shows the first status update
@@ -580,7 +580,7 @@ describe('incident rhs > latest update', () => {
                     // # Edit the status update via API
                     cy.apiEditPost(postId, newMessage).then(() => {
                         // # Get back to the original channel
-                        cy.uiSwitchChannel(incidentName);
+                        cy.uiSwitchChannel(playbookRunName);
                     });
 
                     // * Verify that the RHS shows the new text
@@ -594,9 +594,9 @@ describe('incident rhs > latest update', () => {
 
     describe('shows no updates', () => {
         describe('in a channel we are  currently viewing', () => {
-            it('in a brand new incident', () => {
+            it('in a brand new playbook run', () => {
                 // * Verify that the RHS shows that there are no updates.
-                cy.get('#incidentRHSUpdates')
+                cy.get('#playbookRunRHSUpdates')
                     .contains('No recent updates. Click here to update status.');
             });
 
@@ -615,7 +615,7 @@ describe('incident rhs > latest update', () => {
                     cy.deletePost(postId);
 
                     // * Verify that the RHS shows that there are no updates.
-                    cy.get('#incidentRHSUpdates')
+                    cy.get('#playbookRunRHSUpdates')
                         .contains('No recent updates. Click here to update status.');
                 });
             });
@@ -652,7 +652,7 @@ describe('incident rhs > latest update', () => {
                         cy.deletePost(firstId);
 
                         // * Verify that the RHS shows that there are no updates.
-                        cy.get('#incidentRHSUpdates')
+                        cy.get('#playbookRunRHSUpdates')
                             .contains('No recent updates. Click here to update status.');
                     });
                 });
@@ -676,12 +676,12 @@ describe('incident rhs > latest update', () => {
 
                     // # Delete the status update through the API
                     cy.apiDeletePost(postId).then(() => {
-                        // # Get back to the incident channel
-                        cy.uiSwitchChannel(incidentName);
+                        // # Get back to the playbook run channel
+                        cy.uiSwitchChannel(playbookRunName);
                     });
 
                     // * Verify that the RHS shows that there are no updates.
-                    cy.get('#incidentRHSUpdates')
+                    cy.get('#playbookRunRHSUpdates')
                         .contains('No recent updates. Click here to update status.');
                 });
             });
@@ -713,13 +713,13 @@ describe('incident rhs > latest update', () => {
                         cy.apiDeletePost(secondId).then(() => {
                             // # Delete the first status update.
                             cy.apiDeletePost(firstId).then(() => {
-                                // # Get back to the incident channel
-                                cy.uiSwitchChannel(incidentName);
+                                // # Get back to the playbook run channel
+                                cy.uiSwitchChannel(playbookRunName);
                             });
                         });
 
                         // * Verify that the RHS shows that there are no updates.
-                        cy.get('#incidentRHSUpdates')
+                        cy.get('#playbookRunRHSUpdates')
                             .contains('No recent updates. Click here to update status.');
                     });
                 });

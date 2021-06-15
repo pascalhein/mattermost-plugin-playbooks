@@ -238,7 +238,7 @@ describe('backstage playbook details', () => {
             });
         });
 
-        describe('when an incident starts', () => {
+        describe('when an playbook run starts', () => {
             describe('invite members setting', () => {
                 it('is disabled in a new playbook', () => {
                     // # Visit the selected playbook
@@ -496,7 +496,7 @@ describe('backstage playbook details', () => {
                             cy.apiCreatePlaybook({
                                 teamId,
                                 title: 'Playbook (' + Date.now() + ')',
-                                createPublicIncident: true,
+                                createPublicPlaybookRun: true,
                                 memberIDs: [userId],
                                 invitedUserIds: [userToRemove.id],
                                 inviteUsersEnabled: true,
@@ -725,7 +725,7 @@ describe('backstage playbook details', () => {
                             cy.apiCreatePlaybook({
                                 teamId,
                                 title: 'Playbook (' + Date.now() + ')',
-                                createPublicIncident: true,
+                                createPublicPlaybookRun: true,
                                 memberIDs: [userId],
                                 defaultOwnerId: userToRemove.id,
                                 defaultOwnerEnabled: true,
@@ -952,7 +952,7 @@ describe('backstage playbook details', () => {
                             cy.apiCreatePlaybook({
                                 teamId,
                                 title: 'Playbook (' + Date.now() + ')',
-                                createPublicIncident: true,
+                                createPublicPlaybookRun: true,
                                 memberIDs: [userId],
                                 announcementChannelId: channel.id,
                                 announcementChannelEnabled: true,

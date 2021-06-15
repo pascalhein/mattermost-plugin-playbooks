@@ -6,7 +6,7 @@
 // - [*] indicates an assertion (e.g. * Check the title)
 // ***************************************************************
 
-describe('incident broadcast', () => {
+describe('playbook run broadcast', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     let teamId;
     let userId;
@@ -77,21 +77,21 @@ describe('incident broadcast', () => {
     });
 
     it('to public channels', () => {
-        // # Create a new incident
+        // # Create a new playbook run
         const now = Date.now();
-        const incidentName = `Incident (${now})`;
-        const incidentChannelName = `incident-${now}`;
-        cy.apiStartIncident({
+        const playbookRunName = `Playbook Run (${now})`;
+        const playbookRunChannelName = `playbook-run-${now}`;
+        cy.apiRunPlaybook({
             teamId,
             playbookId: publicBroadcastPlaybookId,
-            incidentName,
+            playbookRunName,
             ownerUserId: userId,
         });
 
-        // # Navigate directly to the application and the incident channel
-        cy.visit(`/ad-1/channels/${incidentChannelName}`);
+        // # Navigate directly to the application and the playbook run channel
+        cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
-        // # Update the incident's status
+        // # Update the playbook run's status
         const updateMessage = 'Update - ' + now;
         cy.updateStatus(updateMessage, 0, 'Active');
 
@@ -105,28 +105,28 @@ describe('incident broadcast', () => {
 
         // * Verify that the last post contains the expected header and the update message verbatim
         cy.getLastPostId().then((lastPostId) => {
-            cy.get(`#postMessageText_${lastPostId}`).contains(`Incident Update: ${incidentName}`);
+            cy.get(`#postMessageText_${lastPostId}`).contains(`Incident Update: ${playbookRunName}`);
             cy.get(`#postMessageText_${lastPostId}`).contains('By @user-1 | Duration: < 1m | Status: Active');
             cy.get(`#postMessageText_${lastPostId}`).contains(updateMessage);
         });
     });
 
     it('to private channels', () => {
-        // # Create a new incident
+        // # Create a new playbook run
         const now = Date.now();
-        const incidentName = 'Incident (' + now + ')';
-        const incidentChannelName = 'incident-' + now;
-        cy.apiStartIncident({
+        const playbookRunName = 'Playbook Run (' + now + ')';
+        const playbookRunChannelName = 'playbook-run-' + now;
+        cy.apiRunPlaybook({
             teamId,
             playbookId: privateBroadcastPlaybookId,
-            incidentName,
+            playbookRunName,
             ownerUserId: userId,
         });
 
-        // # Navigate directly to the application and the incident channel
-        cy.visit('/ad-1/channels/' + incidentChannelName);
+        // # Navigate directly to the application and the playbook run channel
+        cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-        // # Update the incident's status
+        // # Update the playbook run's status
         const updateMessage = 'Update - ' + now;
         cy.updateStatus(updateMessage, 0, 'Active');
 
@@ -140,7 +140,7 @@ describe('incident broadcast', () => {
 
         // * Verify that the last post contains the expected header and the update message verbatim
         cy.getLastPostId().then((lastPostId) => {
-            cy.get(`#postMessageText_${lastPostId}`).contains(`Incident Update: ${incidentName}`);
+            cy.get(`#postMessageText_${lastPostId}`).contains(`Incident Update: ${playbookRunName}`);
             cy.get(`#postMessageText_${lastPostId}`).contains('By @user-1 | Duration: < 1m | Status: Active');
             cy.get(`#postMessageText_${lastPostId}`).contains(updateMessage);
         });

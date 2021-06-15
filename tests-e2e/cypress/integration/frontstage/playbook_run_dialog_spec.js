@@ -6,7 +6,7 @@
 // - [*] indicates an assertion (e.g. * Check the title)
 // ***************************************************************
 
-describe('incident creation dialog', () => {
+describe('playbook run creation dialog', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     let teamId;
 
@@ -35,16 +35,16 @@ describe('incident creation dialog', () => {
         // # Navigate to the application
         cy.visit('/ad-1/');
 
-        // # Trigger the incident creation dialog
-        cy.openIncidentDialogFromSlashCommand();
+        // # Trigger the playbook run creation dialog
+        cy.openPlaybookRunDialogFromSlashCommand();
 
-        // * Verify the incident creation dialog has opened
+        // * Verify the playbook run creation dialog has opened
         cy.get('#interactiveDialogModal').should('exist').within(() => {
             cy.findByText('Incident Details').should('exist');
         });
     });
 
-    it('cannot create an incident without filling required fields', () => {
+    it('cannot create a playbook run without filling required fields', () => {
         cy.get('#interactiveDialogModal').within(() => {
             cy.findByText('Incident Details').should('exist');
 
@@ -58,7 +58,7 @@ describe('incident creation dialog', () => {
         // * Verify required fields
         cy.findByTestId('autoCompleteSelector').contains('Playbook');
         cy.findByTestId('autoCompleteSelector').contains('This field is required.');
-        cy.findByTestId('incidentName').contains('This field is required.');
+        cy.findByTestId('playbookRunName').contains('This field is required.');
     });
 
     it('shows create playbook link', () => {
@@ -79,16 +79,16 @@ describe('incident creation dialog', () => {
             // * Verify playbook dropdown prompt
             cy.findByText('Playbook').should('exist');
 
-            // * Verify incident name prompt
+            // * Verify playbook run name prompt
             cy.findByText('Incident Name').should('exist');
         });
     });
 
     it('is canceled when cancel is clicked', () => {
         // # Populate the interactive dialog
-        const incidentName = 'New Incident' + Date.now();
+        const playbookRunName = 'New Playbook Run' + Date.now();
         cy.get('#interactiveDialogModal').within(() => {
-            cy.findByTestId('incidentNameinput').type(incidentName, {force: true});
+            cy.findByTestId('playbookRunNameinput').type(playbookRunName, {force: true});
         });
 
         // # Cancel the interactive dialog
@@ -97,11 +97,11 @@ describe('incident creation dialog', () => {
         // * Verify the modal is no longer displayed
         cy.get('#interactiveDialogModal').should('not.exist');
 
-        // * Verify the incident did not get created
-        cy.apiGetAllIncidents(teamId).then((response) => {
-            const allIncidents = response.body;
-            const incident = allIncidents.items.find((inc) => inc.name === incidentName);
-            expect(incident).to.be.undefined;
+        // * Verify the playbook run did not get created
+        cy.apiGetAllPlaybookRuns(teamId).then((response) => {
+            const allPlaybookRuns = response.body;
+            const playbookRun = allPlaybookRuns.items.find((inc) => inc.name === playbookRunName);
+            expect(playbookRun).to.be.undefined;
         });
     });
 });

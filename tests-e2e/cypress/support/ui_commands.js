@@ -136,10 +136,10 @@ Cypress.Commands.add('verifyEphemeralMessage', (message, isCompactMode, needsToS
 });
 
 /**
- * Update the status of the current incident through the slash command.
+ * Update the status of the current playbook run through the slash command.
  */
 Cypress.Commands.add('updateStatus', (message, reminder, status, description) => {
-    // # Run the /incident status slash command.
+    // # Run the slash command to update status.
     cy.executeSlashCommand('/incident update');
 
     // # Get the interactive dialog modal.

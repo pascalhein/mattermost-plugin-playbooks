@@ -6,7 +6,7 @@
 // - [*] indicates an assertion (e.g. * Check the title)
 // ***************************************************************
 
-describe('incident automation', () => {
+describe('playbook run automation', () => {
     let teamId;
     let userId;
 
@@ -35,7 +35,7 @@ describe('incident automation', () => {
         cy.visit('/ad-1/channels/town-square');
     });
 
-    describe(('when an incident starts'), () => {
+    describe(('when a playbook run starts'), () => {
         describe('invite members setting', () => {
             it('with no invited users and setting disabled', () => {
                 const playbookName = 'Playbook (' + Date.now() + ')';
@@ -45,7 +45,7 @@ describe('incident automation', () => {
                 cy.apiCreatePlaybook({
                     teamId,
                     title: playbookName,
-                    createPublicIncident: true,
+                    createPublicPlaybookRun: true,
                     memberIDs: [userId],
                     invitedUserIds: [],
                     inviteUsersEnabled: false,
@@ -53,19 +53,19 @@ describe('incident automation', () => {
                     playbookId = playbook.id;
                 });
 
-                // # Create a new incident with that playbook
+                // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const incidentName = `Incident (${now})`;
-                const incidentChannelName = `incident-${now}`;
-                cy.apiStartIncident({
+                const playbookRunName = `Playbook Run (${now})`;
+                const playbookRunChannelName = `playbook-run-${now}`;
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId,
-                    incidentName,
+                    playbookRunName,
                     ownerUserId: userId,
                 });
 
-                // # Navigate to the incident channel
-                cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                // # Navigate to the playbook run channel
+                cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                 // * Verify that no users were invited
                 cy.getFirstPostId().then((id) => {
@@ -78,33 +78,33 @@ describe('incident automation', () => {
             it('with invited users and setting enabled', () => {
                 const playbookName = 'Playbook (' + Date.now() + ')';
 
-                // # Create a playbook with a couple of invited users and the setting enabled, and an incident with it
+                // # Create a playbook with a couple of invited users and the setting enabled, and a playbook run with it
                 cy.apiGetUsers(['aaron.medina', 'alice.johnston']).then((res) => {
                     const userIds = res.body.map((user) => user.id);
 
                     return cy.apiCreatePlaybook({
                         teamId,
                         title: playbookName,
-                        createPublicIncident: true,
+                        createPublicPlaybookRun: true,
                         memberIDs: [userId],
                         invitedUserIds: userIds,
                         inviteUsersEnabled: true,
                     });
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the users were invited
                     cy.getFirstPostId().then((id) => {
@@ -122,33 +122,33 @@ describe('incident automation', () => {
             it('with invited users and setting disabled', () => {
                 const playbookName = 'Playbook (' + Date.now() + ')';
 
-                // # Create a playbook with a couple of invited users and the setting enabled, and an incident with it
+                // # Create a playbook with a couple of invited users and the setting enabled, and a playbook run with it
                 cy.apiGetUsers(['aaron.medina', 'alice.johnston']).then((res) => {
                     const userIds = res.body.map((user) => user.id);
 
                     return cy.apiCreatePlaybook({
                         teamId,
                         title: playbookName,
-                        createPublicIncident: true,
+                        createPublicPlaybookRun: true,
                         memberIDs: [userId],
                         invitedUserIds: userIds,
                         inviteUsersEnabled: false,
                     });
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that no users were invited
                     cy.getFirstPostId().then((id) => {
@@ -175,7 +175,7 @@ describe('incident automation', () => {
                         cy.apiCreatePlaybook({
                             teamId,
                             title: playbookName,
-                            createPublicIncident: true,
+                            createPublicPlaybookRun: true,
                             memberIDs: [userId],
                             invitedUserIds: [userToRemove.id],
                             inviteUsersEnabled: true,
@@ -189,20 +189,20 @@ describe('incident automation', () => {
                 }).then(() => {
                     cy.apiLogin('user-1');
 
-                    // # Create a new incident with the playbook.
+                    // # Create a new playbook run with the playbook.
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that there is an error message from the incident bot
                     cy.getNthPostId(1).then((id) => {
@@ -223,7 +223,7 @@ describe('incident automation', () => {
                 cy.apiCreatePlaybook({
                     teamId,
                     title: playbookName,
-                    createPublicIncident: true,
+                    createPublicPlaybookRun: true,
                     memberIDs: [userId],
                     defaultOwnerId: '',
                     defaultOwnerEnabled: false,
@@ -231,19 +231,19 @@ describe('incident automation', () => {
                     playbookId = playbook.id;
                 });
 
-                // # Create a new incident with that playbook
+                // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const incidentName = `Incident (${now})`;
-                const incidentChannelName = `incident-${now}`;
-                cy.apiStartIncident({
+                const playbookRunName = `Playbook Run (${now})`;
+                const playbookRunChannelName = `playbook-run-${now}`;
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId,
-                    incidentName,
+                    playbookRunName,
                     ownerUserId: userId,
                 });
 
-                // # Navigate to the incident channel
-                cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                // # Navigate to the playbook run channel
+                cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                 // * Verify that the RHS shows the owner being the creator
                 cy.get('#rhsContainer').within(() => {
@@ -262,7 +262,7 @@ describe('incident automation', () => {
                 cy.apiCreatePlaybook({
                     teamId,
                     title: playbookName,
-                    createPublicIncident: true,
+                    createPublicPlaybookRun: true,
                     memberIDs: [userId],
                     defaultOwnerId: '',
                     defaultOwnerEnabled: true,
@@ -270,19 +270,19 @@ describe('incident automation', () => {
                     playbookId = playbook.id;
                 });
 
-                // # Create a new incident with that playbook
+                // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const incidentName = `Incident (${now})`;
-                const incidentChannelName = `incident-${now}`;
-                cy.apiStartIncident({
+                const playbookRunName = `Playbook Run (${now})`;
+                const playbookRunChannelName = `playbook-run-${now}`;
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId,
-                    incidentName,
+                    playbookRunName,
                     ownerUserId: userId,
                 });
 
-                // # Navigate to the incident channel
-                cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                // # Navigate to the playbook run channel
+                cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                 // * Verify that the RHS shows the owner being the creator
                 cy.get('#rhsContainer').within(() => {
@@ -302,7 +302,7 @@ describe('incident automation', () => {
                     return cy.apiCreatePlaybook({
                         teamId,
                         title: playbookName,
-                        createPublicIncident: true,
+                        createPublicPlaybookRun: true,
                         memberIDs: [userId],
                         invitedUserIds: userIds,
                         inviteUsersEnabled: true,
@@ -310,20 +310,20 @@ describe('incident automation', () => {
                         defaultOwnerEnabled: true,
                     });
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the RHS shows the owner being the invited user
                     cy.get('#rhsContainer').within(() => {
@@ -344,7 +344,7 @@ describe('incident automation', () => {
                     return cy.apiCreatePlaybook({
                         teamId,
                         title: playbookName,
-                        createPublicIncident: true,
+                        createPublicPlaybookRun: true,
                         memberIDs: [userId],
                         invitedUserIds: [],
                         inviteUsersEnabled: false,
@@ -352,20 +352,20 @@ describe('incident automation', () => {
                         defaultOwnerEnabled: true,
                     });
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the RHS shows the owner being the invited user
                     cy.get('#rhsContainer').within(() => {
@@ -385,7 +385,7 @@ describe('incident automation', () => {
                 cy.apiCreatePlaybook({
                     teamId,
                     title: playbookName,
-                    createPublicIncident: true,
+                    createPublicPlaybookRun: true,
                     memberIDs: [userId],
                     defaultOwnerId: userId,
                     defaultOwnerEnabled: true,
@@ -393,19 +393,19 @@ describe('incident automation', () => {
                     playbookId = playbook.id;
                 });
 
-                // # Create a new incident with that playbook
+                // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const incidentName = `Incident (${now})`;
-                const incidentChannelName = `incident-${now}`;
-                cy.apiStartIncident({
+                const playbookRunName = `Playbook Run (${now})`;
+                const playbookRunChannelName = `playbook-run-${now}`;
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId,
-                    incidentName,
+                    playbookRunName,
                     ownerUserId: userId,
                 });
 
-                // # Navigate to the incident channel
-                cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                // # Navigate to the playbook run channel
+                cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                 // * Verify that the RHS shows the owner being the creator
                 cy.get('#rhsContainer').within(() => {
@@ -420,31 +420,31 @@ describe('incident automation', () => {
             it('with channel configured and setting enabled', () => {
                 const playbookName = 'Playbook (' + Date.now() + ')';
 
-                // # Create a playbook with a couple of invited users and the setting enabled, and an incident with it
+                // # Create a playbook with a couple of invited users and the setting enabled, and a playbook run with it
                 cy.apiGetChannelByName('ad-1', 'town-square').then(({channel}) => {
                     return cy.apiCreatePlaybook({
                         teamId,
                         title: playbookName,
-                        createPublicIncident: true,
+                        createPublicPlaybookRun: true,
                         memberIDs: [userId],
                         announcementChannelId: channel.id,
                         announcementChannelEnabled: true,
                     });
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel.
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel.
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the channel is created and that the first post exists.
                     cy.getFirstPostId().then((id) => {
@@ -457,7 +457,7 @@ describe('incident automation', () => {
                     cy.visit('/ad-1/channels/town-square');
 
                     cy.getLastPostId().then((lastPostId) => {
-                        cy.get(`#postMessageText_${lastPostId}`).contains(`New Incident: ~${incidentName}`);
+                        cy.get(`#postMessageText_${lastPostId}`).contains(`New Playbook Run: ~${playbookRunName}`);
                         cy.get(`#postMessageText_${lastPostId}`).contains('Owner: @user-1');
                     });
                 });
@@ -466,31 +466,31 @@ describe('incident automation', () => {
             it('with channel configured and setting disabled', () => {
                 const playbookName = 'Playbook (' + Date.now() + ')';
 
-                // # Create a playbook with a couple of invited users and the setting enabled, and an incident with it
+                // # Create a playbook with a couple of invited users and the setting enabled, and a playbook run with it
                 cy.apiGetChannelByName('ad-1', 'town-square').then(({channel}) => {
                     return cy.apiCreatePlaybook({
                         teamId,
                         title: playbookName,
-                        createPublicIncident: true,
+                        createPublicPlaybookRun: true,
                         memberIDs: [userId],
                         announcementChannelId: channel.id,
                         announcementChannelEnabled: false,
                     });
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the channel is created and that the first post exists.
                     cy.getFirstPostId().then((id) => {
@@ -503,7 +503,7 @@ describe('incident automation', () => {
                     cy.visit('/ad-1/channels/town-square');
 
                     cy.getLastPostId().then((lastPostId) => {
-                        cy.get(`#postMessageText_${lastPostId}`).should('not.contain', `New Incident: ~${incidentName}`);
+                        cy.get(`#postMessageText_${lastPostId}`).should('not.contain', `New Playbook Run: ~${playbookRunName}`);
                     });
                 });
             });
@@ -520,7 +520,7 @@ describe('incident automation', () => {
                         cy.apiCreatePlaybook({
                             teamId,
                             title: 'Playbook (' + Date.now() + ')',
-                            createPublicIncident: true,
+                            createPublicPlaybookRun: true,
                             memberIDs: [userId],
                             announcementChannelId: channel.id,
                             announcementChannelEnabled: true,
@@ -534,20 +534,20 @@ describe('incident automation', () => {
                 }).then(() => {
                     cy.apiLogin('user-1');
 
-                    // # Create a new incident with the playbook.
+                    // # Create a new playbook run with the playbook.
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that there is an error message from the incident bot
                     cy.getLastPostId().then((id) => {
@@ -566,26 +566,26 @@ describe('incident automation', () => {
                 cy.apiCreatePlaybook({
                     teamId,
                     title: playbookName,
-                    createPublicIncident: true,
+                    createPublicPlaybookRun: true,
                     memberIDs: [userId],
                     webhookOnCreationURL: 'https://httpbin.org/post',
                     webhookOnCreationEnabled: true,
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
-                        description: 'Incident description.',
+                        description: 'Playbook run description.',
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the bot has not posted a message informing of the failure to send the webhook
                     cy.getLastPostId().then((lastPostId) => {
@@ -601,26 +601,26 @@ describe('incident automation', () => {
                 cy.apiCreatePlaybook({
                     teamId,
                     title: playbookName,
-                    createPublicIncident: true,
+                    createPublicPlaybookRun: true,
                     memberIDs: [userId],
                     webhookOnCreationURL: 'http://example.com/not-an-actual-endpoint',
                     webhookOnCreationEnabled: true,
                 }).then((playbook) => {
-                    // # Create a new incident with that playbook
+                    // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const incidentName = `Incident (${now})`;
-                    const incidentChannelName = `incident-${now}`;
+                    const playbookRunName = `Playbook Run (${now})`;
+                    const playbookRunChannelName = `playbook-run-${now}`;
 
-                    cy.apiStartIncident({
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId: playbook.id,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
-                        description: 'Incident description.',
+                        description: 'Playbook run description.',
                     });
 
-                    // # Navigate to the incident channel
-                    cy.visit(`/ad-1/channels/${incidentChannelName}`);
+                    // # Navigate to the playbook run channel
+                    cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the bot has posted a message informing of the failure to send the webhook
                     cy.findByText('Incident creation announcement through the outgoing webhook failed. Contact your System Admin for more information.');

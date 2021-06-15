@@ -45,7 +45,7 @@ var allNonSpaceNonWordRegex = regexp.MustCompile(`[^\w\s]`)
 const DialogFieldPlaybookIDKey = "playbookID"
 
 // DialogFieldNameKey is the key for the playbook run name field used in OpenCreatePlaybookRunDialog.
-const DialogFieldNameKey = "name"
+const DialogFieldNameKey = "playbookRunName"
 
 // DialogFieldDescriptionKey is the key for the description textarea field used in UpdatePlaybookRunDialog
 const DialogFieldDescriptionKey = "description"
@@ -65,7 +65,7 @@ const DialogFieldPlaybookRunKey = "playbook_run"
 // DialogFieldSummary is the key for the summary in AddToTimelineDialog
 const DialogFieldSummary = "summary"
 
-// DialogFieldItemName is the key for the name in AddChecklistItemDialog
+// DialogFieldItemName is the key for the playbook run name in AddChecklistItemDialog
 const DialogFieldItemNameKey = "name"
 
 // DialogFieldDescriptionKey is the key for the description in AddChecklistItemDialog

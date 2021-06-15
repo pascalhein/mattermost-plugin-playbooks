@@ -7,19 +7,19 @@
 // ***************************************************************
 
 /*
- * This test spec includes tests for the incident creation using all 3 methods:
+ * This test spec includes tests for the playbook run creation using all 3 methods:
  * - Slash command
  * - RHS
  * - Post action menu
  *
- * This spec also includes tests for starting an incident in all types of channels:
+ * This spec also includes tests for starting a playbook run in all types of channels:
  * - Public
  * - Private
  * - Group message
  * - Direct message
  * - Direct message with self
  */
-describe('incidents can be started', () => {
+describe('playbook runs can be started', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     let teamId;
 
@@ -59,20 +59,20 @@ describe('incidents can be started', () => {
             // # Visit a public channel: off-topic
             cy.visit('/ad-1/channels/off-topic');
 
-            // * Verify that incident can be started with slash command
-            const incidentName = 'Public ' + Date.now();
-            cy.startIncidentWithSlashCommand(playbookName, incidentName);
-            cy.verifyIncidentActive(teamId, incidentName);
+            // * Verify that playbook run can be started with slash command
+            const playbookRunName = 'Public ' + Date.now();
+            cy.startPlaybookRunWithSlashCommand(playbookName, playbookRunName);
+            cy.verifyPlaybookRunActive(teamId, playbookRunName);
         });
 
         it('while viewing a private channel', () => {
             // # Visit a private channel: autem-2
             cy.visit('/ad-1/channels/autem-2');
 
-            // * Verify that incident can be started with slash command
-            const incidentName = 'Private ' + Date.now();
-            cy.startIncidentWithSlashCommand(playbookName, incidentName);
-            cy.verifyIncidentActive(teamId, incidentName);
+            // * Verify that playbook run can be started with slash command
+            const playbookRunName = 'Private ' + Date.now();
+            cy.startPlaybookRunWithSlashCommand(playbookName, playbookRunName);
+            cy.verifyPlaybookRunActive(teamId, playbookRunName);
         });
     });
 
@@ -81,20 +81,20 @@ describe('incidents can be started', () => {
             // # Visit a public channel: off-topic
             cy.visit('/ad-1/channels/off-topic');
 
-            // * Verify that incident can be started from incident RHS
-            const incidentName = 'Public - ' + Date.now();
-            cy.startIncidentFromRHS(playbookName, incidentName);
-            cy.verifyIncidentActive(teamId, incidentName);
+            // * Verify that playbook run can be started from playbook run RHS
+            const playbookRunName = 'Public - ' + Date.now();
+            cy.startPlaybookRunFromRHS(playbookName, playbookRunName);
+            cy.verifyPlaybookRunActive(teamId, playbookRunName);
         });
 
         it('while viewing a private channel', () => {
             // # Visit a private channel: autem-2
             cy.visit('/ad-1/channels/autem-2');
 
-            // * Verify that incident can be started from incident RHS
-            const incidentName = 'Private - ' + Date.now();
-            cy.startIncidentFromRHS(playbookName, incidentName);
-            cy.verifyIncidentActive(teamId, incidentName);
+            // * Verify that playbook run can be started from playbook run RHS
+            const playbookRunName = 'Private - ' + Date.now();
+            cy.startPlaybookRunFromRHS(playbookName, playbookRunName);
+            cy.verifyPlaybookRunActive(teamId, playbookRunName);
         });
     });
 
@@ -103,20 +103,20 @@ describe('incidents can be started', () => {
             // # Visit a public channel: off-topic
             cy.visit('/ad-1/channels/off-topic');
 
-            // * Verify that incident can be started from post menu
-            const incidentName = 'Public - ' + Date.now();
-            cy.startIncidentFromPostMenu(playbookName, incidentName);
-            cy.verifyIncidentActive(teamId, incidentName);
+            // * Verify that playbook run can be started from post menu
+            const playbookRunName = 'Public - ' + Date.now();
+            cy.startPlaybookRunFromPostMenu(playbookName, playbookRunName);
+            cy.verifyPlaybookRunActive(teamId, playbookRunName);
         });
 
         it('while viewing a private channel', () => {
             // # Visit a private channel: autem-2
             cy.visit('/ad-1/channels/autem-2');
 
-            // * Verify that incident can be started from post menu
-            const incidentName = 'Private - ' + Date.now();
-            cy.startIncidentFromPostMenu(playbookName, incidentName);
-            cy.verifyIncidentActive(teamId, incidentName);
+            // * Verify that playbook run can be started from post menu
+            const playbookRunName = 'Private - ' + Date.now();
+            cy.startPlaybookRunFromPostMenu(playbookName, playbookRunName);
+            cy.verifyPlaybookRunActive(teamId, playbookRunName);
         });
     });
 
@@ -124,10 +124,10 @@ describe('incidents can be started', () => {
         // # Visit a public channel: off-topic
         cy.visit('/ad-1/channels/off-topic');
 
-        // # Start an incident with a slash command
-        const incidentName = 'Public ' + Date.now();
-        cy.startIncidentWithSlashCommand(playbookName, incidentName);
-        cy.verifyIncidentActive(teamId, incidentName);
+        // # Start a playbook run with a slash command
+        const playbookRunName = 'Public ' + Date.now();
+        cy.startPlaybookRunWithSlashCommand(playbookName, playbookRunName);
+        cy.verifyPlaybookRunActive(teamId, playbookRunName);
 
         // # Open the channel header
         cy.get('#channelHeaderTitle').click();

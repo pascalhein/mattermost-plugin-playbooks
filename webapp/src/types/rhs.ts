@@ -13,7 +13,7 @@ export enum RHSTabState {
 }
 
 export enum TimelineEventType {
-    PlaybookRunCreated = 'playbook_run_created',
+    PlaybookRunCreated = 'incident_created',
     StatusUpdated = 'status_updated',
     OwnerChanged = 'owner_changed',
     AssigneeChanged = 'assignee_changed',

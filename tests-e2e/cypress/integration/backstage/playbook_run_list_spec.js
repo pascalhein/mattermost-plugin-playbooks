@@ -10,14 +10,13 @@ const BACKSTAGE_LIST_PER_PAGE = 15;
 
 import {TINY} from '../../fixtures/timeouts';
 
-describe('backstage incident list', () => {
+describe('backstage playbook run list', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     let teamId;
     let newTeam;
-    let newTeamWithNoActiveIncidents;
+    let newTeamWithNoActivePlaybookRuns;
     let userId;
     let playbookId;
-    let playbookOnTeamWithNoActiveIncidentsId;
 
     before(() => {
         // # Login as the sysadmin
@@ -34,8 +33,8 @@ describe('backstage incident list', () => {
         });
 
         // # Create a new team for the welcome page test when filtering
-        cy.apiCreateTeam('team', 'Team With No Active Incidents').then(({team}) => {
-            newTeamWithNoActiveIncidents = team;
+        cy.apiCreateTeam('team', 'Team With No Active Playbook Runs').then(({team}) => {
+            newTeamWithNoActivePlaybookRuns = team;
 
             // # Add user-1 to team
             cy.apiGetUserByEmail('user-1@sample.mattermost.com').then(({user}) => {
@@ -48,8 +47,6 @@ describe('backstage incident list', () => {
                     teamId: team.id,
                     title: playbookName,
                     userId: user.id,
-                }).then((playbook) => {
-                    playbookOnTeamWithNoActiveIncidentsId = playbook.id;
                 });
             });
         });
@@ -82,129 +79,129 @@ describe('backstage incident list', () => {
         cy.apiLogin('user-1');
     });
 
-    it('shows welcome page when no incidents', () => {
+    it('shows welcome page when no playbook runs', () => {
         // # Open backstage
         cy.visit(`/${newTeam.name}/com.mattermost.plugin-incident-management`);
 
-        // # Switch to incidents backstage
-        cy.findByTestId('incidentsLHSButton').click();
+        // # Switch to playbook runs backstage
+        cy.findByTestId('playbookRunsLHSButton').click();
 
         // * Assert welcome page title text.
         cy.get('#root').findByText('What are Incidents?').should('be.visible');
     });
 
-    it('shows welcome page when no incidents, even when filtering', () => {
-        // # Navigate to a filtered incident list on a team with no incidents.
-        cy.visit(`/${newTeam.name}/com.mattermost.plugin-incident-management/incidents?status=Active`);
+    it('shows welcome page when no playbook runs, even when filtering', () => {
+        // # Navigate to a filtered playbook run list on a team with no playbook runs.
+        cy.visit(`/${newTeam.name}/com.mattermost.plugin-incident-management/runs?status=Active`);
 
         // * Assert welcome page title text.
         cy.get('#root').findByText('What are Incidents?').should('be.visible');
     });
 
-    it('does not show welcome page when filtering yields no incidents', () => {
-        // # Start the incident
+    it('does not show welcome page when filtering yields no playbook runs', () => {
+        // # Run the playbook
         const now = Date.now();
-        const incidentName = 'Incident (' + now + ')';
-        cy.apiStartIncident({
-            teamId: newTeamWithNoActiveIncidents.id,
+        const playbookRunName = 'Playbook Run (' + now + ')';
+        cy.apiRunPlaybook({
+            teamId: newTeamWithNoActivePlaybookRuns.id,
             playbookId,
-            incidentName,
+            playbookRunName,
             ownerUserId: userId,
         });
 
-        // # Navigate to a filtered incident list on a team with no active incidents.
-        cy.visit(`/${newTeamWithNoActiveIncidents.name}/com.mattermost.plugin-incident-management/incidents?status=Active`);
+        // # Navigate to a filtered playbook run list on a team with no active playbook runs.
+        cy.visit(`/${newTeamWithNoActivePlaybookRuns.name}/com.mattermost.plugin-incident-management/runs?status=Active`);
 
         // * Assert welcome page is not visible.
         cy.get('#root').findByText('What are Incidents?').should('not.be.visible');
 
-        // * Assert incident listing is visible.
-        cy.findByTestId('titleIncident').should('exist').contains('Incidents');
-        cy.findByTestId('titleIncident').contains(newTeamWithNoActiveIncidents.display_name);
+        // * Assert playbook run listing is visible.
+        cy.findByTestId('titlePlaybookRun').should('exist').contains('Incidents');
+        cy.findByTestId('titlePlaybookRun').contains(newTeamWithNoActivePlaybookRuns.display_name);
     });
 
-    it('New incident works when the backstage is the first page loaded', () => {
-        // # Navigate to the incidents backstage of a team with no incidents.
-        cy.visit(`/${newTeam.name}/com.mattermost.plugin-incident-management/incidents`);
+    it('New playbook run works when the backstage is the first page loaded', () => {
+        // # Navigate to the playbook runs backstage of a team with no playbook runs.
+        cy.visit(`/${newTeam.name}/com.mattermost.plugin-incident-management/runs`);
 
         // # Make sure that the Redux store is empty
         cy.reload();
 
-        // # Click on New Incident button
-        cy.findByText('New Incident').click();
+        // # Click on button to run a playbook.
+        cy.findByText('Run playbook').click();
 
         // * Verify that we are in the centre channel view, out of the backstage
         cy.url().should('include', `/${newTeam.name}/channels`);
 
-        // * Verify that the interactive dialog modal to create an incident is visible
+        // * Verify that the interactive dialog modal to create a playbook run is visible
         cy.get('#interactiveDialogModal').should('exist');
     });
 
     it('has "Incidents" and team name in heading', () => {
-        // # Start the incident
+        // # Run the playbook
         const now = Date.now();
-        const incidentName = 'Incident (' + now + ')';
-        cy.apiStartIncident({
+        const playbookRunName = 'Playbook Run (' + now + ')';
+        cy.apiRunPlaybook({
             teamId,
             playbookId,
-            incidentName,
+            playbookRunName,
             ownerUserId: userId,
         });
 
         // # Open backstage
         cy.visit('/ad-1/com.mattermost.plugin-incident-management');
 
-        // # Switch to incidents backstage
-        cy.findByTestId('incidentsLHSButton').click();
+        // # Switch to playbook runs backstage
+        cy.findByTestId('playbookRunsLHSButton').click();
 
         // * Assert contents of heading.
-        cy.findByTestId('titleIncident').should('exist').contains('Incidents');
-        cy.findByTestId('titleIncident').contains('eligendi');
+        cy.findByTestId('titlePlaybookRun').should('exist').contains('Incidents');
+        cy.findByTestId('titlePlaybookRun').contains('eligendi');
     });
 
-    it('loads incident details page when clicking on an incident', () => {
-        // # Start the incident
+    it('loads playbook run details page when clicking on a playbook run', () => {
+        // # Run the playbook
         const now = Date.now();
-        const incidentName = 'Incident (' + now + ')';
-        cy.apiStartIncident({
+        const playbookRunName = 'Playbook Run (' + now + ')';
+        cy.apiRunPlaybook({
             teamId,
             playbookId,
-            incidentName,
+            playbookRunName,
             ownerUserId: userId,
         });
 
         // # Open backstage
         cy.visit('/ad-1/com.mattermost.plugin-incident-management');
 
-        // # Switch to incidents backstage
-        cy.findByTestId('incidentsLHSButton').click();
+        // # Switch to playbook runs backstage
+        cy.findByTestId('playbookRunsLHSButton').click();
 
-        // # Find the incident `incident_backstage_1` and click to open details view
-        cy.get('#incidentList').within(() => {
-            cy.findByText(incidentName).click();
+        // # Find the playbook run and click to open details view
+        cy.get('#playbookRunList').within(() => {
+            cy.findByText(playbookRunName).click();
         });
 
-        // * Verify that the header contains the incident name
-        cy.findByTestId('incident-title').contains(incidentName);
+        // * Verify that the header contains the playbook run name
+        cy.findByTestId('playbook-run-title').contains(playbookRunName);
     });
 
     describe('resets pagination when filtering', () => {
-        const incidentTimestamps = [];
+        const playbookRunTimestamps = [];
 
         before(() => {
             // # Login as user-1
             cy.apiLogin('user-1');
 
-            // # Start sufficient incidents to ensure pagination is possible.
+            // # Start sufficient playbook runs to ensure pagination is possible.
             for (let i = 0; i < BACKSTAGE_LIST_PER_PAGE + 1; i++) {
                 const now = Date.now();
-                cy.apiStartIncident({
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId,
-                    incidentName: 'Incident (' + now + ')',
+                    playbookRunName: 'Playbook Run (' + now + ')',
                     ownerUserId: userId,
                 });
-                incidentTimestamps.push(now);
+                playbookRunTimestamps.push(now);
             }
         });
 
@@ -215,8 +212,8 @@ describe('backstage incident list', () => {
             // # Open backstage
             cy.visit('/ad-1/com.mattermost.plugin-incident-management');
 
-            // # Switch to incidents backstage
-            cy.findByTestId('incidentsLHSButton').click();
+            // # Switch to playbook runs backstage
+            cy.findByTestId('playbookRunsLHSButton').click();
 
             // # Switch to page 2
             cy.findByText('Next').click();
@@ -225,11 +222,11 @@ describe('backstage incident list', () => {
             cy.findByText('Previous').should('exist');
         });
 
-        it('by incident name', () => {
-            // # Search for an incident by name
-            cy.get('#incidentList input').type(incidentTimestamps[0]);
+        it('by playbook run name', () => {
+            // # Search for a playbook run by name
+            cy.get('#playbookRunList input').type(playbookRunTimestamps[0]);
 
-            // # Wait for the incident list to update.
+            // # Wait for the playbook run list to update.
             cy.wait(TINY);
 
             // * Verify "Previous" no longer shown
@@ -241,10 +238,10 @@ describe('backstage incident list', () => {
             cy.findByTestId('owner-filter').click();
 
             // # Find the list and chose the first owner in the list
-            cy.get('.incident-user-select__container')
-                .find('.IncidentProfile').first().parent().click({force: true});
+            cy.get('.playbook-run-user-select__container')
+                .find('.PlaybookRunProfile').first().parent().click({force: true});
 
-            // # Wait for the incident list to update.
+            // # Wait for the playbook run list to update.
             cy.wait(TINY);
 
             // * Verify "Previous" no longer shown

@@ -8,7 +8,7 @@
 
 import {TINY} from '../../fixtures/timeouts';
 
-describe('incident rhs checklist', () => {
+describe('playbook run rhs checklist', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     let teamId;
     let userId;
@@ -66,22 +66,22 @@ describe('incident rhs checklist', () => {
     });
 
     describe('rhs stuff', () => {
-        let incidentName;
-        let incidentChannelName;
+        let playbookRunName;
+        let playbookRunChannelName;
 
         before(() => {
-            // # Start the incident
+            // # Run the playbook
             const now = Date.now();
-            incidentName = 'Incident (' + now + ')';
-            incidentChannelName = 'incident-' + now;
-            cy.apiStartIncident({
+            playbookRunName = 'Playbook Run (' + now + ')';
+            playbookRunChannelName = 'playbook-run-' + now;
+            cy.apiRunPlaybook({
                 teamId,
                 playbookId,
-                incidentName,
+                playbookRunName,
                 ownerUserId: userId,
             });
 
-            cy.apiGetChannelByName('ad-1', incidentChannelName).then(({channel}) => {
+            cy.apiGetChannelByName('ad-1', playbookRunChannelName).then(({channel}) => {
                 // # Add @aaron.peterson
                 cy.apiGetUserByEmail('user-7@sample.mattermost.com').then(({user}) => {
                     cy.apiAddUserToChannel(channel.id, user.id);
@@ -115,12 +115,12 @@ describe('incident rhs checklist', () => {
         });
 
         beforeEach(() => {
-            // # Navigate directly to the application and the incident channel
-            cy.visit('/ad-1/channels/' + incidentChannelName);
+            // # Navigate directly to the application and the playbook run channel
+            cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-            // * Verify the incident RHS is open.
+            // * Verify the playbook run RHS is open.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText(incidentName).should('exist');
+                cy.findByText(playbookRunName).should('exist');
 
                 // # Select the tasks tab
                 cy.findByTestId('tasks').click();
@@ -160,8 +160,8 @@ describe('incident rhs checklist', () => {
         });
 
         it('still shows slash commands as having been run after reload', () => {
-            // # Navigate directly to the application and the incident channel
-            cy.visit('/ad-1/channels/' + incidentChannelName);
+            // # Navigate directly to the application and the playbook run channel
+            cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
             cy.get('#rhsContainer').should('exist').within(() => {
                 // # Select the tasks tab
@@ -213,7 +213,7 @@ describe('incident rhs checklist', () => {
                 // Click the profile icon
                 cy.get('.icon-account-plus-outline').click().wait(TINY);
 
-                cy.isInViewport('.incident-user-select');
+                cy.isInViewport('.playbook-run-user-select');
             });
         });
     });

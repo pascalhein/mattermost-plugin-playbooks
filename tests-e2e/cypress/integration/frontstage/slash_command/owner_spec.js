@@ -11,9 +11,9 @@ describe('slash command > owner', () => {
     let teamId;
     let userId;
     let playbookId;
-    let incidentId;
-    let incidentName;
-    let incidentChannelName;
+    let playbookRunId;
+    let playbookRunName;
+    let playbookRunChannelName;
 
     before(() => {
         // # Login as user-1
@@ -22,7 +22,7 @@ describe('slash command > owner', () => {
         // # Switch to clean display mode
         cy.apiSaveMessageDisplayPreference('clean');
 
-        // # Create a playbook and incident.
+        // # Create and run a playbook.
         cy.apiGetTeamByName('ad-1').then((team) => {
             teamId = team.id;
             cy.apiGetCurrentUser().then((user) => {
@@ -52,15 +52,15 @@ describe('slash command > owner', () => {
                     playbookId = playbook.id;
 
                     const now = Date.now();
-                    incidentName = 'Incident (' + now + ')';
-                    incidentChannelName = 'incident-' + now;
-                    cy.apiStartIncident({
+                    playbookRunName = 'Playbook Run (' + now + ')';
+                    playbookRunChannelName = 'playbook-run-' + now;
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
-                    }).then((incident) => {
-                        incidentId = incident.id;
+                    }).then((playbookRun) => {
+                        playbookRunId = playbookRun.id;
                     });
                 });
             });
@@ -75,12 +75,12 @@ describe('slash command > owner', () => {
         cy.apiLogin('user-1');
 
         // # Reset the owner to test-1 as necessary.
-        cy.apiChangeIncidentOwner(incidentId, userId);
+        cy.apiChangePlaybookRunOwner(playbookRunId, userId);
     });
 
     describe('/incident owner', () => {
-        it('should show an error when not in an incident channel', () => {
-            // # Navigate to a non-incident channel
+        it('should show an error when not in an playbook run channel', () => {
+            // # Navigate to a non-playbook run channel
             cy.visit('/ad-1/channels/town-square');
 
             // # Run a slash command to show the current owner
@@ -91,8 +91,8 @@ describe('slash command > owner', () => {
         });
 
         it('should show the current owner', () => {
-            // # Navigate directly to the application and the incident channel
-            cy.visit('/ad-1/channels/' + incidentChannelName);
+            // # Navigate directly to the application and the playbook run channel
+            cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
             // # Run a slash command to show the current owner
             cy.executeSlashCommand('/incident owner');
@@ -103,8 +103,8 @@ describe('slash command > owner', () => {
     });
 
     describe('/incident owner @username', () => {
-        it('should show an error when not in an incident channel', () => {
-            // # Navigate to a non-incident channel
+        it('should show an error when not in an playbook run channel', () => {
+            // # Navigate to a non-playbook run channel
             cy.visit('/ad-1/channels/town-square');
 
             // # Run a slash command to change the current owner
@@ -116,8 +116,8 @@ describe('slash command > owner', () => {
 
         describe('should show an error when the user is not found', () => {
             beforeEach(() => {
-                // # Navigate directly to the application and the incident channel
-                cy.visit('/ad-1/channels/' + incidentChannelName);
+                // # Navigate directly to the application and the playbook run channel
+                cy.visit('/ad-1/channels/' + playbookRunChannelName);
             });
 
             it('when the username has no @-prefix', () => {
@@ -139,8 +139,8 @@ describe('slash command > owner', () => {
 
         describe('should show an error when the user is not in the channel', () => {
             beforeEach(() => {
-                // # Navigate directly to the application and the incident channel
-                cy.visit('/ad-1/channels/' + incidentChannelName);
+                // # Navigate directly to the application and the playbook run channel
+                cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                 // # Ensure the sysadmin is not part of the channel.
                 cy.executeSlashCommand('/kick sysadmin');
@@ -165,8 +165,8 @@ describe('slash command > owner', () => {
 
         describe('should show a message when the user is already the owner', () => {
             beforeEach(() => {
-                // # Navigate directly to the application and the incident channel
-                cy.visit('/ad-1/channels/' + incidentChannelName);
+                // # Navigate directly to the application and the playbook run channel
+                cy.visit('/ad-1/channels/' + playbookRunChannelName);
             });
 
             it('when the username has no @-prefix', () => {
@@ -188,8 +188,8 @@ describe('slash command > owner', () => {
 
         describe('should change the current owner', () => {
             beforeEach(() => {
-                // # Navigate directly to the application and the incident channel
-                cy.visit('/ad-1/channels/' + incidentChannelName);
+                // # Navigate directly to the application and the playbook run channel
+                cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                 // # Ensure the sysadmin is part of the channel.
                 cy.executeSlashCommand('/invite sysadmin');
@@ -213,8 +213,8 @@ describe('slash command > owner', () => {
         });
 
         it('should show an error when specifying more than one username', () => {
-            // # Navigate directly to the application and the incident channel
-            cy.visit('/ad-1/channels/' + incidentChannelName);
+            // # Navigate directly to the application and the playbook run channel
+            cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
             // # Run a slash command with too many parameters
             cy.executeSlashCommand('/incident owner user-1 sysadmin');

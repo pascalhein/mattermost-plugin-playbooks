@@ -11,9 +11,9 @@ describe('slash command > info', () => {
     let teamId;
     let userId;
     let playbookId;
-    let incidentId;
-    let incidentName;
-    let incidentChannelName;
+    let playbookRunId;
+    let playbookRunName;
+    let playbookRunChannelName;
 
     before(() => {
         // # Login as user-1
@@ -22,7 +22,7 @@ describe('slash command > info', () => {
         // # Switch to clean display mode
         cy.apiSaveMessageDisplayPreference('clean');
 
-        // # Create a playbook and incident.
+        // # Create and run a playbook.
         cy.apiGetTeamByName('ad-1').then((team) => {
             teamId = team.id;
             cy.apiGetCurrentUser().then((user) => {
@@ -52,15 +52,15 @@ describe('slash command > info', () => {
                     playbookId = playbook.id;
 
                     const now = Date.now();
-                    incidentName = 'Incident (' + now + ')';
-                    incidentChannelName = 'incident-' + now;
-                    cy.apiStartIncident({
+                    playbookRunName = 'Playbook Run (' + now + ')';
+                    playbookRunChannelName = 'playbook-run-' + now;
+                    cy.apiRunPlaybook({
                         teamId,
                         playbookId,
-                        incidentName,
+                        playbookRunName,
                         ownerUserId: userId,
-                    }).then((incident) => {
-                        incidentId = incident.id;
+                    }).then((playbookRun) => {
+                        playbookRunId = playbookRun.id;
                     });
                 });
             });
@@ -75,15 +75,15 @@ describe('slash command > info', () => {
         cy.apiLogin('user-1');
 
         // # Reset the owner to test-1 as necessary.
-        cy.apiChangeIncidentOwner(incidentId, userId);
+        cy.apiChangePlaybookRunOwner(playbookRunId, userId);
     });
 
     describe('/incident info', () => {
-        it('should show an error when not in an incident channel', () => {
-            // # Navigate to a non-incident channel.
+        it('should show an error when not in an playbook run channel', () => {
+            // # Navigate to a non-playbook run channel.
             cy.visit('/ad-1/channels/town-square');
 
-            // # Run a slash command to show the incident's info.
+            // # Run a slash command to show the playbook run's info.
             cy.executeSlashCommand('/incident info');
 
             // * Verify the expected error message.
@@ -91,16 +91,16 @@ describe('slash command > info', () => {
         });
 
         it('should open the RHS when it is not open', () => {
-            // # Navigate directly to the application and the incident channel.
-            cy.visit('/ad-1/channels/' + incidentChannelName);
+            // # Navigate directly to the application and the playbook run channel.
+            cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-            // # Close the RHS, which is opened by default when navigating to an incident channel.
+            // # Close the RHS, which is opened by default when navigating to an playbook run channel.
             cy.get('#searchResultsCloseButton').click();
 
             // * Verify that the RHS is indeed closed.
             cy.get('#rhsContainer').should('not.exist');
 
-            // # Run a slash command to show the incident's info.
+            // # Run a slash command to show the playbook run's info.
             cy.executeSlashCommand('/incident info');
 
             // * Verify that the RHS is now open.
@@ -108,13 +108,13 @@ describe('slash command > info', () => {
         });
 
         it('should show an ephemeral post when the RHS is already open', () => {
-            // # Navigate directly to the application and the incident channel.
-            cy.visit('/ad-1/channels/' + incidentChannelName);
+            // # Navigate directly to the application and the playbook run channel.
+            cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
             // * Verify that the RHS is open.
             cy.get('#rhsContainer').should('be.visible');
 
-            // # Run a slash command to show the incident's info.
+            // # Run a slash command to show the playbook run's info.
             cy.executeSlashCommand('/incident info');
 
             // * Verify the expected error message.

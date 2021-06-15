@@ -6,7 +6,7 @@
 // - [*] indicates an assertion (e.g. * Check the title)
 // ***************************************************************
 
-describe('incident rhs > footer', () => {
+describe('playbook run rhs > footer', () => {
     const playbookName = 'Playbook (' + Date.now() + ')';
     let teamId;
     let userId;
@@ -43,30 +43,30 @@ describe('incident rhs > footer', () => {
         describe('has navigation button', () => {
             beforeEach(() => {
                 const now = Date.now();
-                const incidentName = 'Incident (' + now + ')';
-                const incidentChannelName = 'incident-' + now;
+                const playbookRunName = 'Playbook Run (' + now + ')';
+                const playbookRunChannelName = 'playbook-run-' + now;
 
-                // # Start the incident
-                cy.apiStartIncident({
+                // # Run the playbook
+                cy.apiRunPlaybook({
                     teamId,
                     playbookId,
-                    incidentName,
+                    playbookRunName,
                     ownerUserId: userId,
                 });
 
-                // # Navigate directly to the application and the incident channel
-                cy.visit('/ad-1/channels/' + incidentChannelName);
+                // # Navigate directly to the application and the playbook run channel
+                cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
                 // # Select the tasks tab
                 cy.findByTestId('tasks').click();
             });
 
             it('should always say update status', () => {
-                // * Verify that the button contains Update Incident
-                cy.get('#incidentRHSFooter button').contains('Update Incident');
+                // * Verify that the button contains the expected text
+                cy.get('#playbookRunRHSFooter button').contains('Update Incident');
 
                 // # Click on the End Incident button
-                cy.get('#incidentRHSFooter button').click();
+                cy.get('#playbookRunRHSFooter button').click();
 
                 // * Verify that the interactive dialog is visible
                 cy.get('#interactiveDialogModalLabel').contains('Confirm End Incident');
