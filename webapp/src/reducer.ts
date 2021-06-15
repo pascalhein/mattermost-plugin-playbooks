@@ -13,13 +13,13 @@ import {
     SET_CLIENT_ID,
     SetClientId,
     INCIDENT_CREATED,
-    IncidentCreated,
+    PlaybookRunCreated,
     RECEIVED_TEAM_INCIDENTS,
-    ReceivedTeamIncidents,
+    ReceivedTeamPlaybookRuns,
     SetRHSState,
     SET_RHS_STATE,
     RemovedFromChannel,
-    IncidentUpdated,
+    PlaybookRunUpdated,
     INCIDENT_UPDATED,
     REMOVED_FROM_CHANNEL,
     SetRHSTabState,
@@ -39,7 +39,7 @@ import {
     SHOW_POST_MENU_MODAL, HIDE_POST_MENU_MODAL,
     SetHasViewedChannel, SET_HAS_VIEWED_CHANNEL,
 } from 'src/types/actions';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 
 import {GlobalSettings} from './types/settings';
 
@@ -70,7 +70,7 @@ function clientId(state = '', action: SetClientId) {
     }
 }
 
-function rhsState(state = RHSState.ViewingIncident, action: SetRHSState) {
+function rhsState(state = RHSState.ViewingPlaybookRun, action: SetRHSState) {
     switch (action.type) {
     case SET_RHS_STATE:
         return action.nextState;
@@ -79,17 +79,17 @@ function rhsState(state = RHSState.ViewingIncident, action: SetRHSState) {
     }
 }
 
-// myIncidentsByTeam is a map of teamId->{channelId->incidents} for which the current user is an incident member. Note
+// myPlaybookRunsByTeam is a map of teamId->{channelId->incidents} for which the current user is an incident member. Note
 // that it is lazy loaded on team change, but will also track incremental updates as provided by
 // websocket events.
 // Aditnally it handles the plugin being disabled on the team
-const myIncidentsByTeam = (
-    state: Record<string, Record<string, Incident>> = {},
-    action: IncidentCreated | IncidentUpdated | ReceivedTeamIncidents | RemovedFromChannel | ReceivedTeamDisabled,
+const myPlaybookRunsByTeam = (
+    state: Record<string, Record<string, PlaybookRun>> = {},
+    action: PlaybookRunCreated | PlaybookRunUpdated | ReceivedTeamPlaybookRuns | RemovedFromChannel | ReceivedTeamDisabled,
 ) => {
     switch (action.type) {
     case INCIDENT_CREATED: {
-        const incidentCreatedAction = action as IncidentCreated;
+        const incidentCreatedAction = action as PlaybookRunCreated;
         const incident = incidentCreatedAction.incident;
         const teamId = incident.team_id;
         return {
@@ -101,7 +101,7 @@ const myIncidentsByTeam = (
         };
     }
     case INCIDENT_UPDATED: {
-        const incidentUpdated = action as IncidentUpdated;
+        const incidentUpdated = action as PlaybookRunUpdated;
         const incident = incidentUpdated.incident;
         const teamId = incident.team_id;
         return {
@@ -113,8 +113,8 @@ const myIncidentsByTeam = (
         };
     }
     case RECEIVED_TEAM_INCIDENTS: {
-        const receivedTeamIncidentsAction = action as ReceivedTeamIncidents;
-        const incidents = receivedTeamIncidentsAction.incidents;
+        const receivedTeamPlaybookRunsAction = action as ReceivedTeamPlaybookRuns;
+        const incidents = receivedTeamPlaybookRunsAction.incidents;
         if (incidents.length === 0) {
             return state;
         }
@@ -261,7 +261,7 @@ export default combineReducers({
     toggleRHSFunction,
     rhsOpen,
     clientId,
-    myIncidentsByTeam,
+    myPlaybookRunsByTeam,
     rhsState,
     tabStateByChannel,
     eventsFilterByChannel,

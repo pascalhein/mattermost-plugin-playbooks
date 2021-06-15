@@ -12,14 +12,14 @@ import {getPost} from 'mattermost-redux/selectors/entities/posts';
 
 import Profile from 'src/components/profile/profile';
 import Duration from 'src/components/duration';
-import {Incident, incidentCurrentStatus} from 'src/types/incident';
-import {lastUpdatedByIncidentId} from 'src/selectors';
+import {PlaybookRun, incidentCurrentStatus} from 'src/types/incident';
+import {lastUpdatedByPlaybookRunId} from 'src/selectors';
 
 import {SmallerProfile} from 'src/components/rhs/rhs_shared';
 
 import StatusBadge from '../backstage/incidents/status_badge';
 
-const IncidentContainer = styled.div<IncidentContainerProps>`
+const PlaybookRunContainer = styled.div<PlaybookRunContainerProps>`
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -30,7 +30,7 @@ const IncidentContainer = styled.div<IncidentContainerProps>`
     `}
 `;
 
-const IncidentTitle = styled.div`
+const PlaybookRunTitle = styled.div`
     font-size: 14px;
     font-style: normal;
     font-weight: 600;
@@ -63,7 +63,7 @@ const Col2 = styled.div`
     font-weight: 400;
 `;
 
-interface IncidentContainerProps {
+interface PlaybookRunContainerProps {
     active: boolean;
 }
 
@@ -82,17 +82,17 @@ const Button = styled.button`
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
     active: boolean;
-    viewIncident: (incidentId: string) => void;
+    viewPlaybookRun: (incidentId: string) => void;
 }
 
-const RHSListIncident = (props: Props) => {
-    const lastUpdatedMap = useSelector(lastUpdatedByIncidentId);
+const RHSListPlaybookRun = (props: Props) => {
+    const lastUpdatedMap = useSelector(lastUpdatedByPlaybookRunId);
 
     return (
-        <IncidentContainer active={props.active}>
-            <IncidentTitle>{props.incident.name}</IncidentTitle>
+        <PlaybookRunContainer active={props.active}>
+            <PlaybookRunTitle>{props.incident.name}</PlaybookRunTitle>
             <Row>
                 <Col1>{'Duration:'}</Col1>
                 <Col2>
@@ -127,13 +127,13 @@ const RHSListIncident = (props: Props) => {
                 </Col2>
             </Row>
             <Button
-                onClick={() => props.viewIncident(props.incident.channel_id)}
+                onClick={() => props.viewPlaybookRun(props.incident.channel_id)}
                 data-testid='go-to-channel'
             >
                 {'Go to Incident Channel'}
             </Button>
-        </IncidentContainer>
+        </PlaybookRunContainer>
     );
 };
 
-export default RHSListIncident;
+export default RHSListPlaybookRun;

@@ -11,7 +11,7 @@ import {getChannelsNameMapInCurrentTeam} from 'mattermost-redux/selectors/entiti
 import {Team} from 'mattermost-redux/types/teams';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {TimelineEvent} from 'src/types/rhs';
 import RHSTimelineEventItem from 'src/components/rhs/rhs_timeline_event_item';
 import {ChannelNamesMap} from 'src/types/backstage';
@@ -40,7 +40,7 @@ const NoEventsNotice = styled.div`
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
     filteredEvents: TimelineEvent[];
 }
 

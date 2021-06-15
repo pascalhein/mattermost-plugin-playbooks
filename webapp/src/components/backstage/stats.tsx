@@ -199,14 +199,14 @@ const StatsView = () => {
             </BackstageHeader>
             <StatsContainers>
                 <StatisticCount
-                    id={'TotalReportedIncidents'}
+                    id={'TotalReportedPlaybookRuns'}
                     title={'Total Reported Incidents'}
                     icon={'fa-exclamation-triangle'}
                     count={stats?.total_reported_incidents}
                     to={'incidents?status=Reported'}
                 />
                 <StatisticCount
-                    id={'TotalActiveIncidents'}
+                    id={'TotalActivePlaybookRuns'}
                     title={'Total Active Incidents'}
                     icon={'fa-exclamation-circle'}
                     count={stats?.total_active_incidents}

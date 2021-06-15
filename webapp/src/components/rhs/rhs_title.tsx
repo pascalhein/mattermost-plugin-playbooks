@@ -10,9 +10,9 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import LeftChevron from 'src/components/assets/icons/left_chevron';
 import {RHSState} from 'src/types/rhs';
 import {setRHSViewingList} from 'src/actions';
-import {currentIncident, currentRHSState} from 'src/selectors';
+import {currentPlaybookRun, currentRHSState} from 'src/selectors';
 import StatusBadge from 'src/components/backstage/incidents/status_badge';
-import {Incident, incidentCurrentStatus} from 'src/types/incident';
+import {PlaybookRun, incidentCurrentStatus} from 'src/types/incident';
 
 const RHSTitleContainer = styled.div`
     display: flex;
@@ -36,10 +36,10 @@ const Button = styled.button`
 
 const RHSTitle = () => {
     const dispatch = useDispatch();
-    const incident = useSelector<GlobalState, Incident | undefined>(currentIncident);
+    const incident = useSelector<GlobalState, PlaybookRun | undefined>(currentPlaybookRun);
     const rhsState = useSelector<GlobalState, RHSState>(currentRHSState);
 
-    if (rhsState === RHSState.ViewingIncident) {
+    if (rhsState === RHSState.ViewingPlaybookRun) {
         return (
             <RHSTitleContainer>
                 <Button

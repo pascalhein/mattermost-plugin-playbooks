@@ -10,7 +10,7 @@ import {
     TabPageContainer,
     Title,
 } from 'src/components/backstage/incidents/shared';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import PostText from 'src/components/post_text';
 
 const StyledContent = styled(Content)`
@@ -19,7 +19,7 @@ const StyledContent = styled(Content)`
     padding: 20px 24px 14px 24px;
 `;
 
-const Description = (props: { incident: Incident }) => {
+const Description = (props: { incident: PlaybookRun }) => {
     let description: JSX.Element = <EmptyBody>{'There is no description available.'}</EmptyBody>;
     if (props.incident.status_posts.length > 0 && props.incident.description) {
         description = (

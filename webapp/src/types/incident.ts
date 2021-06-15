@@ -5,7 +5,7 @@ import {TimelineEvent, TimelineEventType} from 'src/types/rhs';
 
 import {Checklist, isChecklist} from './playbook';
 
-export interface Incident {
+export interface PlaybookRun {
     id: string;
     name: string;
     description: string;
@@ -22,7 +22,7 @@ export interface Incident {
     playbook_id: string;
     checklists: Checklist[];
     status_posts: StatusPost[];
-    current_status: IncidentStatus;
+    current_status: PlaybookRunStatus;
     reminder_post_id: string;
     broadcast_channel_id: string;
     timeline_events: TimelineEvent[];
@@ -34,7 +34,7 @@ export interface Incident {
 
 export interface StatusPost {
     id: string;
-    status: IncidentStatus;
+    status: PlaybookRunStatus;
     create_at: number;
     delete_at: number;
 }
@@ -47,15 +47,15 @@ export interface Metadata {
     total_posts: number;
 }
 
-export interface FetchIncidentsReturn {
+export interface FetchPlaybookRunsReturn {
     total_count: number;
     page_count: number;
     has_more: boolean;
-    items: Incident[];
+    items: PlaybookRun[];
     disabled?: boolean;
 }
 
-export enum IncidentStatus {
+export enum PlaybookRunStatus {
     Reported = 'Reported',
     Active = 'Active',
     Resolved = 'Resolved',
@@ -64,7 +64,7 @@ export enum IncidentStatus {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isIncident(arg: any): arg is Incident {
+export function isPlaybookRun(arg: any): arg is PlaybookRun {
     return Boolean(arg &&
         arg.id && typeof arg.id === 'string' &&
         arg.name && typeof arg.name === 'string' &&
@@ -121,7 +121,7 @@ export function isTimelineEvent(arg: any): arg is TimelineEvent {
         typeof arg.creator_user_id === 'string');
 }
 
-export function incidentCurrentStatusPost(incident: Incident): StatusPost | undefined {
+export function incidentCurrentStatusPost(incident: PlaybookRun): StatusPost | undefined {
     const sortedPosts = [...incident.status_posts]
         .filter((a) => a.delete_at === 0)
         .sort((a, b) => b.create_at - a.create_at);
@@ -129,16 +129,16 @@ export function incidentCurrentStatusPost(incident: Incident): StatusPost | unde
     return sortedPosts[0];
 }
 
-export function incidentCurrentStatus(incident: Incident): IncidentStatus {
+export function incidentCurrentStatus(incident: PlaybookRun): PlaybookRunStatus {
     return incident.current_status;
 }
 
-export function incidentIsActive(incident: Incident): boolean {
+export function incidentIsActive(incident: PlaybookRun): boolean {
     const currentStatus = incidentCurrentStatus(incident);
-    return currentStatus !== IncidentStatus.Archived;
+    return currentStatus !== PlaybookRunStatus.Archived;
 }
 
-export interface FetchIncidentsParams {
+export interface FetchPlaybookRunsParams {
     team_id?: string;
     page?: number;
     per_page?: number;

@@ -19,13 +19,13 @@ import {
     StatusOption,
 } from 'src/components/backstage/incidents/incident_list/status_filter';
 import {
-    FetchIncidentsParams,
-    Incident,
+    FetchPlaybookRunsParams,
+    PlaybookRun,
     incidentCurrentStatus,
     incidentIsActive,
 } from 'src/types/incident';
 import {BACKSTAGE_LIST_PER_PAGE} from 'src/constants';
-import {fetchOwnersInTeam, fetchIncidents} from 'src/client';
+import {fetchOwnersInTeam, fetchPlaybookRuns} from 'src/client';
 import {navigateToTeamPluginUrl} from 'src/browser_routing';
 import SearchInput from 'src/components/backstage/incidents/incident_list/search_input';
 import ProfileSelector from 'src/components/profile/profile_selector';
@@ -45,7 +45,7 @@ const ControlComponent = (ownProps: ControlProps<any>) => (
         <components.Control {...ownProps}/>
         {ownProps.selectProps.showCustomReset && (
             <a
-                className='IncidentFilter-reset'
+                className='PlaybookRunFilter-reset'
                 onClick={ownProps.selectProps.onCustomReset}
             >
                 {'Reset to all owners'}
@@ -54,7 +54,7 @@ const ControlComponent = (ownProps: ControlProps<any>) => (
     </div>
 );
 
-const IncidentListContainer = styled.div`
+const PlaybookRunListContainer = styled.div`
     padding-top: 32px;
 `;
 
@@ -70,13 +70,13 @@ interface Props {
     playbook: Playbook | null
 }
 
-const IncidentList = (props: Props) => {
-    const [incidents, setIncidents] = useState<Incident[] | null>(null);
+const PlaybookRunList = (props: Props) => {
+    const [incidents, setPlaybookRuns] = useState<PlaybookRun[] | null>(null);
     const [totalCount, setTotalCount] = useState(0);
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
     const selectUser = useSelector<GlobalState>((state) => (userId: string) => getUser(state, userId)) as (userId: string) => UserProfile;
 
-    const [fetchParams, setFetchParams] = useState<FetchIncidentsParams>(
+    const [fetchParams, setFetchParams] = useState<FetchPlaybookRunsParams>(
         {
             team_id: currentTeam.id,
             page: 0,
@@ -96,19 +96,19 @@ const IncidentList = (props: Props) => {
     useEffect(() => {
         let isCanceled = false;
 
-        async function fetchIncidentsAsync() {
-            const incidentsReturn = await fetchIncidents(fetchParams);
+        async function fetchPlaybookRunsAsync() {
+            const incidentsReturn = await fetchPlaybookRuns(fetchParams);
 
             if (!isCanceled) {
-                setIncidents(incidentsReturn.items);
+                setPlaybookRuns(incidentsReturn.items);
                 setTotalCount(incidentsReturn.total_count);
             }
         }
 
         if (props.playbook) {
-            fetchIncidentsAsync();
+            fetchPlaybookRunsAsync();
         } else {
-            setIncidents([]);
+            setPlaybookRuns([]);
             setTotalCount(0);
         }
 
@@ -154,7 +154,7 @@ const IncidentList = (props: Props) => {
         setFetchParams({...fetchParams, owner_user_id: userId, page: 0});
     }
 
-    function openIncidentDetails(incident: Incident) {
+    function openPlaybookRunDetails(incident: PlaybookRun) {
         navigateToTeamPluginUrl(currentTeam.name, `/incidents/${incident.id}`);
     }
 
@@ -171,12 +171,12 @@ const IncidentList = (props: Props) => {
     }
 
     return (
-        <IncidentListContainer className='IncidentList'>
+        <PlaybookRunListContainer className='PlaybookRunList'>
             <div
                 id='incidentList'
                 className='list'
             >
-                <div className='IncidentList__filters'>
+                <div className='PlaybookRunList__filters'>
                     <SearchInput
                         default={fetchParams.search_term}
                         onSearch={debounce(setSearchTerm, debounceDelay)}
@@ -249,7 +249,7 @@ const IncidentList = (props: Props) => {
                     <div
                         className='row incident-item'
                         key={incident.id}
-                        onClick={() => openIncidentDetails(incident)}
+                        onClick={() => openPlaybookRunDetails(incident)}
                     >
                         <a className='col-sm-3 incident-item__title'>
                             <TextWithTooltip
@@ -284,7 +284,7 @@ const IncidentList = (props: Props) => {
                     setPage={setPage}
                 />
             </div>
-        </IncidentListContainer>
+        </PlaybookRunListContainer>
     );
 };
 
@@ -307,4 +307,4 @@ const endedAt = (isActive: boolean, time: number) => {
     return '--';
 };
 
-export default IncidentList;
+export default PlaybookRunList;

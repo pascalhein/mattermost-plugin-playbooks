@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {Incident, IncidentStatus} from 'src/types/incident';
+import {PlaybookRun, PlaybookRunStatus} from 'src/types/incident';
 import Profile from 'src/components/profile/profile';
 import {Badge, Content, TabPageContainer, Title} from 'src/components/backstage/incidents/shared';
 
@@ -39,7 +39,7 @@ const Line = styled.div`
 `;
 
 // STUB COMPONENT. NOT IN ACTIVE USE YET
-const Followups = (props: { incident: Incident }) => {
+const Followups = (props: { incident: PlaybookRun }) => {
     return (
         <TabPageContainer>
             <Title>{'Follow ups'}</Title>
@@ -59,7 +59,7 @@ const Followups = (props: { incident: Incident }) => {
                         <SmallProfile userId={props.incident.owner_user_id}/>
                     </Cell>
                     <Cell>
-                        <Badge status={'Open' as IncidentStatus}/>
+                        <Badge status={'Open' as PlaybookRunStatus}/>
                     </Cell>
                     <Cell>
                         <a href={''}>{'MM-42843'}</a>
@@ -70,7 +70,7 @@ const Followups = (props: { incident: Incident }) => {
                         <SmallProfile userId={props.incident.reporter_user_id}/>
                     </Cell>
                     <Cell>
-                        <Badge status={'In Progress' as IncidentStatus}/>
+                        <Badge status={'In Progress' as PlaybookRunStatus}/>
                     </Cell>
                     <Cell>
                         <a href={''}>{'MM-42850'}</a>

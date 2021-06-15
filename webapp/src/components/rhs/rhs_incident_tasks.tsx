@@ -9,7 +9,7 @@ import Scrollbars from 'react-custom-scrollbars';
 import {DragDropContext, Droppable, DroppableProvided, Draggable, DraggableProvided, DropResult, DraggableStateSnapshot} from 'react-beautiful-dnd';
 
 import {toggleRHS, addNewTask, incidentUpdated} from 'src/actions';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {ChecklistItem, ChecklistItemState, Checklist} from 'src/types/playbook';
 import {setChecklistItemState, clientReorderChecklist} from 'src/client';
 import {ChecklistItemDetails} from 'src/components/checklist_item';
@@ -60,10 +60,10 @@ const InnerContainer = styled.div`
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
-const RHSIncidentTasks = (props: Props) => {
+const RHSPlaybookRunTasks = (props: Props) => {
     const dispatch = useDispatch();
 
     const checklists = props.incident.checklists || [];
@@ -78,7 +78,7 @@ const RHSIncidentTasks = (props: Props) => {
             renderView={renderView}
             style={{position: 'absolute'}}
         >
-            <div className='IncidentDetails'>
+            <div className='PlaybookRunDetails'>
                 <InnerContainer>
                     {checklists.map((checklist: Checklist, checklistIndex: number) => (
                         <>
@@ -172,4 +172,4 @@ const RHSIncidentTasks = (props: Props) => {
     );
 };
 
-export default RHSIncidentTasks;
+export default RHSPlaybookRunTasks;

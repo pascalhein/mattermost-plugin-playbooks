@@ -3,12 +3,12 @@
 
 import React from 'react';
 
-import IncidentIcon from './incident_icon';
+import PlaybookRunIcon from './incident_icon';
 
-const IncidentPostMenuIcon = () => (
+const PlaybookRunPostMenuIcon = () => (
     <span className='MenuItem__icon'>
-        <IncidentIcon/>
+        <PlaybookRunIcon/>
     </span>
 );
 
-export default IncidentPostMenuIcon;
+export default PlaybookRunPostMenuIcon;

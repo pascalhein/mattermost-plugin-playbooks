@@ -12,10 +12,10 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {Channel} from 'mattermost-redux/types/channels';
 import {getChannel} from 'mattermost-redux/selectors/entities/channels';
 
-import {Incident, Metadata as IncidentMetadata} from 'src/types/incident';
+import {PlaybookRun, Metadata as PlaybookRunMetadata} from 'src/types/incident';
 import {Overview} from 'src/components/backstage/incidents/incident_backstage/overview/overview';
 import {Retrospective} from 'src/components/backstage/incidents/incident_backstage/retrospective/retrospective';
-import {fetchIncident, fetchIncidentMetadata} from 'src/client';
+import {fetchPlaybookRun, fetchPlaybookRunMetadata} from 'src/client';
 import {navigateToTeamPluginUrl, navigateToUrl, teamPluginErrorUrl} from 'src/browser_routing';
 import {ErrorPageTypes} from 'src/constants';
 import {
@@ -122,9 +122,9 @@ const FetchingStateType = {
     notFound: 'notfound',
 };
 
-const IncidentBackstage = () => {
-    const [incident, setIncident] = useState<Incident | null>(null);
-    const [incidentMetadata, setIncidentMetadata] = useState<IncidentMetadata | null>(null);
+const PlaybookRunBackstage = () => {
+    const [incident, setPlaybookRun] = useState<PlaybookRun | null>(null);
+    const [incidentMetadata, setPlaybookRunMetadata] = useState<PlaybookRunMetadata | null>(null);
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
     const channel = useSelector<GlobalState, Channel | null>((state) => (incident ? getChannel(state, incident.channel_id) : null));
     const match = useRouteMatch<MatchParams>();
@@ -135,9 +135,9 @@ const IncidentBackstage = () => {
     useEffect(() => {
         const incidentId = match.params.incidentId;
 
-        Promise.all([fetchIncident(incidentId), fetchIncidentMetadata(incidentId)]).then(([incidentResult, incidentMetadataResult]) => {
-            setIncident(incidentResult);
-            setIncidentMetadata(incidentMetadataResult);
+        Promise.all([fetchPlaybookRun(incidentId), fetchPlaybookRunMetadata(incidentId)]).then(([incidentResult, incidentMetadataResult]) => {
+            setPlaybookRun(incidentResult);
+            setPlaybookRunMetadata(incidentMetadataResult);
             setFetchingState(FetchingStateType.fetched);
         }).catch(() => {
             setFetchingState(FetchingStateType.notFound);
@@ -161,7 +161,7 @@ const IncidentBackstage = () => {
         channelIcon = channel.type === 'O' ? 'icon-globe' : 'icon-lock-outline';
     }
 
-    const closeIncidentDetails = () => {
+    const closePlaybookRunDetails = () => {
         navigateToTeamPluginUrl(currentTeam.name, '/incidents');
     };
 
@@ -171,7 +171,7 @@ const IncidentBackstage = () => {
                 <FirstRow>
                     <LeftArrow
                         className='icon-arrow-left'
-                        onClick={closeIncidentDetails}
+                        onClick={closePlaybookRunDetails}
                     />
                     <Title data-testid='incident-title'>{incident.name}</Title>
                     <Badge status={incident.current_status}/>
@@ -215,4 +215,4 @@ const IncidentBackstage = () => {
     );
 };
 
-export default IncidentBackstage;
+export default PlaybookRunBackstage;

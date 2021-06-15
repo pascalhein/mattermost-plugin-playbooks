@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {Content, TabPageContainer, Title} from 'src/components/backstage/incidents/shared';
 import Profile from 'src/components/profile/profile';
 import Duration from 'src/components/duration';
@@ -38,7 +38,7 @@ const SmallProfile = styled(Profile)`
     }
 `;
 
-const About = (props: { incident: Incident }) => {
+const About = (props: { incident: PlaybookRun }) => {
     return (
         <TabPageContainer>
             <Title>{'About'}</Title>

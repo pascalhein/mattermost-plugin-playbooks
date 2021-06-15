@@ -3,7 +3,7 @@
 
 export enum RHSState {
     ViewingList,
-    ViewingIncident,
+    ViewingPlaybookRun,
 }
 
 export enum RHSTabState {
@@ -13,7 +13,7 @@ export enum RHSTabState {
 }
 
 export enum TimelineEventType {
-    IncidentCreated = 'incident_created',
+    PlaybookRunCreated = 'incident_created',
     StatusUpdated = 'status_updated',
     OwnerChanged = 'owner_changed',
     AssigneeChanged = 'assignee_changed',

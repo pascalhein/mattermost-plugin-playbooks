@@ -47,7 +47,7 @@ export interface FetchPlaybooksNoChecklistReturn {
     items: PlaybookNoChecklist[];
 }
 
-export interface FetchIncidentsParams {
+export interface FetchPlaybookRunsParams {
     sort?: string;
     direction?: string;
 }

@@ -4,10 +4,10 @@ import React from 'react';
 
 import styled, {css} from 'styled-components';
 
-import {IncidentStatus} from 'src/types/incident';
+import {PlaybookRunStatus} from 'src/types/incident';
 
 interface BadgeProps {
-    status: IncidentStatus;
+    status: PlaybookRunStatus;
     compact?: boolean;
 }
 
@@ -24,19 +24,19 @@ const Badge = styled.div<BadgeProps>`
 
     ${(props) => {
         switch (props.status) {
-        case IncidentStatus.Reported:
+        case PlaybookRunStatus.Reported:
             return css`
                 background-color: var(--away-indicator);
         `;
-        case IncidentStatus.Active:
+        case PlaybookRunStatus.Active:
             return css`
                 background-color: var(--dnd-indicator);
         `;
-        case IncidentStatus.Resolved:
+        case PlaybookRunStatus.Resolved:
             return css`
                 background-color: var(--online-indicator);
         `;
-        case IncidentStatus.Archived:
+        case PlaybookRunStatus.Archived:
         default:
             return css`
                 color: var(--center-channel-color);

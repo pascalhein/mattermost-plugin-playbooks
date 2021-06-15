@@ -296,7 +296,7 @@ const ControlComponent = (ownProps: ControlProps<any>) => (
         <components.Control {...ownProps}/>
         {ownProps.selectProps.showCustomReset && (
             <a
-                className='IncidentFilter-reset'
+                className='PlaybookRunFilter-reset'
                 onClick={ownProps.selectProps.onCustomReset}
             >
                 {'No Assignee'}

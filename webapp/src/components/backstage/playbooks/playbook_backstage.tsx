@@ -19,7 +19,7 @@ import ClipboardsPlay from 'src/components/assets/icons/clipboards_play';
 import ClipboardsCheckmark from 'src/components/assets/icons/clipboards_checkmark';
 import Profiles from 'src/components/assets/icons/profiles';
 import LineGraph from 'src/components/backstage/playbooks/line_graph';
-import IncidentList from 'src/components/backstage/playbooks/incident_list/incident_list';
+import PlaybookRunList from 'src/components/backstage/playbooks/incident_list/incident_list';
 import BarGraph from 'src/components/backstage/playbooks/bar_graph';
 import {EmptyPlaybookStats} from 'src/types/stats';
 
@@ -310,7 +310,7 @@ const PlaybookBackstage = () => {
                             />
                         </GraphBox>
                     </BottomRow>
-                    <IncidentList playbook={playbook}/>
+                    <PlaybookRunList playbook={playbook}/>
                 </BottomInnerContainer>
             </BottomContainer>
         </OuterContainer>

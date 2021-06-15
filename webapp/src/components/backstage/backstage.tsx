@@ -13,13 +13,13 @@ import {Team} from 'mattermost-redux/types/teams';
 
 import PlaybookList from 'src/components/backstage/playbook_list';
 import PlaybookEdit from 'src/components/backstage/playbook_edit';
-import BackstageIncidentList from 'src/components/backstage/incidents/incident_list/incident_list';
+import BackstagePlaybookRunList from 'src/components/backstage/incidents/incident_list/incident_list';
 import {NewPlaybook} from 'src/components/backstage/new_playbook';
 import {ErrorPageTypes} from 'src/constants';
 import {navigateToUrl, teamPluginErrorUrl} from 'src/browser_routing';
 import PlaybookIcon from 'src/components/assets/icons/playbook_icon';
-import IncidentIcon from 'src/components/assets/icons/incident_icon';
-import IncidentBackstage
+import PlaybookRunIcon from 'src/components/assets/icons/incident_icon';
+import PlaybookRunBackstage
     from 'src/components/backstage/incidents/incident_backstage/incident_backstage';
 import PlaybookBackstage from 'src/components/backstage/playbooks/playbook_backstage';
 import {useExperimentalFeaturesEnabled} from 'src/hooks';
@@ -148,7 +148,7 @@ const Backstage = () => {
                         data-testid='incidentsLHSButton'
                     >
                         <span className='mr-3 d-flex items-center'>
-                            <IncidentIcon/>
+                            <PlaybookRunIcon/>
                         </span>
                         {'Incidents'}
                     </BackstageTitlebarItem>
@@ -198,10 +198,10 @@ const Backstage = () => {
                         <PlaybookList/>
                     </Route>
                     <Route path={`${match.url}/incidents/:incidentId`}>
-                        <IncidentBackstage/>
+                        <PlaybookRunBackstage/>
                     </Route>
                     <Route path={`${match.url}/incidents`}>
-                        <BackstageIncidentList/>
+                        <BackstagePlaybookRunList/>
                         {/*<Dashboard/>*/}
                     </Route>
                     <Route path={`${match.url}/stats`}>

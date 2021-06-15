@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import ProfileVertical
     from 'src/components/backstage/incidents/incident_backstage/retrospective/profile_vertical';
 import {
@@ -43,7 +43,7 @@ const ColTitle = styled.div`
 `;
 
 // STUB COMPONENT. NOT IN ACTIVE USE YET
-const Learnings = (props: {incident: Incident}) => {
+const Learnings = (props: {incident: PlaybookRun}) => {
     return (
         <TabPageContainer>
             <Header>

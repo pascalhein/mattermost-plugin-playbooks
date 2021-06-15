@@ -9,7 +9,7 @@ import {
     Title,
     SecondaryButton,
 } from 'src/components/backstage/incidents/shared';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {publishRetrospective, updateRetrospective} from 'src/client';
 import {PrimaryButton} from 'src/components/assets/buttons';
 import PostText from 'src/components/post_text';
@@ -59,7 +59,7 @@ const ReportContainer = styled.div`
 `;
 
 interface ReportProps {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 const Report = (props: ReportProps) => {

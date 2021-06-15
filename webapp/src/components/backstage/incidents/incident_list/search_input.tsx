@@ -19,7 +19,7 @@ export default function SearchInput(props: Props) {
     const [term, setTerm] = useState(props.default ? props.default : '');
 
     return (
-        <div className='IncidentList-search'>
+        <div className='PlaybookRunList-search'>
             <input
                 type='text'
                 placeholder='Search by Incident name'

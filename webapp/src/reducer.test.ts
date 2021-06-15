@@ -3,14 +3,14 @@ import {
 } from 'src/types/actions';
 import reducer from 'src/reducer';
 
-describe('myIncidentsByTeam', () => {
+describe('myPlaybookRunsByTeam', () => {
     // @ts-ignore
     const initialState = reducer(undefined, {}); // eslint-disable-line no-undefined
 
     describe('REMOVED_FROM_CHANNEL', () => {
-        const makeState = (myIncidentsByTeam: any) => ({
+        const makeState = (myPlaybookRunsByTeam: any) => ({
             ...initialState,
-            myIncidentsByTeam,
+            myPlaybookRunsByTeam,
         });
 
         it('should ignore a channel not in the data structure', () => {

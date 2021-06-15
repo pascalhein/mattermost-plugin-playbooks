@@ -13,7 +13,7 @@ import {getPostIdsInCurrentChannel, getPostsInCurrentChannel} from 'mattermost-r
 
 import {GlobalState} from 'mattermost-redux/types/store';
 
-import {currentIncident} from 'src/selectors';
+import {currentPlaybookRun} from 'src/selectors';
 
 import {navigateToUrl} from 'src/browser_routing';
 
@@ -52,7 +52,7 @@ interface ReminderCommonProps {
 const selectLatestReminderPost = (state: GlobalState) => getPostsInCurrentChannel(state)?.find((value: Post) => value.type.startsWith('custom_retro'));
 
 const ReminderCommon = (props: ReminderCommonProps) => {
-    const incident = useSelector(currentIncident);
+    const incident = useSelector(currentPlaybookRun);
     const reminderDuration = incident?.retrospective_reminder_interval_seconds || 0;
     const wasPublishedOrCanceled = incident?.retrospective_published_at !== 0;
     const currentTeam = useSelector(getCurrentTeam);

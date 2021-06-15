@@ -4,7 +4,7 @@
 import Integrations from 'mattermost-redux/action_types/integrations';
 
 import {RHSState, RHSTabState, TimelineEventsFilter} from 'src/types/rhs';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {Playbook} from 'src/types/playbook';
 import {pluginId} from 'src/manifest';
 
@@ -49,14 +49,14 @@ export interface SetClientId {
     clientId: string;
 }
 
-export interface IncidentCreated {
+export interface PlaybookRunCreated {
     type: typeof INCIDENT_CREATED;
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
-export interface IncidentUpdated {
+export interface PlaybookRunUpdated {
     type: typeof INCIDENT_UPDATED;
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 export interface PlaybookCreated {
@@ -75,9 +75,9 @@ export interface ReceivedTeamNumPlaybooks {
     numPlaybooks: number;
 }
 
-export interface ReceivedTeamIncidents {
+export interface ReceivedTeamPlaybookRuns {
     type: typeof RECEIVED_TEAM_INCIDENTS;
-    incidents: Incident[];
+    incidents: PlaybookRun[];
 }
 
 export interface ReceivedTeamDisabled {

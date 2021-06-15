@@ -8,9 +8,9 @@ import React from 'react';
 import Report from 'src/components/backstage/incidents/incident_backstage/retrospective/report';
 import TimelineRetro from 'src/components/backstage/incidents/incident_backstage/retrospective/timeline_retro';
 import {Container, Left, Right} from 'src/components/backstage/incidents/shared';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 
-export const Retrospective = (props: { incident: Incident }) => {
+export const Retrospective = (props: { incident: PlaybookRun }) => {
     return (
         <Container>
             <Left>

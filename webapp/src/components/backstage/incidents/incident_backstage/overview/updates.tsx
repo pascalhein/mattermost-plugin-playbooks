@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import PostCard from 'src/components/rhs/post_card';
 import {
     Content,
@@ -19,7 +19,7 @@ const StyledContent = styled(Content)`
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 const Updates = (props: Props) => {

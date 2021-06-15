@@ -3,7 +3,7 @@
 
 import React, {FC} from 'react';
 
-const NoContentIncidentsSvg = () => (
+const NoContentPlaybookRunsSvg = () => (
     <svg
         width='541'
         height='413'
@@ -258,4 +258,4 @@ const NoContentIncidentsSvg = () => (
     </svg>
 );
 
-export default NoContentIncidentsSvg;
+export default NoContentPlaybookRunsSvg;

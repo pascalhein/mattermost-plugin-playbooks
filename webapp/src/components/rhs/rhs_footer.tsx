@@ -9,23 +9,23 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
 import {Footer, StyledFooterButton} from 'src/components/rhs/rhs_shared';
 import {updateStatus} from 'src/actions';
-import {Incident, incidentCurrentStatus} from 'src/types/incident';
+import {PlaybookRun, incidentCurrentStatus} from 'src/types/incident';
 import {navigateToUrl} from 'src/browser_routing';
 import {pluginId} from 'src/manifest';
-import {currentIncident} from 'src/selectors';
+import {currentPlaybookRun} from 'src/selectors';
 
 const SpacedFooterButton = styled(StyledFooterButton)`
     margin-left: 10px;
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 const RHSFooter = (props: Props) => {
     const dispatch = useDispatch();
     const currentTeam = useSelector(getCurrentTeam);
-    const incident = useSelector(currentIncident);
+    const incident = useSelector(currentPlaybookRun);
 
     let text = 'Update Status';
     if (incidentCurrentStatus(props.incident) === 'Archived') {

@@ -19,13 +19,13 @@ import {
     renderTrackHorizontal,
     renderView, RHSContainer, RHSContent,
 } from 'src/components/rhs/rhs_shared';
-import {setRHSViewingIncident, startIncident} from 'src/actions';
+import {setRHSViewingPlaybookRun, startPlaybookRun} from 'src/actions';
 import {navigateToTeamPluginUrl, navigateToUrl} from 'src/browser_routing';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import DotMenu, {DropdownMenuItem} from 'src/components/dot_menu';
-import {myActiveIncidentsList} from 'src/selectors';
+import {myActivePlaybookRunsList} from 'src/selectors';
 import {HamburgerButton} from 'src/components/assets/icons/three_dots_icon';
-import RHSListIncident from 'src/components/rhs/rhs_list_incident';
+import RHSListPlaybookRun from 'src/components/rhs/rhs_list_incident';
 
 const Header = styled.div`
     display: grid;
@@ -75,14 +75,14 @@ const RHSListView = () => {
     const dispatch = useDispatch();
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
     const currentChannelId = useSelector<GlobalState, string>(getCurrentChannelId);
-    const incidentList = useSelector<GlobalState, Incident[]>(myActiveIncidentsList);
+    const incidentList = useSelector<GlobalState, PlaybookRun[]>(myActivePlaybookRunsList);
 
-    const viewIncident = (channelId: string) => {
-        dispatch(setRHSViewingIncident());
+    const viewPlaybookRun = (channelId: string) => {
+        dispatch(setRHSViewingPlaybookRun());
         navigateToUrl(`/${currentTeam.name}/channels/${channelId}`);
     };
 
-    const viewBackstageIncidentList = () => {
+    const viewBackstagePlaybookRunList = () => {
         navigateToUrl(`/${currentTeam.name}/${pluginId}/incidents`);
     };
 
@@ -104,32 +104,32 @@ const RHSListView = () => {
                 >
                     <Header>
                         <CenterCell>
-                            <Link onClick={() => dispatch(startIncident())}>
+                            <Link onClick={() => dispatch(startPlaybookRun())}>
                                 <PlusIcon/>{'Start Incident'}
                             </Link>
                         </CenterCell>
                         <RightCell>
                             <ThreeDotMenu
                                 onCreatePlaybook={() => navigateToTeamPluginUrl(currentTeam.name, '/playbooks')}
-                                onSeeAllIncidents={() => navigateToTeamPluginUrl(currentTeam.name, '/incidents')}
+                                onSeeAllPlaybookRuns={() => navigateToTeamPluginUrl(currentTeam.name, '/incidents')}
                             />
                         </RightCell>
                     </Header>
 
                     {incidentList.map((incident) => {
                         return (
-                            <RHSListIncident
+                            <RHSListPlaybookRun
                                 key={incident.id}
                                 incident={incident}
                                 active={currentChannelId === incident.channel_id}
-                                viewIncident={viewIncident}
+                                viewPlaybookRun={viewPlaybookRun}
                             />
                         );
                     })}
 
                     <Footer>
                         {'Looking for closed incidents? '}
-                        <a onClick={viewBackstageIncidentList}>{'Click here'}</a>
+                        <a onClick={viewBackstagePlaybookRunList}>{'Click here'}</a>
                         {' to see all incidents.'}
                     </Footer>
                 </Scrollbars>
@@ -140,7 +140,7 @@ const RHSListView = () => {
 
 interface ThreeDotMenuProps {
     onCreatePlaybook: () => void;
-    onSeeAllIncidents: () => void;
+    onSeeAllPlaybookRuns: () => void;
 }
 
 const ThreeDotMenu = (props: ThreeDotMenuProps) => (
@@ -154,7 +154,7 @@ const ThreeDotMenu = (props: ThreeDotMenuProps) => (
         />
         <DropdownMenuItem
             text='See all Incidents'
-            onClick={props.onSeeAllIncidents}
+            onClick={props.onSeeAllPlaybookRuns}
         />
     </DotMenu>
 );

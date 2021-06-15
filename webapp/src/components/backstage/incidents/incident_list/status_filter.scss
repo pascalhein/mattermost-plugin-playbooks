@@ -38,7 +38,7 @@
     }
 }
 
-.IncidentFilter-button {
+.PlaybookRunFilter-button {
     background-color: transparent;
     border: none;
     padding: 8px;
@@ -77,19 +77,19 @@
     }
 }
 
-.IncidentFilter--active {
-    .IncidentFilter-button {
+.PlaybookRunFilter--active {
+    .PlaybookRunFilter-button {
         background: var(--button-bg-08);
         color: var(--button-bg);
     }
 }
 
-.IncidentFilter-select {
+.PlaybookRunFilter-select {
     margin: 4px 0 0;
     min-width: 20rem;
 }
 
-.IncidentFilter-reset {
+.PlaybookRunFilter-reset {
     display: inline-block;
     margin: 0 0 8px 12px;
     font-weight: 600;

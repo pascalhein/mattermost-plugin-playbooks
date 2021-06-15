@@ -9,17 +9,17 @@ import {IntegrationTypes} from 'mattermost-redux/action_types';
 import {GetStateFunc} from 'mattermost-redux/types/actions';
 
 import {selectToggleRHS} from 'src/selectors';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {RHSState, RHSTabState, TimelineEventsFilter} from 'src/types/rhs';
 
 import {
     INCIDENT_CREATED,
     INCIDENT_UPDATED,
-    IncidentCreated,
-    IncidentUpdated,
+    PlaybookRunCreated,
+    PlaybookRunUpdated,
     RECEIVED_TEAM_INCIDENTS,
     RECEIVED_TOGGLE_RHS_ACTION,
-    ReceivedTeamIncidents,
+    ReceivedTeamPlaybookRuns,
     ReceivedToggleRHSAction,
     REMOVED_FROM_CHANNEL,
     RemovedFromChannel,
@@ -54,7 +54,7 @@ import {
 import {clientExecuteCommand} from './client';
 import {GlobalSettings} from './types/settings';
 
-export function startIncident(postId?: string) {
+export function startPlaybookRun(postId?: string) {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
         // Add unique id
         const clientId = generateId();
@@ -69,13 +69,13 @@ export function startIncident(postId?: string) {
     };
 }
 
-export function endIncident() {
+export function endPlaybookRun() {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
         await clientExecuteCommand(dispatch, getState, '/incident end');
     };
 }
 
-export function restartIncident() {
+export function restartPlaybookRun() {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
         await clientExecuteCommand(dispatch, getState, '/incident restart');
     };
@@ -106,10 +106,10 @@ export function setRHSOpen(open: boolean): SetRHSOpen {
     };
 }
 
-export function setRHSViewingIncident(): SetRHSState {
+export function setRHSViewingPlaybookRun(): SetRHSState {
     return {
         type: SET_RHS_STATE,
-        nextState: RHSState.ViewingIncident,
+        nextState: RHSState.ViewingPlaybookRun,
     };
 }
 
@@ -151,12 +151,12 @@ export function setClientId(clientId: string): SetClientId {
     };
 }
 
-export const incidentCreated = (incident: Incident): IncidentCreated => ({
+export const incidentCreated = (incident: PlaybookRun): PlaybookRunCreated => ({
     type: INCIDENT_CREATED,
     incident,
 });
 
-export const incidentUpdated = (incident: Incident): IncidentUpdated => ({
+export const incidentUpdated = (incident: PlaybookRun): PlaybookRunUpdated => ({
     type: INCIDENT_UPDATED,
     incident,
 });
@@ -177,7 +177,7 @@ export const receivedTeamNumPlaybooks = (teamID: string, numPlaybooks: number): 
     numPlaybooks,
 });
 
-export const receivedTeamIncidents = (incidents: Incident[]): ReceivedTeamIncidents => ({
+export const receivedTeamPlaybookRuns = (incidents: PlaybookRun[]): ReceivedTeamPlaybookRuns => ({
     type: RECEIVED_TEAM_INCIDENTS,
     incidents,
 });
@@ -187,7 +187,7 @@ export const receivedDisabledOnTeam = (teamId: string): ReceivedTeamDisabled => 
     teamId,
 });
 
-export const removedFromIncidentChannel = (channelId: string): RemovedFromChannel => ({
+export const removedFromPlaybookRunChannel = (channelId: string): RemovedFromChannel => ({
     type: REMOVED_FROM_CHANNEL,
     channelId,
 });

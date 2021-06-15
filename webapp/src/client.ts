@@ -15,11 +15,11 @@ import {ClientError} from 'mattermost-redux/client/client4';
 import {setTriggerId} from 'src/actions';
 import {OwnerInfo} from 'src/types/backstage';
 import {
-    FetchIncidentsParams,
+    FetchPlaybookRunsParams,
     FetchPlaybooksParams,
-    FetchIncidentsReturn,
-    Incident,
-    isIncident,
+    FetchPlaybookRunsReturn,
+    PlaybookRun,
+    isPlaybookRun,
     isMetadata,
     Metadata,
 } from 'src/types/incident';
@@ -40,54 +40,54 @@ import {GlobalSettings, globalSettingsSetDefaults} from './types/settings';
 
 const apiUrl = `/plugins/${pluginId}/api/v0`;
 
-export async function fetchIncidents(params: FetchIncidentsParams) {
+export async function fetchPlaybookRuns(params: FetchPlaybookRunsParams) {
     const queryParams = qs.stringify(params, {addQueryPrefix: true});
 
     let data = await doGet(`${apiUrl}/incidents${queryParams}`);
     if (!data) {
-        data = {items: [], total_count: 0, page_count: 0, has_more: false} as FetchIncidentsReturn;
+        data = {items: [], total_count: 0, page_count: 0, has_more: false} as FetchPlaybookRunsReturn;
     }
 
-    return data as FetchIncidentsReturn;
+    return data as FetchPlaybookRunsReturn;
 }
 
-export async function fetchIncident(id: string) {
+export async function fetchPlaybookRun(id: string) {
     const data = await doGet(`${apiUrl}/incidents/${id}`);
     // eslint-disable-next-line no-process-env
     if (process.env.NODE_ENV !== 'production') {
-        if (!isIncident(data)) {
+        if (!isPlaybookRun(data)) {
             // eslint-disable-next-line no-console
-            console.error('expected an Incident in fetchIncident, received:', data);
+            console.error('expected an PlaybookRun in fetchPlaybookRun, received:', data);
         }
     }
 
-    return data as Incident;
+    return data as PlaybookRun;
 }
 
-export async function fetchIncidentMetadata(id: string) {
+export async function fetchPlaybookRunMetadata(id: string) {
     const data = await doGet(`${apiUrl}/incidents/${id}/metadata`);
     // eslint-disable-next-line no-process-env
     if (process.env.NODE_ENV !== 'production') {
         if (!isMetadata(data)) {
             // eslint-disable-next-line no-console
-            console.error('expected a Metadata in fetchIncidentMetadata, received:', data);
+            console.error('expected a Metadata in fetchPlaybookRunMetadata, received:', data);
         }
     }
 
     return data as Metadata;
 }
 
-export async function fetchIncidentByChannel(channelId: string) {
+export async function fetchPlaybookRunByChannel(channelId: string) {
     const data = await doGet(`${apiUrl}/incidents/channel/${channelId}`);
     // eslint-disable-next-line no-process-env
     if (process.env.NODE_ENV !== 'production') {
-        if (!isIncident(data)) {
+        if (!isPlaybookRun(data)) {
             // eslint-disable-next-line no-console
-            console.error('expected an Incident in fetchIncident, received:', data);
+            console.error('expected an PlaybookRun in fetchPlaybookRun, received:', data);
         }
     }
 
-    return data as Incident;
+    return data as PlaybookRun;
 }
 
 export async function fetchCheckAndSendMessageOnJoin(incidentID: string, channelId: string) {
@@ -95,7 +95,7 @@ export async function fetchCheckAndSendMessageOnJoin(incidentID: string, channel
     return Boolean(data.viewed);
 }
 
-export function fetchIncidentChannels(teamID: string, userID: string) {
+export function fetchPlaybookRunChannels(teamID: string, userID: string) {
     return doGet(`${apiUrl}/incidents/channels?team_id=${teamID}&member_id=${userID}`);
 }
 
@@ -296,7 +296,7 @@ export async function fetchPlaybookStats(playbookID: string): Promise<PlaybookSt
     return data as PlaybookStats;
 }
 
-export async function telemetryEventForIncident(incidentID: string, action: string) {
+export async function telemetryEventForPlaybookRun(incidentID: string, action: string) {
     await doFetchWithoutResponse(`${apiUrl}/telemetry/incident/${incidentID}`, {
         method: 'POST',
         body: JSON.stringify({action}),

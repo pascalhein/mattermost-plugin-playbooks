@@ -7,15 +7,15 @@ import {getCurrentChannel} from 'mattermost-redux/selectors/entities/channels';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 
-import {fetchIncidents} from 'src/client';
+import {fetchPlaybookRuns} from 'src/client';
 
-import {isIncidentRHSOpen, inIncidentChannel} from 'src/selectors';
-import {toggleRHS, receivedTeamIncidents, receivedDisabledOnTeam} from 'src/actions';
+import {isPlaybookRunRHSOpen, inPlaybookRunChannel} from 'src/selectors';
+import {toggleRHS, receivedTeamPlaybookRuns, receivedDisabledOnTeam} from 'src/actions';
 
 export function makeRHSOpener(store: Store<GlobalState>): () => Promise<void> {
     let currentTeamId = '';
     let currentChannelId = '';
-    let currentChannelIsIncident = false;
+    let currentChannelIsPlaybookRun = false;
 
     return async () => {
         const state = store.getState();
@@ -34,27 +34,27 @@ export function makeRHSOpener(store: Store<GlobalState>): () => Promise<void> {
         if (currentTeamId !== currentTeam.id) {
             currentTeamId = currentTeam.id;
             const currentUserId = getCurrentUserId(state);
-            const fetched = await fetchIncidents({
+            const fetched = await fetchPlaybookRuns({
                 team_id: currentTeam.id,
                 member_id: currentUserId,
             });
             if (fetched.disabled) {
                 store.dispatch(receivedDisabledOnTeam(currentTeam.id));
             } else {
-                store.dispatch(receivedTeamIncidents(fetched.items));
+                store.dispatch(receivedTeamPlaybookRuns(fetched.items));
             }
         }
 
         // Only consider opening the RHS if the channel has changed and wasn't already seen as
         // an incident.
-        if (currentChannel.id === currentChannelId && currentChannelIsIncident) {
+        if (currentChannel.id === currentChannelId && currentChannelIsPlaybookRun) {
             return;
         }
         currentChannelId = currentChannel.id;
-        currentChannelIsIncident = inIncidentChannel(state);
+        currentChannelIsPlaybookRun = inPlaybookRunChannel(state);
 
         // Don't do anything if the incident RHS is already open.
-        if (isIncidentRHSOpen(state)) {
+        if (isPlaybookRunRHSOpen(state)) {
             return;
         }
 
@@ -64,7 +64,7 @@ export function makeRHSOpener(store: Store<GlobalState>): () => Promise<void> {
         }
 
         // Don't do anything unless we're in an incident channel.
-        if (!currentChannelIsIncident) {
+        if (!currentChannelIsPlaybookRun) {
             return;
         }
 

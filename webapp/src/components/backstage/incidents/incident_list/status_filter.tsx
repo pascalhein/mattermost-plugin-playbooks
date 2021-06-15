@@ -50,7 +50,7 @@ export function StatusFilter(props: Props) {
             target={
                 <button
                     onClick={toggleOpen}
-                    className='IncidentFilter-button'
+                    className='PlaybookRunFilter-button'
                 >
                     {selected.value === '' ? 'Status' : selected.label}
                     {<i className='icon-chevron-down icon--small ml-2'/>}
@@ -106,13 +106,13 @@ const DropdownContainer = styled.div`
 
 const Dropdown = ({children, isOpen, target, onClose}: DropdownProps) => (
     <DropdownContainer
-        className={`IncidentFilter status-filter-dropdown${isOpen ? ' IncidentFilter--active status-filter-dropdown--active' : ''}`}
+        className={`PlaybookRunFilter status-filter-dropdown${isOpen ? ' PlaybookRunFilter--active status-filter-dropdown--active' : ''}`}
     >
         {target}
         {
             isOpen &&
             <>
-                <Menu className='IncidentFilter-select status-filter-select__container'>
+                <Menu className='PlaybookRunFilter-select status-filter-select__container'>
                     {children}
                 </Menu>
                 <Blanket onClick={onClose}/>

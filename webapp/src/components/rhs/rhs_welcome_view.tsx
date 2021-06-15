@@ -9,14 +9,14 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {GlobalState} from 'mattermost-redux/types/store';
 import {Team} from 'mattermost-redux/types/teams';
 
-import {startIncident} from 'src/actions';
+import {startPlaybookRun} from 'src/actions';
 import {navigateToTeamPluginUrl} from 'src/browser_routing';
 import {clientHasPlaybooks} from 'src/client';
 import {PrimaryButton, TertiaryButton} from 'src/components/assets/buttons';
 import NoContentPlaybookSvgRhs from 'src/components/assets/no_content_playbooks_rhs_svg';
 import {RHSContainer} from 'src/components/rhs/rhs_shared';
 
-const NoIncidentsContainer = styled.div`
+const NoPlaybookRunsContainer = styled.div`
     margin: 48px 40px 0;
     display: block;
     flex-direction: column;
@@ -31,7 +31,7 @@ const NoIncidentsContainer = styled.div`
     }
 `;
 
-const NoIncidentsItem = styled.div`
+const NoPlaybookRunsItem = styled.div`
     margin-bottom: 24px;
 `;
 
@@ -56,9 +56,9 @@ const RHSWelcomeView = () => {
     if (hasPlaybooks) {
         return (
             <RHSContainer>
-                <NoIncidentsContainer data-testid='welcome-view-has-playbooks'>
+                <NoPlaybookRunsContainer data-testid='welcome-view-has-playbooks'>
                     <NoContentPlaybookSvgRhs/>
-                    <NoIncidentsItem>
+                    <NoPlaybookRunsItem>
                         <h1>
                             {'Take action now with Incident Collaboration.'}
                         </h1>
@@ -67,7 +67,7 @@ const RHSWelcomeView = () => {
                         </p>
                         <div className='header-button-div mb-4'>
                             <PrimaryButton
-                                onClick={() => dispatch(startIncident())}
+                                onClick={() => dispatch(startPlaybookRun())}
                             >
                                 <SideBySide>
                                     <i className='icon-plus icon--no-spacing mr-2'/>
@@ -83,17 +83,17 @@ const RHSWelcomeView = () => {
                         >
                             {'Create Playbook'}
                         </TertiaryButton>
-                    </NoIncidentsItem>
-                </NoIncidentsContainer>
+                    </NoPlaybookRunsItem>
+                </NoPlaybookRunsContainer>
             </RHSContainer>
         );
     }
 
     return (
         <RHSContainer>
-            <NoIncidentsContainer data-testid='welcome-view'>
+            <NoPlaybookRunsContainer data-testid='welcome-view'>
                 <NoContentPlaybookSvgRhs/>
-                <NoIncidentsItem>
+                <NoPlaybookRunsItem>
                     <h1>
                         {'Simplify your processes with Incident Collaboration'}
                     </h1>
@@ -107,8 +107,8 @@ const RHSWelcomeView = () => {
                             {'Create Playbook'}
                         </PrimaryButton>
                     </div>
-                </NoIncidentsItem>
-            </NoIncidentsContainer>
+                </NoPlaybookRunsItem>
+            </NoPlaybookRunsContainer>
         </RHSContainer>
     );
 };

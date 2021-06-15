@@ -121,11 +121,11 @@ const RHSTimelineEventItem = (props: Props) => {
     let timeSince: JSX.Element | null = <TimeDay>{'Time: ' + stamp}</TimeDay>;
 
     switch (props.event.event_type) {
-    case TimelineEventType.IncidentCreated:
+    case TimelineEventType.PlaybookRunCreated:
         iconClass = 'icon icon-shield-alert-outline';
         summaryTitle = 'Incident Reported by ' + props.event.subject_display_name;
         timeSince = null;
-        testid = TimelineEventType.IncidentCreated;
+        testid = TimelineEventType.PlaybookRunCreated;
         break;
     case TimelineEventType.StatusUpdated:
         iconClass = 'icon icon-flag-outline';

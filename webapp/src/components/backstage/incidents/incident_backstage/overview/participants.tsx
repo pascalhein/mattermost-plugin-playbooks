@@ -10,7 +10,7 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import {UserProfile} from 'mattermost-redux/types/users';
 import {getUser} from 'mattermost-redux/selectors/entities/users';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import ProfileWithPosition
     from 'src/components/backstage/incidents/incident_backstage/overview/profile_w_position';
 import {useProfilesInChannel} from 'src/hooks';
@@ -38,7 +38,7 @@ const ParticipantRow = styled.div`
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 const Participants = (props: Props) => {

@@ -9,7 +9,7 @@ interface Props {
     id?: string;
 }
 
-const IncidentIcon = React.forwardRef<Ref, Props>((props: Props, forwardedRef) => (
+const PlaybookRunIcon = React.forwardRef<Ref, Props>((props: Props, forwardedRef) => (
     <svg
         id={props?.id}
         ref={forwardedRef}
@@ -26,4 +26,4 @@ const IncidentIcon = React.forwardRef<Ref, Props>((props: Props, forwardedRef) =
     </svg>
 ));
 
-export default IncidentIcon;
+export default PlaybookRunIcon;

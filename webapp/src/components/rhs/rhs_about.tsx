@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import {useDispatch} from 'react-redux';
 
 import {setOwner} from 'src/client';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import ProfileSelector from 'src/components/profile/profile_selector';
 
 import './incident_details.scss';
@@ -37,7 +37,7 @@ const NoDescription = styled.div`
 `;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 const RHSAbout = (props: Props) => {
@@ -81,7 +81,7 @@ const RHSAbout = (props: Props) => {
             renderView={renderView}
             style={{position: 'absolute'}}
         >
-            <div className='IncidentDetails'>
+            <div className='PlaybookRunDetails'>
                 <Description>
                     <div className='title'>
                         {'Description'}

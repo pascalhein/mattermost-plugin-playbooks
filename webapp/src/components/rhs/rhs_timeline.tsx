@@ -21,7 +21,7 @@ import {
 import {Team} from 'mattermost-redux/types/teams';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import {
     TimelineEvent,
     TimelineEventsFilter,
@@ -35,9 +35,9 @@ import {
 } from 'src/components/rhs/rhs_shared';
 import {ChannelNamesMap} from 'src/types/backstage';
 import MultiCheckbox, {CheckboxOption} from 'src/components/multi_checkbox';
-import {currentRHSEventsFilter, currentIncident} from 'src/selectors';
+import {currentRHSEventsFilter, currentPlaybookRun} from 'src/selectors';
 import {setRHSEventsFilter} from 'src/actions';
-import {telemetryEventForIncident} from 'src/client';
+import {telemetryEventForPlaybookRun} from 'src/client';
 
 import {useAllowTimelineViewInCurrentTeam} from 'src/hooks';
 
@@ -77,7 +77,7 @@ const NoEventsNotice = styled.div`
 type IdToUserFn = (userId: string) => UserProfile;
 
 interface Props {
-    incident: Incident;
+    incident: PlaybookRun;
 }
 
 const RHSTimeline = (props: Props) => {
@@ -92,7 +92,7 @@ const RHSTimeline = (props: Props) => {
     const [allEvents, setAllEvents] = useState<TimelineEvent[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<TimelineEvent[]>([]);
     const eventsFilter = useSelector<GlobalState, TimelineEventsFilter>(currentRHSEventsFilter);
-    const incident = useSelector<GlobalState, Incident>(currentIncident);
+    const incident = useSelector<GlobalState, PlaybookRun>(currentPlaybookRun);
 
     const allowTimelineView = useAllowTimelineViewInCurrentTeam();
 
@@ -101,7 +101,7 @@ const RHSTimeline = (props: Props) => {
     }, [eventsFilter, allEvents]);
 
     const selectOption = (value: string, checked: boolean) => {
-        telemetryEventForIncident(incident.id, 'timeline_tab_filter_selected');
+        telemetryEventForPlaybookRun(incident.id, 'timeline_tab_filter_selected');
 
         if (eventsFilter.all && value !== 'all') {
             return;
@@ -252,5 +252,5 @@ const showEvent = (eventType: string, filter: TimelineEventsFilter) => {
     }
     const filterRecord = filter as unknown as Record<string, boolean>;
     return filterRecord[eventType] ||
-        (eventType === TimelineEventType.IncidentCreated && filterRecord[TimelineEventType.StatusUpdated]);
+        (eventType === TimelineEventType.PlaybookRunCreated && filterRecord[TimelineEventType.StatusUpdated]);
 };

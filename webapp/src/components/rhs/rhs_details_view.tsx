@@ -9,16 +9,16 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import {RHSContainer, RHSContent} from 'src/components/rhs/rhs_shared';
 import RHSTabView from 'src/components/rhs/rhs_tab_view';
 import {RHSTabState} from 'src/types/rhs';
-import {currentIncident, currentRHSTabState} from 'src/selectors';
+import {currentPlaybookRun, currentRHSTabState} from 'src/selectors';
 import RHSAbout from 'src/components/rhs/rhs_about';
-import RHSIncidentTasks from 'src/components/rhs/rhs_incident_tasks';
+import RHSPlaybookRunTasks from 'src/components/rhs/rhs_incident_tasks';
 import RHSFooter from 'src/components/rhs/rhs_footer';
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import RHSTimeline from 'src/components/rhs/rhs_timeline';
 import {useAllowTimelineViewInCurrentTeam} from 'src/hooks';
 
 const RHSDetailsView = () => {
-    const incident = useSelector<GlobalState, Incident | undefined>(currentIncident);
+    const incident = useSelector<GlobalState, PlaybookRun | undefined>(currentPlaybookRun);
     const currentTabState = useSelector<GlobalState, RHSTabState>(currentRHSTabState);
     const allowTimelineView = useAllowTimelineViewInCurrentTeam();
     const showFooter = currentTabState !== RHSTabState.ViewingTimeline || allowTimelineView;
@@ -33,7 +33,7 @@ const RHSDetailsView = () => {
         currentView = <RHSAbout incident={incident}/>;
         break;
     case RHSTabState.ViewingTasks:
-        currentView = <RHSIncidentTasks incident={incident}/>;
+        currentView = <RHSPlaybookRunTasks incident={incident}/>;
         break;
     case RHSTabState.ViewingTimeline:
         currentView = <RHSTimeline incident={incident}/>;

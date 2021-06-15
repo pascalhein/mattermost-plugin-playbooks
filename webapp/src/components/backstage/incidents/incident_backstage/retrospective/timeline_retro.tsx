@@ -13,7 +13,7 @@ import {getUser as getUserAction} from 'mattermost-redux/actions/users';
 import {DispatchFunc} from 'mattermost-redux/types/actions';
 import {getUser} from 'mattermost-redux/selectors/entities/users';
 
-import {Incident} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/incident';
 import Timeline from 'src/components/backstage/incidents/incident_backstage/retrospective/timeline';
 import MultiCheckbox, {CheckboxOption} from 'src/components/multi_checkbox';
 import {TimelineEvent, TimelineEventsFilter, TimelineEventType} from 'src/types/rhs';
@@ -69,7 +69,7 @@ const PrimaryButtonNotRight = styled(PrimaryButtonRight)`
 
 type IdToUserFn = (userId: string) => UserProfile;
 
-const TimelineRetro = (props: { incident: Incident }) => {
+const TimelineRetro = (props: { incident: PlaybookRun }) => {
     const dispatch = useDispatch();
     const displayPreference = useSelector<GlobalState, string | undefined>(getTeammateNameDisplaySetting) || 'username';
     const [allEvents, setAllEvents] = useState<TimelineEvent[]>([]);
@@ -199,5 +199,5 @@ const showEvent = (eventType: string, filter: TimelineEventsFilter) => {
     }
     const filterRecord = filter as unknown as Record<string, boolean>;
     return filterRecord[eventType] ||
-        (eventType === TimelineEventType.IncidentCreated && filterRecord[TimelineEventType.StatusUpdated]);
+        (eventType === TimelineEventType.PlaybookRunCreated && filterRecord[TimelineEventType.StatusUpdated]);
 };
