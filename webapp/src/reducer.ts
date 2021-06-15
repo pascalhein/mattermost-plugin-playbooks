@@ -18,10 +18,10 @@ import {
     ReceivedTeamIncidents,
     SetRHSState,
     SET_RHS_STATE,
-    RemovedFromIncidentChannel,
+    RemovedFromChannel,
     IncidentUpdated,
     INCIDENT_UPDATED,
-    REMOVED_FROM_INCIDENT_CHANNEL,
+    REMOVED_FROM_CHANNEL,
     SetRHSTabState,
     SET_RHS_TAB_STATE,
     SetRHSEventsFilter,
@@ -85,7 +85,7 @@ function rhsState(state = RHSState.ViewingIncident, action: SetRHSState) {
 // Aditnally it handles the plugin being disabled on the team
 const myIncidentsByTeam = (
     state: Record<string, Record<string, Incident>> = {},
-    action: IncidentCreated | IncidentUpdated | ReceivedTeamIncidents | RemovedFromIncidentChannel | ReceivedTeamDisabled,
+    action: IncidentCreated | IncidentUpdated | ReceivedTeamIncidents | RemovedFromChannel | ReceivedTeamDisabled,
 ) => {
     switch (action.type) {
     case INCIDENT_CREATED: {
@@ -132,8 +132,8 @@ const myIncidentsByTeam = (
 
         return newState;
     }
-    case REMOVED_FROM_INCIDENT_CHANNEL: {
-        const removedFromChannelAction = action as RemovedFromIncidentChannel;
+    case REMOVED_FROM_CHANNEL: {
+        const removedFromChannelAction = action as RemovedFromChannel;
         const channelId = removedFromChannelAction.channelId;
         const teamId = Object.keys(state).find((t) => Boolean(state[t][channelId]));
         if (!teamId) {

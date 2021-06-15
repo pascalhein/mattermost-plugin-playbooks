@@ -20,7 +20,7 @@ export const PLAYBOOK_DELETED = pluginId + '_playbook_deleted';
 export const RECEIVED_TEAM_NUM_PLAYBOOKS = pluginId + '_received_team_num_playbooks';
 export const RECEIVED_TEAM_INCIDENTS = pluginId + '_received_team_incident_channels';
 export const RECEIVED_TEAM_DISABLED = pluginId + '_received_team_disabled';
-export const REMOVED_FROM_INCIDENT_CHANNEL = pluginId + '_removed_from_incident_channel';
+export const REMOVED_FROM_CHANNEL = pluginId + '_removed_from_incident_channel';
 export const SET_RHS_STATE = pluginId + '_set_rhs_state';
 export const SET_RHS_TAB_STATE = pluginId + '_set_rhs_tab_state';
 export const SET_RHS_EVENTS_FILTER = pluginId + '_set_rhs_events_filter';
@@ -85,8 +85,8 @@ export interface ReceivedTeamDisabled {
     teamId: string
 }
 
-export interface RemovedFromIncidentChannel {
-    type: typeof REMOVED_FROM_INCIDENT_CHANNEL;
+export interface RemovedFromChannel {
+    type: typeof REMOVED_FROM_CHANNEL;
     channelId: string;
 }
 

@@ -1,5 +1,5 @@
 import {
-    REMOVED_FROM_INCIDENT_CHANNEL,
+    REMOVED_FROM_CHANNEL,
 } from 'src/types/actions';
 import reducer from 'src/reducer';
 
@@ -7,7 +7,7 @@ describe('myIncidentsByTeam', () => {
     // @ts-ignore
     const initialState = reducer(undefined, {}); // eslint-disable-line no-undefined
 
-    describe('REMOVED_FROM_INCIDENT_CHANNEL', () => {
+    describe('REMOVED_FROM_CHANNEL', () => {
         const makeState = (myIncidentsByTeam: any) => ({
             ...initialState,
             myIncidentsByTeam,
@@ -25,7 +25,7 @@ describe('myIncidentsByTeam', () => {
                 },
             });
             const action = {
-                type: REMOVED_FROM_INCIDENT_CHANNEL,
+                type: REMOVED_FROM_CHANNEL,
                 channelId: 'unknown',
             };
             const expectedState = state;
@@ -46,7 +46,7 @@ describe('myIncidentsByTeam', () => {
                 },
             });
             const action = {
-                type: REMOVED_FROM_INCIDENT_CHANNEL,
+                type: REMOVED_FROM_CHANNEL,
                 channelId: 'channelId2',
             };
             const expectedState = makeState({

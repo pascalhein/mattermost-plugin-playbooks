@@ -21,8 +21,8 @@ import {
     RECEIVED_TOGGLE_RHS_ACTION,
     ReceivedTeamIncidents,
     ReceivedToggleRHSAction,
-    REMOVED_FROM_INCIDENT_CHANNEL,
-    RemovedFromIncidentChannel,
+    REMOVED_FROM_CHANNEL,
+    RemovedFromChannel,
     SET_CLIENT_ID,
     SET_RHS_EVENTS_FILTER,
     SET_RHS_OPEN,
@@ -187,8 +187,8 @@ export const receivedDisabledOnTeam = (teamId: string): ReceivedTeamDisabled => 
     teamId,
 });
 
-export const removedFromIncidentChannel = (channelId: string): RemovedFromIncidentChannel => ({
-    type: REMOVED_FROM_INCIDENT_CHANNEL,
+export const removedFromIncidentChannel = (channelId: string): RemovedFromChannel => ({
+    type: REMOVED_FROM_CHANNEL,
     channelId,
 });
 
