@@ -60,7 +60,7 @@ const DialogFieldReminderInSecondsKey = "reminder"
 const DialogFieldStatusKey = "status"
 
 // DialogFieldPlaybookRunKey is the key for the playbook run chosen in AddToTimelineDialog
-const DialogFieldPlaybookRunKey = "incident"
+const DialogFieldPlaybookRunKey = "playbook_run"
 
 // DialogFieldSummary is the key for the summary in AddToTimelineDialog
 const DialogFieldSummary = "summary"
@@ -201,7 +201,7 @@ func (s *PlaybookRunServiceImpl) CreatePlaybookRun(playbookRun *PlaybookRun, pb 
 
 	header := "This is an incident channel. To view more information, select the shield icon then select *Tasks* or *Overview*."
 	if siteURL != "" && pb != nil {
-		overviewURL = fmt.Sprintf("%s/%s/%s/incidents/%s", siteURL, team.Name, s.configService.GetManifest().Id, playbookRun.ID)
+		overviewURL = fmt.Sprintf("%s/%s/%s/runs/%s", siteURL, team.Name, s.configService.GetManifest().Id, playbookRun.ID)
 		playbookURL = fmt.Sprintf("%s/%s/%s/playbooks/%s", siteURL, team.Name, s.configService.GetManifest().Id, pb.ID)
 		header = fmt.Sprintf("This channel was created as part of the [%s](%s) playbook. Visit [the overview page](%s) for more information.",
 			pb.Title, playbookURL, overviewURL)
@@ -389,7 +389,7 @@ func (s *PlaybookRunServiceImpl) OpenCreatePlaybookRunDialog(teamID, ownerID, tr
 	}
 
 	dialogRequest := model.OpenDialogRequest{
-		URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/dialog",
+		URL: fmt.Sprintf("/plugins/%s/api/v0/runs/dialog",
 			s.configService.GetManifest().Id),
 		Dialog:    *dialog,
 		TriggerId: triggerID,
@@ -427,7 +427,7 @@ func (s *PlaybookRunServiceImpl) OpenUpdateStatusDialog(playbookRunID string, tr
 	}
 
 	dialogRequest := model.OpenDialogRequest{
-		URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/%s/update-status-dialog",
+		URL: fmt.Sprintf("/plugins/%s/api/v0/runs/%s/update-status-dialog",
 			s.configService.GetManifest().Id,
 			playbookRunID),
 		Dialog:    *dialog,
@@ -463,7 +463,7 @@ func (s *PlaybookRunServiceImpl) OpenAddToTimelineDialog(requesterInfo Requester
 	}
 
 	dialogRequest := model.OpenDialogRequest{
-		URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/add-to-timeline-dialog",
+		URL: fmt.Sprintf("/plugins/%s/api/v0/runs/add-to-timeline-dialog",
 			s.configService.GetManifest().Id),
 		Dialog:    *dialog,
 		TriggerId: triggerID,
@@ -499,7 +499,7 @@ func (s *PlaybookRunServiceImpl) OpenAddChecklistItemDialog(triggerID, playbookR
 	}
 
 	dialogRequest := model.OpenDialogRequest{
-		URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/%s/checklists/%v/add-dialog",
+		URL: fmt.Sprintf("/plugins/%s/api/v0/runs/%s/checklists/%v/add-dialog",
 			s.configService.GetManifest().Id, playbookRunID, checklist),
 		Dialog:    *dialog,
 		TriggerId: triggerID,
@@ -784,7 +784,7 @@ func (s *PlaybookRunServiceImpl) postRetrospectiveReminder(playbookRun *Playbook
 		return err
 	}
 
-	retrospectiveURL := fmt.Sprintf("/%s/%s/incidents/%s/retrospective",
+	retrospectiveURL := fmt.Sprintf("/%s/%s/runs/%s/retrospective",
 		team.Name,
 		s.configService.GetManifest().Id,
 		playbookRun.ID,
@@ -797,7 +797,7 @@ func (s *PlaybookRunServiceImpl) postRetrospectiveReminder(playbookRun *Playbook
 					Type: "button",
 					Name: "No Retrospective",
 					Integration: &model.PostActionIntegration{
-						URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/%s/no-retrospective-button",
+						URL: fmt.Sprintf("/plugins/%s/api/v0/runs/%s/no-retrospective-button",
 							s.configService.GetManifest().Id,
 							playbookRun.ID),
 					},
@@ -1853,7 +1853,7 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(playbookRunID, text, publi
 		return err
 	}
 
-	retrospectiveURL := fmt.Sprintf("/%s/%s/incidents/%s/retrospective",
+	retrospectiveURL := fmt.Sprintf("/%s/%s/runs/%s/retrospective",
 		team.Name,
 		s.configService.GetManifest().Id,
 		playbookRunToPublish.ID,
@@ -1947,7 +1947,7 @@ func getChannelURL(siteURL string, teamName string, channelName string) string {
 }
 
 func getDetailsURL(siteURL string, teamName string, manifestID string, playbookRunID string) string {
-	return fmt.Sprintf("%s/%s/%s/incidents/%s",
+	return fmt.Sprintf("%s/%s/%s/runs/%s",
 		siteURL,
 		teamName,
 		manifestID,

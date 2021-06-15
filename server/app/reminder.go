@@ -12,10 +12,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Reminder struct {
-	PlaybookRunID string `json:"incident_id"`
-}
-
 const RetrospectivePrefix = "retro_"
 
 // HandleReminder is the handler for all reminder events.
@@ -80,7 +76,7 @@ func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(playbookRunID string
 					Type: "button",
 					Name: "Update Status",
 					Integration: &model.PostActionIntegration{
-						URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/%s/reminder/button-update",
+						URL: fmt.Sprintf("/plugins/%s/api/v0/runs/%s/reminder/button-update",
 							s.configService.GetManifest().Id,
 							playbookRunToModify.ID),
 					},
@@ -89,7 +85,7 @@ func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(playbookRunID string
 					Type: "button",
 					Name: "Dismiss",
 					Integration: &model.PostActionIntegration{
-						URL: fmt.Sprintf("/plugins/%s/api/v0/incidents/%s/reminder/button-dismiss",
+						URL: fmt.Sprintf("/plugins/%s/api/v0/runs/%s/reminder/button-dismiss",
 							s.configService.GetManifest().Id,
 							playbookRunToModify.ID),
 					},
