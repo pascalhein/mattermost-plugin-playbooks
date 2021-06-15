@@ -90,7 +90,7 @@ export const AutomationSettings = (props: Props) => {
                         onChannelSelected={props.onAnnouncementChannelSelected}
                     />
                 </Setting>
-                <Setting id={'incident-creation__outgoing-webhook'}>
+                <Setting id={'playbook-run-creation__outgoing-webhook'}>
                     <Webhook
                         enabled={props.webhookOnCreationEnabled}
                         onToggle={props.onToggleWebhookOnCreation}
@@ -103,7 +103,7 @@ export const AutomationSettings = (props: Props) => {
                 <SectionTitle>
                     {'When an incident status is updated'}
                 </SectionTitle>
-                <Setting id={'incident-status-update__outgoing-webhook'}>
+                <Setting id={'playbook-run-status-update__outgoing-webhook'}>
                     <Webhook
                         enabled={props.webhookOnStatusUpdateEnabled}
                         onToggle={props.onToggleWebhookOnStatusUpdate}

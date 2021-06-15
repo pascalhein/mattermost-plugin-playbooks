@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-import {EmptyBody, TabPageContainer, Title} from 'src/components/backstage/incidents/shared';
+import {EmptyBody, TabPageContainer, Title} from 'src/components/backstage/playbook_runs/shared';
 
 const RetrospectiveSummary = () => {
     return (

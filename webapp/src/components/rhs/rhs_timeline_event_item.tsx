@@ -217,7 +217,7 @@ const RHSTimelineEventItem = (props: Props) => {
                 message={'Are you sure you want to delete this event? Deleted events will be permanently removed from the timeline.'}
                 confirmButtonText={'Delete Entry'}
                 onConfirm={() =>
-                    clientRemoveTimelineEvent(props.event.incident_id, props.event.id)
+                    clientRemoveTimelineEvent(props.event.playbook_run_id, props.event.id)
                 }
                 onCancel={() => setShowDeleteConfirm(false)}
             />

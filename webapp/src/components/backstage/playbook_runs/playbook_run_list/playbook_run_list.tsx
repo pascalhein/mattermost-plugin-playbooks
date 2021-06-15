@@ -15,17 +15,22 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import {Team} from 'mattermost-redux/types/teams';
 import {UserProfile} from 'mattermost-redux/types/users';
 
-import NoContentPlaybookRunSvg from 'src/components/assets/no_content_incidents_svg';
-import TextWithTooltip from 'src/components/widgets/text_with_tooltip';
-import {SortableColHeader} from 'src/components/sortable_col_header';
+import NoContentPlaybookRunSvg from 'src/components/assets/no_content_playbook_runs_svg';
+
 import {
     StatusFilter,
     StatusOption,
-} from 'src/components/backstage/incidents/incident_list/status_filter';
-import SearchInput from 'src/components/backstage/incidents/incident_list/search_input';
+} from 'src/components/backstage/playbook_runs/playbook_run_list/status_filter';
+
+import SearchInput from 'src/components/backstage/playbook_runs/playbook_run_list/search_input';
+
+import {FetchPlaybookRunsParams, PlaybookRun, playbookRunIsActive, playbookRunCurrentStatus} from 'src/types/playbook_run';
+
+import TextWithTooltip from 'src/components/widgets/text_with_tooltip';
+import {SortableColHeader} from 'src/components/sortable_col_header';
+
 import ProfileSelector from 'src/components/profile/profile_selector';
 import {PaginationRow} from 'src/components/pagination_row';
-import {FetchPlaybookRunsParams, PlaybookRun, incidentIsActive, incidentCurrentStatus} from 'src/types/incident';
 import {
     fetchOwnersInTeam,
     fetchPlaybookRuns,
@@ -38,7 +43,7 @@ import RightFade from 'src/components/assets/right_fade';
 import LeftDots from 'src/components/assets/left_dots';
 import LeftFade from 'src/components/assets/left_fade';
 
-import './incident_list.scss';
+import './playbook_run_list.scss';
 import BackstageListHeader from '../../backstage_list_header';
 import {BACKSTAGE_LIST_PER_PAGE} from 'src/constants';
 import {startPlaybookRun} from 'src/actions';
@@ -160,7 +165,7 @@ const statusOptions: StatusOption[] = [
 const BackstagePlaybookRunList = () => {
     const dispatch = useDispatch();
     const [showNoPlaybookRuns, setShowNoPlaybookRuns] = useState(false);
-    const [incidents, setPlaybookRuns] = useState<PlaybookRun[] | null>(null);
+    const [playbookRuns, setPlaybookRuns] = useState<PlaybookRun[] | null>(null);
     const [totalCount, setTotalCount] = useState(0);
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
     const selectUser = useSelector<GlobalState>((state) => (userId: string) => getUser(state, userId)) as (userId: string) => UserProfile;
@@ -188,17 +193,17 @@ const BackstagePlaybookRunList = () => {
     }, [currentTeam.id]);
 
     // When the component is first mounted (or the team changes), determine if there are any
-    // incidents at all, ignoring filters. Decide once if we should show the "no incidents"
+    // playbook runs at all, ignoring filters. Decide once if we should show the "no playbook runs"
     // landing page.
     useEffect(() => {
         async function checkForPlaybookRuns() {
-            const incidentsReturn = await fetchPlaybookRuns({
+            const playbookRunsReturn = await fetchPlaybookRuns({
                 team_id: currentTeam.id,
                 page: 0,
                 per_page: 1,
             });
 
-            if (incidentsReturn.items.length === 0) {
+            if (playbookRunsReturn.items.length === 0) {
                 setShowNoPlaybookRuns(true);
             }
         }
@@ -209,11 +214,11 @@ const BackstagePlaybookRunList = () => {
     useEffect(() => {
         let isCanceled = false;
         async function fetchPlaybookRunsAsync() {
-            const incidentsReturn = await fetchPlaybookRuns(fetchParams);
+            const playbookRunsReturn = await fetchPlaybookRuns(fetchParams);
 
             if (!isCanceled) {
-                setPlaybookRuns(incidentsReturn.items);
-                setTotalCount(incidentsReturn.total_count);
+                setPlaybookRuns(playbookRunsReturn.items);
+                setTotalCount(playbookRunsReturn.total_count);
             }
         }
 
@@ -261,8 +266,8 @@ const BackstagePlaybookRunList = () => {
         setFetchParams({...fetchParams, owner_user_id: userId, page: 0});
     }
 
-    function openPlaybookRunDetails(incident: PlaybookRun) {
-        navigateToTeamPluginUrl(currentTeam.name, `/incidents/${incident.id}`);
+    function openPlaybookRunDetails(playbookRun: PlaybookRun) {
+        navigateToTeamPluginUrl(currentTeam.name, `/runs/${playbookRun.id}`);
     }
 
     const [profileSelectorToggle, setProfileSelectorToggle] = useState(false);
@@ -281,8 +286,8 @@ const BackstagePlaybookRunList = () => {
         dispatch(startPlaybookRun());
     };
 
-    // Show nothing until after we've completed fetching incidents.
-    if (incidents === null) {
+    // Show nothing until after we've completed fetching playbook runs.
+    if (playbookRuns === null) {
         return null;
     }
 
@@ -306,7 +311,7 @@ const BackstagePlaybookRunList = () => {
                 </div>
             </div>
             <div
-                id='incidentList'
+                id='playbookRunList'
                 className='list'
             >
                 <div className='PlaybookRunList__filters'>
@@ -373,42 +378,42 @@ const BackstagePlaybookRunList = () => {
                     </div>
                 </BackstageListHeader>
 
-                {incidents.length === 0 &&
+                {playbookRuns.length === 0 &&
                     <div className='text-center pt-8'>
                         {'There are no incidents for '}
                         <i>{currentTeam.display_name}</i>
                         {' matching those filters.'}
                     </div>
                 }
-                {incidents.map((incident) => (
+                {playbookRuns.map((playbookRun) => (
                     <div
-                        className='row incident-item'
-                        key={incident.id}
-                        onClick={() => openPlaybookRunDetails(incident)}
+                        className='row playbook-run-item'
+                        key={playbookRun.id}
+                        onClick={() => openPlaybookRunDetails(playbookRun)}
                     >
-                        <a className='col-sm-3 incident-item__title'>
+                        <a className='col-sm-3 playbook-run-item__title'>
                             <TextWithTooltip
-                                id={incident.id}
-                                text={incident.name}
+                                id={playbookRun.id}
+                                text={playbookRun.name}
                             />
                         </a>
                         <div className='col-sm-2'>
-                            <StatusBadge status={incidentCurrentStatus(incident)}/>
+                            <StatusBadge status={playbookRunCurrentStatus(playbookRun)}/>
                         </div>
                         <div
                             className='col-sm-2'
                         >
                             {
-                                formatDate(moment(incident.create_at))
+                                formatDate(moment(playbookRun.create_at))
                             }
                         </div>
                         <div className='col-sm-2'>
                             {
-                                endedAt(incidentIsActive(incident), incident.end_at)
+                                endedAt(playbookRunIsActive(playbookRun), playbookRun.end_at)
                             }
                         </div>
                         <div className='col-sm-3'>
-                            <Profile userId={incident.owner_user_id}/>
+                            <Profile userId={playbookRun.owner_user_id}/>
                         </div>
                     </div>
                 ))}

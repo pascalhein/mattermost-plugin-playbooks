@@ -4,14 +4,16 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {PlaybookRun} from 'src/types/incident';
-import PostCard from 'src/components/rhs/post_card';
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {
     Content,
     EmptyBody,
     TabPageContainer,
     Title,
-} from 'src/components/backstage/incidents/shared';
+} from 'src/components/backstage/playbook_runs/shared';
+
+import PostCard from 'src/components/rhs/post_card';
 import {usePost} from 'src/hooks';
 
 const StyledContent = styled(Content)`
@@ -19,11 +21,11 @@ const StyledContent = styled(Content)`
 `;
 
 interface Props {
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
 }
 
 const Updates = (props: Props) => {
-    const statusPosts = props.incident.status_posts.sort((a, b) => b.create_at - a.create_at);
+    const statusPosts = props.playbookRun.status_posts.sort((a, b) => b.create_at - a.create_at);
 
     let updates: JSX.Element | JSX.Element[] =
         <EmptyBody>{'There are no updates available.'}</EmptyBody>;

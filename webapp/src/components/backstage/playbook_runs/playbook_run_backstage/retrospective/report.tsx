@@ -4,12 +4,14 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
 
-import {StyledTextarea} from 'src/components/backstage/styles';
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {
     Title,
     SecondaryButton,
-} from 'src/components/backstage/incidents/shared';
-import {PlaybookRun} from 'src/types/incident';
+} from 'src/components/backstage/playbook_runs/shared';
+
+import {StyledTextarea} from 'src/components/backstage/styles';
 import {publishRetrospective, updateRetrospective} from 'src/client';
 import {PrimaryButton} from 'src/components/assets/buttons';
 import PostText from 'src/components/post_text';
@@ -59,21 +61,21 @@ const ReportContainer = styled.div`
 `;
 
 interface ReportProps {
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
 }
 
 const Report = (props: ReportProps) => {
-    const [report, setReport] = useState(props.incident.retrospective);
+    const [report, setReport] = useState(props.playbookRun.retrospective);
     const [editing, setEditing] = useState(false);
     const [publishedThisSession, setPublishedThisSession] = useState(false);
 
     const savePressed = () => {
-        updateRetrospective(props.incident.id, report);
+        updateRetrospective(props.playbookRun.id, report);
         setEditing(false);
     };
 
     const publishPressed = () => {
-        publishRetrospective(props.incident.id, report);
+        publishRetrospective(props.playbookRun.id, report);
         setEditing(false);
         setPublishedThisSession(true);
     };
@@ -86,7 +88,7 @@ const Report = (props: ReportProps) => {
                 {'Published'}
             </>
         );
-    } else if (props.incident.retrospective_published_at && !props.incident.retrospective_was_canceled) {
+    } else if (props.playbookRun.retrospective_published_at && !props.playbookRun.retrospective_was_canceled) {
         publishButtonText = 'Republish';
     }
 

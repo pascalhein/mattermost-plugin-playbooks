@@ -13,18 +13,21 @@ import {getUser as getUserAction} from 'mattermost-redux/actions/users';
 import {DispatchFunc} from 'mattermost-redux/types/actions';
 import {getUser} from 'mattermost-redux/selectors/entities/users';
 
-import {PlaybookRun} from 'src/types/incident';
-import Timeline from 'src/components/backstage/incidents/incident_backstage/retrospective/timeline';
-import MultiCheckbox, {CheckboxOption} from 'src/components/multi_checkbox';
-import {TimelineEvent, TimelineEventsFilter, TimelineEventType} from 'src/types/rhs';
-import {setRHSEventsFilter} from 'src/actions';
-import {rhsEventsFilterForChannel} from 'src/selectors';
+import Timeline from 'src/components/backstage/playbook_runs/playbook_run_backstage/retrospective/timeline';
+
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {
     Content,
     PrimaryButtonRight,
     TabPageContainer,
     Title,
-} from 'src/components/backstage/incidents/shared';
+} from 'src/components/backstage/playbook_runs/shared';
+
+import MultiCheckbox, {CheckboxOption} from 'src/components/multi_checkbox';
+import {TimelineEvent, TimelineEventsFilter, TimelineEventType} from 'src/types/rhs';
+import {setRHSEventsFilter} from 'src/actions';
+import {rhsEventsFilterForChannel} from 'src/selectors';
 
 const Header = styled.div`
     display: flex;
@@ -69,12 +72,12 @@ const PrimaryButtonNotRight = styled(PrimaryButtonRight)`
 
 type IdToUserFn = (userId: string) => UserProfile;
 
-const TimelineRetro = (props: { incident: PlaybookRun }) => {
+const TimelineRetro = (props: { playbookRun: PlaybookRun }) => {
     const dispatch = useDispatch();
     const displayPreference = useSelector<GlobalState, string | undefined>(getTeammateNameDisplaySetting) || 'username';
     const [allEvents, setAllEvents] = useState<TimelineEvent[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<TimelineEvent[]>([]);
-    const eventsFilter = useSelector<GlobalState, TimelineEventsFilter>((state) => rhsEventsFilterForChannel(state, props.incident.channel_id));
+    const eventsFilter = useSelector<GlobalState, TimelineEventsFilter>((state) => rhsEventsFilterForChannel(state, props.playbookRun.channel_id));
     const getStateFn = useStore().getState;
     const getUserFn = (userId: string) => getUserAction(userId)(dispatch as DispatchFunc, getStateFn);
     const selectUser = useSelector<GlobalState, IdToUserFn>((state) => (userId: string) => getUser(state, userId));
@@ -84,7 +87,7 @@ const TimelineRetro = (props: { incident: PlaybookRun }) => {
     }, [eventsFilter, allEvents]);
 
     useEffect(() => {
-        Promise.all(props.incident.timeline_events.map(async (e) => {
+        Promise.all(props.playbookRun.timeline_events.map(async (e) => {
             let user = selectUser(e.subject_user_id) as UserProfile | undefined;
 
             if (!user) {
@@ -102,14 +105,14 @@ const TimelineRetro = (props: { incident: PlaybookRun }) => {
         })).then((eventArray) => {
             setAllEvents(eventArray.filter((e) => e) as TimelineEvent[]);
         });
-    }, [props.incident.timeline_events, displayPreference]);
+    }, [props.playbookRun.timeline_events, displayPreference]);
 
     const selectOption = (value: string, checked: boolean) => {
         if (eventsFilter.all && value !== 'all') {
             return;
         }
 
-        dispatch(setRHSEventsFilter(props.incident.channel_id, {
+        dispatch(setRHSEventsFilter(props.playbookRun.channel_id, {
             ...eventsFilter,
             [value]: checked,
         }));
@@ -183,7 +186,7 @@ const TimelineRetro = (props: { incident: PlaybookRun }) => {
             </Header>
             <Content>
                 <Timeline
-                    incident={props.incident}
+                    playbookRun={props.playbookRun}
                     filteredEvents={filteredEvents}
                 />
             </Content>

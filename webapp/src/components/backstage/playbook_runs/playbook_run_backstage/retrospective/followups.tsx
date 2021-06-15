@@ -4,9 +4,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {PlaybookRun, PlaybookRunStatus} from 'src/types/incident';
+import {PlaybookRun, PlaybookRunStatus} from 'src/types/playbook_run';
+
+import {Badge, Content, TabPageContainer, Title} from 'src/components/backstage/playbook_runs/shared';
+
 import Profile from 'src/components/profile/profile';
-import {Badge, Content, TabPageContainer, Title} from 'src/components/backstage/incidents/shared';
 
 const StyledContent = styled(Content)`
     margin: 8px 0 0 0;
@@ -39,7 +41,7 @@ const Line = styled.div`
 `;
 
 // STUB COMPONENT. NOT IN ACTIVE USE YET
-const Followups = (props: { incident: PlaybookRun }) => {
+const Followups = (props: { playbookRun: PlaybookRun }) => {
     return (
         <TabPageContainer>
             <Title>{'Follow ups'}</Title>
@@ -56,7 +58,7 @@ const Followups = (props: { incident: PlaybookRun }) => {
 
                     <Cell>{'Improve our TTR by automating our OgsGenie webhooks.'}</Cell>
                     <Cell>
-                        <SmallProfile userId={props.incident.owner_user_id}/>
+                        <SmallProfile userId={props.playbookRun.owner_user_id}/>
                     </Cell>
                     <Cell>
                         <Badge status={'Open' as PlaybookRunStatus}/>
@@ -67,7 +69,7 @@ const Followups = (props: { incident: PlaybookRun }) => {
 
                     <Cell>{'Notify affected customers sooner by collecting related Pagerduty events and DMing owner automatically.'}</Cell>
                     <Cell>
-                        <SmallProfile userId={props.incident.reporter_user_id}/>
+                        <SmallProfile userId={props.playbookRun.reporter_user_id}/>
                     </Cell>
                     <Cell>
                         <Badge status={'In Progress' as PlaybookRunStatus}/>

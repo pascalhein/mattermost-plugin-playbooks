@@ -8,7 +8,7 @@ import {createGlobalStyle} from 'styled-components';
 
 import {isPlaybookRunRHSOpen, isDisabledOnCurrentTeam} from 'src/selectors';
 
-import PlaybookRunIcon, {Ref as PlaybookRunIconRef} from './incident_icon';
+import IncidentIcon, {Ref as PlaybookRunIconRef} from './incident_icon';
 
 const DisabledStyle = createGlobalStyle`
     .plugin-icon-hide {
@@ -40,7 +40,7 @@ const ChannelHeaderButton = () => {
     return (
         <>
             <DisabledStyle/>
-            <PlaybookRunIcon
+            <IncidentIcon
                 id='incidentIcon'
                 ref={myRef}
             />

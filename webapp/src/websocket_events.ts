@@ -9,9 +9,11 @@ import {WebSocketMessage} from 'mattermost-redux/types/websocket';
 import {getCurrentTeam, getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 
+import {PlaybookRun, isPlaybookRun, StatusPost} from 'src/types/playbook_run';
+
 import {navigateToUrl} from 'src/browser_routing';
 import {
-    incidentCreated, incidentUpdated,
+    playbookRunCreated, playbookRunUpdated,
     removedFromPlaybookRunChannel,
     receivedTeamPlaybookRuns,
     playbookCreated,
@@ -23,9 +25,8 @@ import {
     fetchPlaybookRuns,
 } from 'src/client';
 import {clientId, hasViewedByChannelID, myPlaybookRunsMap} from 'src/selectors';
-import {PlaybookRun, isPlaybookRun, StatusPost} from 'src/types/incident';
 
-export const websocketSubscribersToPlaybookRunUpdate = new Set<(incident: PlaybookRun) => void>();
+export const websocketSubscribersToPlaybookRunUpdate = new Set<(playbookRun: PlaybookRun) => void>();
 
 export function handleReconnect(getState: GetStateFunc, dispatch: Dispatch) {
     return async (): Promise<void> => {
@@ -56,14 +57,14 @@ export function handleWebsocketPlaybookRunUpdated(getState: GetStateFunc, dispat
         if (process.env.NODE_ENV !== 'production') {
             if (!isPlaybookRun(data)) {
                 // eslint-disable-next-line no-console
-                console.error('received a websocket data payload that was not an incident in handleWebsocketPlaybookRunUpdate:', data);
+                console.error('received a websocket data payload that was not a playbook run in handleWebsocketPlaybookRunUpdate:', data);
             }
         }
-        const incident = data as PlaybookRun;
+        const playbookRun = data as PlaybookRun;
 
-        dispatch(incidentUpdated(incident));
+        dispatch(playbookRunUpdated(playbookRun));
 
-        websocketSubscribersToPlaybookRunUpdate.forEach((fn) => fn(incident));
+        websocketSubscribersToPlaybookRunUpdate.forEach((fn) => fn(playbookRun));
     };
 }
 
@@ -73,18 +74,18 @@ export function handleWebsocketPlaybookRunCreated(getState: GetStateFunc, dispat
             return;
         }
         const payload = JSON.parse(msg.data.payload);
-        const data = payload.incident;
+        const data = payload.playbook_run;
 
         // eslint-disable-next-line no-process-env
         if (process.env.NODE_ENV !== 'production') {
             if (!isPlaybookRun(data)) {
                 // eslint-disable-next-line no-console
-                console.error('received a websocket data payload that was not an incident in handleWebsocketPlaybookRunCreate:', data);
+                console.error('received a websocket data payload that was not a playbook run in handleWebsocketPlaybookRunCreate:', data);
             }
         }
-        const incident = data as PlaybookRun;
+        const playbookRun = data as PlaybookRun;
 
-        dispatch(incidentCreated(incident));
+        dispatch(playbookRunCreated(playbookRun));
 
         if (payload.client_id !== clientId(getState())) {
             return;
@@ -93,7 +94,7 @@ export function handleWebsocketPlaybookRunCreated(getState: GetStateFunc, dispat
         const currentTeam = getCurrentTeam(getState());
 
         // Navigate to the newly created channel
-        const url = `/${currentTeam.name}/channels/${incident.channel_id}`;
+        const url = `/${currentTeam.name}/channels/${playbookRun.channel_id}`;
         navigateToUrl(url);
     };
 }
@@ -128,8 +129,8 @@ export function handleWebsocketUserAdded(getState: GetStateFunc, dispatch: Dispa
         const currentTeamId = getCurrentTeamId(getState());
         if (currentUserId === msg.data.user_id && currentTeamId === msg.data.team_id) {
             try {
-                const incident = await fetchPlaybookRunByChannel(msg.broadcast.channel_id);
-                dispatch(receivedTeamPlaybookRuns([incident]));
+                const playbookRun = await fetchPlaybookRunByChannel(msg.broadcast.channel_id);
+                dispatch(receivedTeamPlaybookRuns([playbookRun]));
             } catch (error) {
                 if (error.status_code !== 404) {
                     throw error;
@@ -149,15 +150,15 @@ export function handleWebsocketUserRemoved(getState: GetStateFunc, dispatch: Dis
 }
 
 async function getPlaybookRunFromStatusUpdate(post: Post): Promise<PlaybookRun | null> {
-    let incident: PlaybookRun;
+    let playbookRun: PlaybookRun;
     try {
-        incident = await fetchPlaybookRunByChannel(post.channel_id);
+        playbookRun = await fetchPlaybookRunByChannel(post.channel_id);
     } catch (err) {
         return null;
     }
 
-    if (incident.status_posts.find((value: StatusPost) => post.id === value.id)) {
-        return incident;
+    if (playbookRun.status_posts.find((value: StatusPost) => post.id === value.id)) {
+        return playbookRun;
     }
 
     return null;
@@ -165,12 +166,12 @@ async function getPlaybookRunFromStatusUpdate(post: Post): Promise<PlaybookRun |
 
 export const handleWebsocketPostEditedOrDeleted = (getState: GetStateFunc, dispatch: Dispatch) => {
     return async (msg: WebSocketMessage<{ post: string }>) => {
-        const incidentsMap = myPlaybookRunsMap(getState());
-        if (incidentsMap[msg.broadcast.channel_id]) {
-            const incident = await getPlaybookRunFromStatusUpdate(JSON.parse(msg.data.post));
-            if (incident) {
-                dispatch(incidentUpdated(incident));
-                websocketSubscribersToPlaybookRunUpdate.forEach((fn) => fn(incident));
+        const playbookRunsMap = myPlaybookRunsMap(getState());
+        if (playbookRunsMap[msg.broadcast.channel_id]) {
+            const playbookRun = await getPlaybookRunFromStatusUpdate(JSON.parse(msg.data.post));
+            if (playbookRun) {
+                dispatch(playbookRunUpdated(playbookRun));
+                websocketSubscribersToPlaybookRunUpdate.forEach((fn) => fn(playbookRun));
             }
         }
     };
@@ -180,17 +181,17 @@ export const handleWebsocketChannelUpdated = (getState: GetStateFunc, dispatch: 
     return async (msg: WebSocketMessage<{ channel: string }>) => {
         const channel = JSON.parse(msg.data.channel);
 
-        // Ignore updates to non-incident channels.
-        const incidentsMap = myPlaybookRunsMap(getState());
-        if (!incidentsMap[channel.id]) {
+        // Ignore updates to non-playbook run channels.
+        const playbookRunsMap = myPlaybookRunsMap(getState());
+        if (!playbookRunsMap[channel.id]) {
             return;
         }
 
-        // Fetch the updated incident, since some metadata (like incident name) comes directly
+        // Fetch the updated playbook run, since some metadata (like playbook run name) comes directly
         // from the channel, and the plugin cannot detect channel update events for itself.
-        const incident = await fetchPlaybookRunByChannel(channel.id);
-        if (incident) {
-            dispatch(incidentUpdated(incident));
+        const playbookRun = await fetchPlaybookRunByChannel(channel.id);
+        if (playbookRun) {
+            dispatch(playbookRunUpdated(playbookRun));
         }
     };
 };
@@ -199,14 +200,14 @@ export const handleWebsocketChannelViewed = (getState: GetStateFunc, dispatch: D
     return async (msg: WebSocketMessage<{ channel_id: string }>) => {
         const channelId = msg.data.channel_id;
 
-        // If this isn't an incident channel, stop
-        const incident = myPlaybookRunsMap(getState())[channelId];
-        if (!incident) {
+        // If this isn't a playbook run channel, stop
+        const playbookRun = myPlaybookRunsMap(getState())[channelId];
+        if (!playbookRun) {
             return;
         }
 
         if (!hasViewedByChannelID(getState())[channelId]) {
-            const hasViewed = await fetchCheckAndSendMessageOnJoin(incident.id, channelId);
+            const hasViewed = await fetchCheckAndSendMessageOnJoin(playbookRun.id, channelId);
             if (hasViewed) {
                 dispatch(setHasViewedChannel(channelId));
             }

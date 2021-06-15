@@ -23,7 +23,7 @@ import {PrimaryButton} from 'src/components/assets/buttons';
 import {BackstageNavbar} from 'src/components/backstage/backstage';
 import {AutomationSettings} from 'src/components/backstage/automation/settings';
 import RouteLeavingGuard from 'src/components/backstage/route_leaving_guard';
-import {SecondaryButton} from 'src/components/backstage/incidents/shared';
+import {SecondaryButton} from 'src/components/backstage/playbook_runs/shared';
 
 import './playbook.scss';
 import {useExperimentalFeaturesEnabled} from 'src/hooks';
@@ -272,7 +272,7 @@ const PlaybookEdit = (props: Props) => {
     const handlePublicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPlaybook({
             ...playbook,
-            create_public_incident: e.target.value === 'public',
+            create_public_playbook_run: e.target.value === 'public',
         });
         setChangesMade(true);
     };
@@ -667,7 +667,7 @@ const PlaybookEdit = (props: Props) => {
                                                 type='radio'
                                                 name='public'
                                                 value={'public'}
-                                                checked={playbook.create_public_incident}
+                                                checked={playbook.create_public_playbook_run}
                                                 onChange={handlePublicChange}
                                             />
                                             {'Public'}
@@ -677,7 +677,7 @@ const PlaybookEdit = (props: Props) => {
                                                 type='radio'
                                                 name='public'
                                                 value={'private'}
-                                                checked={!playbook.create_public_incident}
+                                                checked={!playbook.create_public_playbook_run}
                                                 onChange={handlePublicChange}
                                             />
                                             {'Private'}

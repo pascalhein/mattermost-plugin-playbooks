@@ -13,7 +13,7 @@ export enum RHSTabState {
 }
 
 export enum TimelineEventType {
-    PlaybookRunCreated = 'incident_created',
+    PlaybookRunCreated = 'playbook_run_created',
     StatusUpdated = 'status_updated',
     OwnerChanged = 'owner_changed',
     AssigneeChanged = 'assignee_changed',
@@ -27,7 +27,7 @@ export enum TimelineEventType {
 
 export interface TimelineEvent {
     id: string;
-    incident_id: string;
+    playbook_run_id: string;
     create_at: number;
     delete_at: number;
     event_at: number;

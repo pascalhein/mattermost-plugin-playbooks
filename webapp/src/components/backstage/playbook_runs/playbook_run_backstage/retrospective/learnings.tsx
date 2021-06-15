@@ -4,15 +4,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {PlaybookRun} from 'src/types/incident';
 import ProfileVertical
-    from 'src/components/backstage/incidents/incident_backstage/retrospective/profile_vertical';
+    from 'src/components/backstage/playbook_runs/playbook_run_backstage/retrospective/profile_vertical';
+
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {
     Content,
     SecondaryButtonRight,
     TabPageContainer,
     Title,
-} from 'src/components/backstage/incidents/shared';
+} from 'src/components/backstage/playbook_runs/shared';
 
 const Header = styled.div`
     display: flex;
@@ -43,7 +45,7 @@ const ColTitle = styled.div`
 `;
 
 // STUB COMPONENT. NOT IN ACTIVE USE YET
-const Learnings = (props: {incident: PlaybookRun}) => {
+const Learnings = (props: {playbookRun: PlaybookRun}) => {
     return (
         <TabPageContainer>
             <Header>
@@ -67,7 +69,7 @@ const Learnings = (props: {incident: PlaybookRun}) => {
                     <Line/>
                     <Line/>
 
-                    <Cell><ProfileVertical userId={props.incident.owner_user_id}/></Cell>
+                    <Cell><ProfileVertical userId={props.playbookRun.owner_user_id}/></Cell>
                     <Line/>
                     <Cell>{'Sed venenatis massa laoreet ex tristique, quis suscipit ante aliquam. Nulla dignissim, justo vel finibus malesuada, turpis dui hendrerit elit, at ultrices libero libero faucibus odio.'}</Cell>
                     <Line/>
@@ -82,7 +84,7 @@ const Learnings = (props: {incident: PlaybookRun}) => {
                     <Line/>
                     <Line/>
 
-                    <Cell><ProfileVertical userId={props.incident.owner_user_id}/></Cell>
+                    <Cell><ProfileVertical userId={props.playbookRun.owner_user_id}/></Cell>
                     <Line/>
                     <Cell>{'In viverra eros sit amet est tincidunt malesuada.'}</Cell>
                     <Line/>
@@ -97,7 +99,7 @@ const Learnings = (props: {incident: PlaybookRun}) => {
                     <Line/>
                     <Line/>
 
-                    <Cell><ProfileVertical userId={props.incident.owner_user_id}/></Cell>
+                    <Cell><ProfileVertical userId={props.playbookRun.owner_user_id}/></Cell>
                     <Line/>
                     <Cell>{'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed mauris dui, imperdiet quis rutrum eget, lobortis a mauris.'}</Cell>
                     <Line/>

@@ -15,6 +15,8 @@ import {sortByUsername} from 'mattermost-redux/utils/user_utils';
 import {$ID, IDMappedObjects, Dictionary} from 'mattermost-redux/types/utilities';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/users';
 
+import {PlaybookRun, playbookRunIsActive} from 'src/types/playbook_run';
+
 import {pluginId} from 'src/manifest';
 import {
     RHSState,
@@ -22,7 +24,6 @@ import {
     TimelineEventsFilter,
     TimelineEventsFilterDefault,
 } from 'src/types/rhs';
-import {PlaybookRun, incidentIsActive} from 'src/types/incident';
 
 import {GlobalSettings} from './types/settings';
 
@@ -43,7 +44,7 @@ export const isDisabledOnCurrentTeam = (state: GlobalState): boolean => pluginSt
 
 export const globalSettings = (state: GlobalState): GlobalSettings | null => pluginState(state).globalSettings;
 
-// reminder: myPlaybookRunsByTeam indexes teamId->channelId->incident
+// reminder: myPlaybookRunsByTeam indexes teamId->channelId->playbookRun
 const myPlaybookRunsByTeam = (state: GlobalState): Record<string, Record<string, PlaybookRun>> =>
     pluginState(state).myPlaybookRunsByTeam;
 
@@ -51,8 +52,8 @@ export const inPlaybookRunChannel = createSelector(
     getCurrentTeamId,
     getCurrentChannelId,
     myPlaybookRunsByTeam,
-    (teamId, channelId, incidentMapByTeam) => {
-        return Boolean(incidentMapByTeam[teamId]?.[channelId]);
+    (teamId, channelId, playbookRunMapByTeam) => {
+        return Boolean(playbookRunMapByTeam[teamId]?.[channelId]);
     },
 );
 
@@ -60,27 +61,27 @@ export const currentPlaybookRun = createSelector(
     getCurrentTeamId,
     getCurrentChannelId,
     myPlaybookRunsByTeam,
-    (teamId, channelId, incidentMapByTeam) => {
-        return incidentMapByTeam[teamId]?.[channelId];
+    (teamId, channelId, playbookRunMapByTeam) => {
+        return playbookRunMapByTeam[teamId]?.[channelId];
     },
 );
 
 export const myActivePlaybookRunsList = createSelector(
     getCurrentTeamId,
     myPlaybookRunsByTeam,
-    (teamId, incidentMapByTeam) => {
-        if (!incidentMapByTeam[teamId]) {
+    (teamId, playbookRunMapByTeam) => {
+        if (!playbookRunMapByTeam[teamId]) {
             return [];
         }
 
-        // return active incidents, sorted descending by create_at
-        return Object.values(incidentMapByTeam[teamId])
-            .filter((i) => incidentIsActive(i))
+        // return active playbook runs, sorted descending by create_at
+        return Object.values(playbookRunMapByTeam[teamId])
+            .filter((i) => playbookRunIsActive(i))
             .sort((a, b) => b.create_at - a.create_at);
     },
 );
 
-// myActivePlaybookRunsMap returns a map indexed by channelId->incident for the current team
+// myActivePlaybookRunsMap returns a map indexed by channelId->playbookRun for the current team
 export const myPlaybookRunsMap = (state: GlobalState) => {
     return myPlaybookRunsByTeam(state)[getCurrentTeamId(state)] || {};
 };
@@ -110,18 +111,18 @@ export const rhsEventsFilterForChannel = (state: GlobalState, channelId: string)
 export const lastUpdatedByPlaybookRunId = createSelector(
     getCurrentTeamId,
     myPlaybookRunsByTeam,
-    (teamId, incidentsMapByTeam) => {
+    (teamId, playbookRunsMapByTeam) => {
         const result = {} as Record<string, number>;
-        const incidentMap = incidentsMapByTeam[teamId];
-        for (const incident of Object.values(incidentMap)) {
-            result[incident.id] = findLastUpdated(incident);
+        const playbookRunMap = playbookRunsMapByTeam[teamId];
+        for (const playbookRun of Object.values(playbookRunMap)) {
+            result[playbookRun.id] = findLastUpdated(playbookRun);
         }
         return result;
     },
 );
 
-const findLastUpdated = (incident: PlaybookRun) => {
-    const posts = [...incident.status_posts]
+const findLastUpdated = (playbookRun: PlaybookRun) => {
+    const posts = [...playbookRun.status_posts]
         .filter((a) => a.delete_at === 0)
         .sort((a, b) => b.create_at - a.create_at);
     return posts.length === 0 ? 0 : posts[0].create_at;

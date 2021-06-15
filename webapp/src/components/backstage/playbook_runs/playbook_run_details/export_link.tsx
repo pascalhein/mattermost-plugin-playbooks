@@ -7,16 +7,18 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import styled from 'styled-components';
 import {Tooltip, OverlayTrigger} from 'react-bootstrap';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
+import {SecondaryButtonLarger} from 'src/components/backstage/playbook_runs/shared';
+
 import {OVERLAY_DELAY} from 'src/constants';
 import {isExportLicensed} from 'src/selectors';
 import {exportChannelUrl} from 'src/client';
 
-import {PlaybookRun} from 'src/types/incident';
 import {Banner} from 'src/components/backstage/styles';
-import {SecondaryButtonLarger} from 'src/components/backstage/incidents/shared';
 
 interface ExportLinkProps {
-    incident: PlaybookRun
+    playbookRun: PlaybookRun
 }
 
 const ExportBannerTimeout = 2500;
@@ -43,7 +45,7 @@ const ExportLink = (props: ExportLinkProps) => {
     const [showBanner, setShowBanner] = useState(false);
 
     const onExportClick = () => {
-        window.location.href = exportChannelUrl(props.incident.channel_id);
+        window.location.href = exportChannelUrl(props.playbookRun.channel_id);
         setShowBanner(true);
         window.setTimeout(() => {
             setShowBanner(false);

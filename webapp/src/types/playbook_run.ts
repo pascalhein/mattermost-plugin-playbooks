@@ -109,7 +109,7 @@ export function isMetadata(arg: any): arg is Metadata {
 export function isTimelineEvent(arg: any): arg is TimelineEvent {
     return Boolean(arg &&
         typeof arg.id === 'string' &&
-        typeof arg.incident_id === 'string' &&
+        typeof arg.playbook_run_id === 'string' &&
         typeof arg.create_at === 'number' &&
         typeof arg.delete_at === 'number' &&
         typeof arg.event_at === 'number' &&
@@ -121,20 +121,20 @@ export function isTimelineEvent(arg: any): arg is TimelineEvent {
         typeof arg.creator_user_id === 'string');
 }
 
-export function incidentCurrentStatusPost(incident: PlaybookRun): StatusPost | undefined {
-    const sortedPosts = [...incident.status_posts]
+export function playbookRunCurrentStatusPost(playbookRun: PlaybookRun): StatusPost | undefined {
+    const sortedPosts = [...playbookRun.status_posts]
         .filter((a) => a.delete_at === 0)
         .sort((a, b) => b.create_at - a.create_at);
 
     return sortedPosts[0];
 }
 
-export function incidentCurrentStatus(incident: PlaybookRun): PlaybookRunStatus {
-    return incident.current_status;
+export function playbookRunCurrentStatus(playbookRun: PlaybookRun): PlaybookRunStatus {
+    return playbookRun.current_status;
 }
 
-export function incidentIsActive(incident: PlaybookRun): boolean {
-    const currentStatus = incidentCurrentStatus(incident);
+export function playbookRunIsActive(playbookRun: PlaybookRun): boolean {
+    const currentStatus = playbookRunCurrentStatus(playbookRun);
     return currentStatus !== PlaybookRunStatus.Archived;
 }
 

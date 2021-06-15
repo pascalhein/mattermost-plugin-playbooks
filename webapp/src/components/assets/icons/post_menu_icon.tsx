@@ -3,11 +3,11 @@
 
 import React from 'react';
 
-import PlaybookRunIcon from './incident_icon';
+import IncidentIcon from './incident_icon';
 
 const PlaybookRunPostMenuIcon = () => (
     <span className='MenuItem__icon'>
-        <PlaybookRunIcon/>
+        <IncidentIcon/>
     </span>
 );
 

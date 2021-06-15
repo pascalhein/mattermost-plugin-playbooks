@@ -4,13 +4,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {
     Content,
     EmptyBody,
     TabPageContainer,
     Title,
-} from 'src/components/backstage/incidents/shared';
-import {PlaybookRun} from 'src/types/incident';
+} from 'src/components/backstage/playbook_runs/shared';
+
 import PostText from 'src/components/post_text';
 
 const StyledContent = styled(Content)`
@@ -19,12 +21,12 @@ const StyledContent = styled(Content)`
     padding: 20px 24px 14px 24px;
 `;
 
-const Description = (props: { incident: PlaybookRun }) => {
+const Description = (props: { playbookRun: PlaybookRun }) => {
     let description: JSX.Element = <EmptyBody>{'There is no description available.'}</EmptyBody>;
-    if (props.incident.status_posts.length > 0 && props.incident.description) {
+    if (props.playbookRun.status_posts.length > 0 && props.playbookRun.description) {
         description = (
             <StyledContent>
-                <PostText text={props.incident.description}/>
+                <PostText text={props.playbookRun.description}/>
             </StyledContent>
         );
     }

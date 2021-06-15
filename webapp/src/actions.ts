@@ -8,8 +8,9 @@ import {IntegrationTypes} from 'mattermost-redux/action_types';
 
 import {GetStateFunc} from 'mattermost-redux/types/actions';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {selectToggleRHS} from 'src/selectors';
-import {PlaybookRun} from 'src/types/incident';
 import {RHSState, RHSTabState, TimelineEventsFilter} from 'src/types/rhs';
 
 import {
@@ -151,14 +152,14 @@ export function setClientId(clientId: string): SetClientId {
     };
 }
 
-export const incidentCreated = (incident: PlaybookRun): PlaybookRunCreated => ({
+export const playbookRunCreated = (playbookRun: PlaybookRun): PlaybookRunCreated => ({
     type: PLAYBOOK_RUN_CREATED,
-    incident,
+    playbookRun,
 });
 
-export const incidentUpdated = (incident: PlaybookRun): PlaybookRunUpdated => ({
+export const playbookRunUpdated = (playbookRun: PlaybookRun): PlaybookRunUpdated => ({
     type: PLAYBOOK_RUN_UPDATED,
-    incident,
+    playbookRun,
 });
 
 export const playbookCreated = (teamID: string): PlaybookCreated => ({
@@ -177,9 +178,9 @@ export const receivedTeamNumPlaybooks = (teamID: string, numPlaybooks: number): 
     numPlaybooks,
 });
 
-export const receivedTeamPlaybookRuns = (incidents: PlaybookRun[]): ReceivedTeamPlaybookRuns => ({
+export const receivedTeamPlaybookRuns = (playbookRuns: PlaybookRun[]): ReceivedTeamPlaybookRuns => ({
     type: RECEIVED_TEAM_PLAYBOOK_RUNS,
-    incidents,
+    playbookRuns,
 });
 
 export const receivedDisabledOnTeam = (teamId: string): ReceivedTeamDisabled => ({

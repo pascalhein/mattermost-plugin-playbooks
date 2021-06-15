@@ -10,14 +10,15 @@ import {Post} from 'mattermost-redux/types/posts';
 import {GlobalState} from 'mattermost-redux/types/store';
 import {getPost} from 'mattermost-redux/selectors/entities/posts';
 
+import {PlaybookRun, playbookRunCurrentStatus} from 'src/types/playbook_run';
+
 import Profile from 'src/components/profile/profile';
 import Duration from 'src/components/duration';
-import {PlaybookRun, incidentCurrentStatus} from 'src/types/incident';
 import {lastUpdatedByPlaybookRunId} from 'src/selectors';
 
 import {SmallerProfile} from 'src/components/rhs/rhs_shared';
 
-import StatusBadge from '../backstage/incidents/status_badge';
+import StatusBadge from '../backstage/playbook_runs/status_badge';
 
 const PlaybookRunContainer = styled.div<PlaybookRunContainerProps>`
     display: flex;
@@ -82,7 +83,7 @@ const Button = styled.button`
 `;
 
 interface Props {
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
     active: boolean;
     viewPlaybookRun: (playbookRunId: string) => void;
 }
@@ -92,13 +93,13 @@ const RHSListPlaybookRun = (props: Props) => {
 
     return (
         <PlaybookRunContainer active={props.active}>
-            <PlaybookRunTitle>{props.incident.name}</PlaybookRunTitle>
+            <PlaybookRunTitle>{props.playbookRun.name}</PlaybookRunTitle>
             <Row>
                 <Col1>{'Duration:'}</Col1>
                 <Col2>
                     <Duration
-                        from={props.incident.create_at}
-                        to={props.incident.end_at}
+                        from={props.playbookRun.create_at}
+                        to={props.playbookRun.end_at}
                     />
                 </Col2>
             </Row>
@@ -106,7 +107,7 @@ const RHSListPlaybookRun = (props: Props) => {
                 <Col1>{'Status:'}</Col1>
                 <Col2>
                     <div>
-                        <StatusBadge status={incidentCurrentStatus(props.incident)}/>
+                        <StatusBadge status={playbookRunCurrentStatus(props.playbookRun)}/>
                     </div>
                 </Col2>
             </Row>
@@ -114,7 +115,7 @@ const RHSListPlaybookRun = (props: Props) => {
                 <Col1>{'Last updated:'}</Col1>
                 <Col2>
                     <Duration
-                        from={lastUpdatedMap[props.incident.id]}
+                        from={lastUpdatedMap[props.playbookRun.id]}
                         to={0}
                         ago={true}
                     />
@@ -123,11 +124,11 @@ const RHSListPlaybookRun = (props: Props) => {
             <Row>
                 <Col1>{'Owner:'}</Col1>
                 <Col2>
-                    <SmallerProfile userId={props.incident.owner_user_id}/>
+                    <SmallerProfile userId={props.playbookRun.owner_user_id}/>
                 </Col2>
             </Row>
             <Button
-                onClick={() => props.viewPlaybookRun(props.incident.channel_id)}
+                onClick={() => props.viewPlaybookRun(props.playbookRun.channel_id)}
                 data-testid='go-to-channel'
             >
                 {'Go to Incident Channel'}

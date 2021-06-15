@@ -3,6 +3,8 @@
 
 import {combineReducers} from 'redux';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {RHSState, RHSTabState, TimelineEventsFilter} from 'src/types/rhs';
 
 import {
@@ -39,7 +41,6 @@ import {
     SHOW_POST_MENU_MODAL, HIDE_POST_MENU_MODAL,
     SetHasViewedChannel, SET_HAS_VIEWED_CHANNEL,
 } from 'src/types/actions';
-import {PlaybookRun} from 'src/types/incident';
 
 import {GlobalSettings} from './types/settings';
 
@@ -79,7 +80,7 @@ function rhsState(state = RHSState.ViewingPlaybookRun, action: SetRHSState) {
     }
 }
 
-// myPlaybookRunsByTeam is a map of teamId->{channelId->incidents} for which the current user is an incident member. Note
+// myPlaybookRunsByTeam is a map of teamId->{channelId->playbookRuns} for which the current user is an playbook run member. Note
 // that it is lazy loaded on team change, but will also track incremental updates as provided by
 // websocket events.
 // Aditnally it handles the plugin being disabled on the team
@@ -89,36 +90,36 @@ const myPlaybookRunsByTeam = (
 ) => {
     switch (action.type) {
     case PLAYBOOK_RUN_CREATED: {
-        const incidentCreatedAction = action as PlaybookRunCreated;
-        const incident = incidentCreatedAction.incident;
-        const teamId = incident.team_id;
+        const playbookRunCreatedAction = action as PlaybookRunCreated;
+        const playbookRun = playbookRunCreatedAction.playbookRun;
+        const teamId = playbookRun.team_id;
         return {
             ...state,
             [teamId]: {
                 ...state[teamId],
-                [incident.channel_id]: incident,
+                [playbookRun.channel_id]: playbookRun,
             },
         };
     }
     case PLAYBOOK_RUN_UPDATED: {
-        const incidentUpdated = action as PlaybookRunUpdated;
-        const incident = incidentUpdated.incident;
-        const teamId = incident.team_id;
+        const playbookRunUpdated = action as PlaybookRunUpdated;
+        const playbookRun = playbookRunUpdated.playbookRun;
+        const teamId = playbookRun.team_id;
         return {
             ...state,
             [teamId]: {
                 ...state[teamId],
-                [incident.channel_id]: incident,
+                [playbookRun.channel_id]: playbookRun,
             },
         };
     }
     case RECEIVED_TEAM_PLAYBOOK_RUNS: {
         const receivedTeamPlaybookRunsAction = action as ReceivedTeamPlaybookRuns;
-        const incidents = receivedTeamPlaybookRunsAction.incidents;
-        if (incidents.length === 0) {
+        const playbookRuns = receivedTeamPlaybookRunsAction.playbookRuns;
+        if (playbookRuns.length === 0) {
             return state;
         }
-        const teamId = incidents[0].team_id;
+        const teamId = playbookRuns[0].team_id;
         const newState = {
             ...state,
             [teamId]: {
@@ -126,8 +127,8 @@ const myPlaybookRunsByTeam = (
             },
         };
 
-        for (const incident of incidents) {
-            newState[teamId][incident.channel_id] = incident;
+        for (const playbookRun of playbookRuns) {
+            newState[teamId][playbookRun.channel_id] = playbookRun;
         }
 
         return newState;

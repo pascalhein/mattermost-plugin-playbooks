@@ -30,7 +30,7 @@ export function makeRHSOpener(store: Store<GlobalState>): () => Promise<void> {
             return;
         }
 
-        // Update the known set of incidents whenever the team changes.
+        // Update the known set of playbook runs whenever the team changes.
         if (currentTeamId !== currentTeam.id) {
             currentTeamId = currentTeam.id;
             const currentUserId = getCurrentUserId(state);
@@ -46,14 +46,14 @@ export function makeRHSOpener(store: Store<GlobalState>): () => Promise<void> {
         }
 
         // Only consider opening the RHS if the channel has changed and wasn't already seen as
-        // an incident.
+        // a playbook run.
         if (currentChannel.id === currentChannelId && currentChannelIsPlaybookRun) {
             return;
         }
         currentChannelId = currentChannel.id;
         currentChannelIsPlaybookRun = inPlaybookRunChannel(state);
 
-        // Don't do anything if the incident RHS is already open.
+        // Don't do anything if the playbook run RHS is already open.
         if (isPlaybookRunRHSOpen(state)) {
             return;
         }
@@ -63,7 +63,7 @@ export function makeRHSOpener(store: Store<GlobalState>): () => Promise<void> {
             return;
         }
 
-        // Don't do anything unless we're in an incident channel.
+        // Don't do anything unless we're in an playbook run channel.
         if (!currentChannelIsPlaybookRun) {
             return;
         }

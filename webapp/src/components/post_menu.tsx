@@ -42,7 +42,7 @@ export const StartPlaybookRunPostMenu = (props: Props) => {
                 onClick={handleClick}
             >
                 <button
-                    data-testid='incidentPostMenuIcon'
+                    data-testid='playbookRunPostMenuIcon'
                     className='style--none'
                     role='presentation'
                 >
@@ -79,7 +79,7 @@ export const AttachToPlaybookRunPostMenu = (props: Props) => {
                 onClick={handleClick}
             >
                 <button
-                    data-testid='incidentAddToTimeline'
+                    data-testid='playbookRunAddToTimeline'
                     className='style--none'
                     role='presentation'
                 >

@@ -8,8 +8,9 @@ import Scrollbars from 'react-custom-scrollbars';
 
 import {DragDropContext, Droppable, DroppableProvided, Draggable, DraggableProvided, DropResult, DraggableStateSnapshot} from 'react-beautiful-dnd';
 
-import {toggleRHS, addNewTask, incidentUpdated} from 'src/actions';
-import {PlaybookRun} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/playbook_run';
+
+import {toggleRHS, addNewTask, playbookRunUpdated} from 'src/actions';
 import {ChecklistItem, ChecklistItemState, Checklist} from 'src/types/playbook';
 import {setChecklistItemState, clientReorderChecklist} from 'src/client';
 import {ChecklistItemDetails} from 'src/components/checklist_item';
@@ -60,13 +61,13 @@ const InnerContainer = styled.div`
 `;
 
 interface Props {
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
 }
 
 const RHSPlaybookRunTasks = (props: Props) => {
     const dispatch = useDispatch();
 
-    const checklists = props.incident.checklists || [];
+    const checklists = props.playbookRun.checklists || [];
 
     return (
         <Scrollbars
@@ -113,12 +114,12 @@ const RHSPlaybookRunTasks = (props: Props) => {
                                         newChecklistItems.splice(result.destination.index, 0, removed);
                                         newChecklists[checklistIndex] = {...newChecklists[checklistIndex], items: newChecklistItems};
 
-                                        dispatch(incidentUpdated({
-                                            ...props.incident,
+                                        dispatch(playbookRunUpdated({
+                                            ...props.playbookRun,
                                             checklists: newChecklists,
                                         }));
 
-                                        clientReorderChecklist(props.incident.id, checklistIndex, result.source.index, result.destination.index);
+                                        clientReorderChecklist(props.playbookRun.id, checklistIndex, result.source.index, result.destination.index);
                                     }}
                                 >
                                     <Droppable
@@ -142,10 +143,10 @@ const RHSPlaybookRunTasks = (props: Props) => {
                                                                 checklistItem={checklistItem}
                                                                 checklistNum={checklistIndex}
                                                                 itemNum={index}
-                                                                channelId={props.incident.channel_id}
-                                                                playbookRunId={props.incident.id}
+                                                                channelId={props.playbookRun.channel_id}
+                                                                playbookRunId={props.playbookRun.id}
                                                                 onChange={(newState: ChecklistItemState) => {
-                                                                    setChecklistItemState(props.incident.id, checklistIndex, index, newState);
+                                                                    setChecklistItemState(props.playbookRun.id, checklistIndex, index, newState);
                                                                 }}
                                                                 onRedirect={() => {
                                                                     if (isMobile()) {

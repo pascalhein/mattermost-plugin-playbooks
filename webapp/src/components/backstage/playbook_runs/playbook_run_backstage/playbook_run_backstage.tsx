@@ -12,17 +12,22 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {Channel} from 'mattermost-redux/types/channels';
 import {getChannel} from 'mattermost-redux/selectors/entities/channels';
 
-import {PlaybookRun, Metadata as PlaybookRunMetadata} from 'src/types/incident';
-import {Overview} from 'src/components/backstage/incidents/incident_backstage/overview/overview';
-import {Retrospective} from 'src/components/backstage/incidents/incident_backstage/retrospective/retrospective';
-import {fetchPlaybookRun, fetchPlaybookRunMetadata} from 'src/client';
-import {navigateToTeamPluginUrl, navigateToUrl, teamPluginErrorUrl} from 'src/browser_routing';
-import {ErrorPageTypes} from 'src/constants';
+import {PlaybookRun, Metadata as PlaybookRunMetadata} from 'src/types/playbook_run';
+
+import {Overview} from 'src/components/backstage/playbook_runs/playbook_run_backstage/overview/overview';
+import {Retrospective} from 'src/components/backstage/playbook_runs/playbook_run_backstage/retrospective/retrospective';
+
 import {
     Badge,
     SecondaryButtonLargerRight,
-} from 'src/components/backstage/incidents/shared';
-import ExportLink from 'src/components/backstage/incidents/incident_details/export_link';
+} from 'src/components/backstage/playbook_runs/shared';
+
+import ExportLink from 'src/components/backstage/playbook_runs/playbook_run_details/export_link';
+
+import {fetchPlaybookRun, fetchPlaybookRunMetadata} from 'src/client';
+import {navigateToTeamPluginUrl, navigateToUrl, teamPluginErrorUrl} from 'src/browser_routing';
+import {ErrorPageTypes} from 'src/constants';
+
 import {useExperimentalFeaturesEnabled} from 'src/hooks';
 
 const OuterContainer = styled.div`
@@ -123,10 +128,10 @@ const FetchingStateType = {
 };
 
 const PlaybookRunBackstage = () => {
-    const [incident, setPlaybookRun] = useState<PlaybookRun | null>(null);
-    const [incidentMetadata, setPlaybookRunMetadata] = useState<PlaybookRunMetadata | null>(null);
+    const [playbookRun, setPlaybookRun] = useState<PlaybookRun | null>(null);
+    const [playbookRunMetadata, setPlaybookRunMetadata] = useState<PlaybookRunMetadata | null>(null);
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
-    const channel = useSelector<GlobalState, Channel | null>((state) => (incident ? getChannel(state, incident.channel_id) : null));
+    const channel = useSelector<GlobalState, Channel | null>((state) => (playbookRun ? getChannel(state, playbookRun.channel_id) : null));
     const match = useRouteMatch<MatchParams>();
     const experimentalFeaturesEnabled = useExperimentalFeaturesEnabled();
 
@@ -135,9 +140,9 @@ const PlaybookRunBackstage = () => {
     useEffect(() => {
         const playbookRunId = match.params.playbookRunId;
 
-        Promise.all([fetchPlaybookRun(playbookRunId), fetchPlaybookRunMetadata(playbookRunId)]).then(([incidentResult, incidentMetadataResult]) => {
-            setPlaybookRun(incidentResult);
-            setPlaybookRunMetadata(incidentMetadataResult);
+        Promise.all([fetchPlaybookRun(playbookRunId), fetchPlaybookRunMetadata(playbookRunId)]).then(([playbookRunResult, playbookRunMetadataResult]) => {
+            setPlaybookRun(playbookRunResult);
+            setPlaybookRunMetadata(playbookRunMetadataResult);
             setFetchingState(FetchingStateType.fetched);
         }).catch(() => {
             setFetchingState(FetchingStateType.notFound);
@@ -148,12 +153,12 @@ const PlaybookRunBackstage = () => {
         return null;
     }
 
-    if (fetchingState === FetchingStateType.notFound || incident === null || incidentMetadata === null) {
+    if (fetchingState === FetchingStateType.notFound || playbookRun === null || playbookRunMetadata === null) {
         return <Redirect to={teamPluginErrorUrl(currentTeam.name, ErrorPageTypes.PLAYBOOK_RUNS)}/>;
     }
 
     const goToChannel = () => {
-        navigateToUrl(`/${incidentMetadata.team_name}/channels/${incidentMetadata.channel_name}`);
+        navigateToUrl(`/${playbookRunMetadata.team_name}/channels/${playbookRunMetadata.channel_name}`);
     };
 
     let channelIcon = 'icon-mattermost';
@@ -162,7 +167,7 @@ const PlaybookRunBackstage = () => {
     }
 
     const closePlaybookRunDetails = () => {
-        navigateToTeamPluginUrl(currentTeam.name, '/incidents');
+        navigateToTeamPluginUrl(currentTeam.name, '/runs');
     };
 
     return (
@@ -173,13 +178,13 @@ const PlaybookRunBackstage = () => {
                         className='icon-arrow-left'
                         onClick={closePlaybookRunDetails}
                     />
-                    <Title data-testid='incident-title'>{incident.name}</Title>
-                    <Badge status={incident.current_status}/>
+                    <Title data-testid='playbook-run-title'>{playbookRun.name}</Title>
+                    <Badge status={playbookRun.current_status}/>
                     <SecondaryButtonLargerRight onClick={goToChannel}>
                         <i className={'icon ' + channelIcon}/>
                         {'Go to channel'}
                     </SecondaryButtonLargerRight>
-                    <ExportLink incident={incident}/>
+                    <ExportLink playbookRun={playbookRun}/>
                 </FirstRow>
                 <SecondRow>
                     <TabItem
@@ -202,10 +207,10 @@ const PlaybookRunBackstage = () => {
                 <InnerContainer>
                     <Switch>
                         <Route path={`${match.url}/overview`}>
-                            <Overview incident={incident}/>
+                            <Overview playbookRun={playbookRun}/>
                         </Route>
                         <Route path={`${match.url}/retrospective`}>
-                            <Retrospective incident={incident}/>
+                            <Retrospective playbookRun={playbookRun}/>
                         </Route>
                         <Redirect to={`${match.url}/overview`}/>
                     </Switch>

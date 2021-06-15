@@ -17,26 +17,31 @@ import styled from 'styled-components';
 import {
     StatusFilter,
     StatusOption,
-} from 'src/components/backstage/incidents/incident_list/status_filter';
+} from 'src/components/backstage/playbook_runs/playbook_run_list/status_filter';
+
+import SearchInput from 'src/components/backstage/playbook_runs/playbook_run_list/search_input';
+
 import {
     FetchPlaybookRunsParams,
     PlaybookRun,
-    incidentCurrentStatus,
-    incidentIsActive,
-} from 'src/types/incident';
+    playbookRunCurrentStatus,
+    playbookRunIsActive,
+} from 'src/types/playbook_run';
+
+import StatusBadge from 'src/components/backstage/playbook_runs/status_badge';
+
 import {BACKSTAGE_LIST_PER_PAGE} from 'src/constants';
 import {fetchOwnersInTeam, fetchPlaybookRuns} from 'src/client';
 import {navigateToTeamPluginUrl} from 'src/browser_routing';
-import SearchInput from 'src/components/backstage/incidents/incident_list/search_input';
 import ProfileSelector from 'src/components/profile/profile_selector';
 import BackstageListHeader from 'src/components/backstage/backstage_list_header';
 import {SortableColHeader} from 'src/components/sortable_col_header';
 import TextWithTooltip from 'src/components/widgets/text_with_tooltip';
-import StatusBadge from 'src/components/backstage/incidents/status_badge';
+
 import Profile from 'src/components/profile/profile';
 import {PaginationRow} from 'src/components/pagination_row';
 import {Playbook} from 'src/types/playbook';
-import 'src/components/backstage/incidents/incident_list/incident_list.scss';
+import 'src/components/backstage/playbook_runs/playbook_run_list/playbook_run_list.scss';
 
 const debounceDelay = 300; // in milliseconds
 
@@ -71,7 +76,7 @@ interface Props {
 }
 
 const PlaybookRunList = (props: Props) => {
-    const [incidents, setPlaybookRuns] = useState<PlaybookRun[] | null>(null);
+    const [playbookRuns, setPlaybookRuns] = useState<PlaybookRun[] | null>(null);
     const [totalCount, setTotalCount] = useState(0);
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
     const selectUser = useSelector<GlobalState>((state) => (userId: string) => getUser(state, userId)) as (userId: string) => UserProfile;
@@ -97,11 +102,11 @@ const PlaybookRunList = (props: Props) => {
         let isCanceled = false;
 
         async function fetchPlaybookRunsAsync() {
-            const incidentsReturn = await fetchPlaybookRuns(fetchParams);
+            const playbookRunsReturn = await fetchPlaybookRuns(fetchParams);
 
             if (!isCanceled) {
-                setPlaybookRuns(incidentsReturn.items);
-                setTotalCount(incidentsReturn.total_count);
+                setPlaybookRuns(playbookRunsReturn.items);
+                setTotalCount(playbookRunsReturn.total_count);
             }
         }
 
@@ -154,8 +159,8 @@ const PlaybookRunList = (props: Props) => {
         setFetchParams({...fetchParams, owner_user_id: userId, page: 0});
     }
 
-    function openPlaybookRunDetails(incident: PlaybookRun) {
-        navigateToTeamPluginUrl(currentTeam.name, `/incidents/${incident.id}`);
+    function openPlaybookRunDetails(playbookRun: PlaybookRun) {
+        navigateToTeamPluginUrl(currentTeam.name, `/runs/${playbookRun.id}`);
     }
 
     const [profileSelectorToggle, setProfileSelectorToggle] = useState(false);
@@ -165,15 +170,15 @@ const PlaybookRunList = (props: Props) => {
         setProfileSelectorToggle(!profileSelectorToggle);
     };
 
-    // Show nothing until after we've completed fetching incidents.
-    if (incidents === null) {
+    // Show nothing until after we've completed fetching playbook runs.
+    if (playbookRuns === null) {
         return null;
     }
 
     return (
         <PlaybookRunListContainer className='PlaybookRunList'>
             <div
-                id='incidentList'
+                id='playbookRunList'
                 className='list'
             >
                 <div className='PlaybookRunList__filters'>
@@ -240,40 +245,40 @@ const PlaybookRunList = (props: Props) => {
                     </div>
                 </BackstageListHeader>
 
-                {incidents.length === 0 &&
+                {playbookRuns.length === 0 &&
                 <div className='text-center pt-8'>
                     {'There are no incidents for this playbook.'}
                 </div>
                 }
-                {incidents.map((incident) => (
+                {playbookRuns.map((playbookRun) => (
                     <div
-                        className='row incident-item'
-                        key={incident.id}
-                        onClick={() => openPlaybookRunDetails(incident)}
+                        className='row playbook-run-item'
+                        key={playbookRun.id}
+                        onClick={() => openPlaybookRunDetails(playbookRun)}
                     >
-                        <a className='col-sm-3 incident-item__title'>
+                        <a className='col-sm-3 playbook-run-item__title'>
                             <TextWithTooltip
-                                id={incident.id}
-                                text={incident.name}
+                                id={playbookRun.id}
+                                text={playbookRun.name}
                             />
                         </a>
                         <div className='col-sm-2'>
-                            <StatusBadge status={incidentCurrentStatus(incident)}/>
+                            <StatusBadge status={playbookRunCurrentStatus(playbookRun)}/>
                         </div>
                         <div
                             className='col-sm-2'
                         >
                             {
-                                formatDate(moment(incident.create_at))
+                                formatDate(moment(playbookRun.create_at))
                             }
                         </div>
                         <div className='col-sm-2'>
                             {
-                                endedAt(incidentIsActive(incident), incident.end_at)
+                                endedAt(playbookRunIsActive(playbookRun), playbookRun.end_at)
                             }
                         </div>
                         <div className='col-sm-3'>
-                            <Profile userId={incident.owner_user_id}/>
+                            <Profile userId={playbookRun.owner_user_id}/>
                         </div>
                     </div>
                 ))}

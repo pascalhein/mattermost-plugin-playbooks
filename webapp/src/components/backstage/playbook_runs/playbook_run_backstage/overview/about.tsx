@@ -4,8 +4,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {PlaybookRun} from 'src/types/incident';
-import {Content, TabPageContainer, Title} from 'src/components/backstage/incidents/shared';
+import {PlaybookRun} from 'src/types/playbook_run';
+
+import {Content, TabPageContainer, Title} from 'src/components/backstage/playbook_runs/shared';
+
 import Profile from 'src/components/profile/profile';
 import Duration from 'src/components/duration';
 
@@ -38,7 +40,7 @@ const SmallProfile = styled(Profile)`
     }
 `;
 
-const About = (props: { incident: PlaybookRun }) => {
+const About = (props: { playbookRun: PlaybookRun }) => {
     return (
         <TabPageContainer>
             <Title>{'About'}</Title>
@@ -47,12 +49,12 @@ const About = (props: { incident: PlaybookRun }) => {
                     <ColTitle>{'Owner'}</ColTitle>
                     <ColTitle>{'Duration'}</ColTitle>
                     <ColItem>
-                        <SmallProfile userId={props.incident.owner_user_id}/>
+                        <SmallProfile userId={props.playbookRun.owner_user_id}/>
                     </ColItem>
                     <ColItem>
                         <Duration
-                            from={props.incident.create_at}
-                            to={props.incident.end_at}
+                            from={props.playbookRun.create_at}
+                            to={props.playbookRun.end_at}
                         />
                     </ColItem>
                 </Grid>

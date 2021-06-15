@@ -11,7 +11,8 @@ import {getChannelsNameMapInCurrentTeam} from 'mattermost-redux/selectors/entiti
 import {Team} from 'mattermost-redux/types/teams';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
-import {PlaybookRun} from 'src/types/incident';
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {TimelineEvent} from 'src/types/rhs';
 import RHSTimelineEventItem from 'src/components/rhs/rhs_timeline_event_item';
 import {ChannelNamesMap} from 'src/types/backstage';
@@ -40,7 +41,7 @@ const NoEventsNotice = styled.div`
 `;
 
 interface Props {
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
     filteredEvents: TimelineEvent[];
 }
 
@@ -48,7 +49,7 @@ const Timeline = (props: Props) => {
     const channelNamesMap = useSelector<GlobalState, ChannelNamesMap>(getChannelsNameMapInCurrentTeam);
     const team = useSelector<GlobalState, Team>(getCurrentTeam);
 
-    if (props.incident.timeline_events.length === 0) {
+    if (props.playbookRun.timeline_events.length === 0) {
         return (
             <NoEventsNotice>
                 {'Timeline events are displayed here as they occur. Hover over an event to remove it.'}
@@ -62,7 +63,7 @@ const Timeline = (props: Props) => {
                 <RHSTimelineEventItem
                     key={event.id}
                     event={event}
-                    reportedAt={moment(props.incident.create_at)}
+                    reportedAt={moment(props.playbookRun.create_at)}
                     channelNames={channelNamesMap}
                     team={team}
                 />

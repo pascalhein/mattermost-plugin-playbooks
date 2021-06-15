@@ -3,8 +3,9 @@
 
 import Integrations from 'mattermost-redux/action_types/integrations';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {RHSState, RHSTabState, TimelineEventsFilter} from 'src/types/rhs';
-import {PlaybookRun} from 'src/types/incident';
 import {Playbook} from 'src/types/playbook';
 import {pluginId} from 'src/manifest';
 
@@ -13,14 +14,14 @@ import {GlobalSettings} from './settings';
 export const RECEIVED_TOGGLE_RHS_ACTION = pluginId + '_toggle_rhs';
 export const SET_RHS_OPEN = pluginId + '_set_rhs_open';
 export const SET_CLIENT_ID = pluginId + '_set_client_id';
-export const PLAYBOOK_RUN_CREATED = pluginId + '_incident_created';
-export const PLAYBOOK_RUN_UPDATED = pluginId + '_incident_updated';
+export const PLAYBOOK_RUN_CREATED = pluginId + '_playbook_run_created';
+export const PLAYBOOK_RUN_UPDATED = pluginId + '_playbook_run_updated';
 export const PLAYBOOK_CREATED = pluginId + '_playbook_created';
 export const PLAYBOOK_DELETED = pluginId + '_playbook_deleted';
 export const RECEIVED_TEAM_NUM_PLAYBOOKS = pluginId + '_received_team_num_playbooks';
-export const RECEIVED_TEAM_PLAYBOOK_RUNS = pluginId + '_received_team_incident_channels';
+export const RECEIVED_TEAM_PLAYBOOK_RUNS = pluginId + '_received_team_playbook_run_channels';
 export const RECEIVED_TEAM_DISABLED = pluginId + '_received_team_disabled';
-export const REMOVED_FROM_CHANNEL = pluginId + '_removed_from_incident_channel';
+export const REMOVED_FROM_CHANNEL = pluginId + '_removed_from_playbook_run_channel';
 export const SET_RHS_STATE = pluginId + '_set_rhs_state';
 export const SET_RHS_TAB_STATE = pluginId + '_set_rhs_tab_state';
 export const SET_RHS_EVENTS_FILTER = pluginId + '_set_rhs_events_filter';
@@ -51,12 +52,12 @@ export interface SetClientId {
 
 export interface PlaybookRunCreated {
     type: typeof PLAYBOOK_RUN_CREATED;
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
 }
 
 export interface PlaybookRunUpdated {
     type: typeof PLAYBOOK_RUN_UPDATED;
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
 }
 
 export interface PlaybookCreated {
@@ -77,7 +78,7 @@ export interface ReceivedTeamNumPlaybooks {
 
 export interface ReceivedTeamPlaybookRuns {
     type: typeof RECEIVED_TEAM_PLAYBOOK_RUNS;
-    incidents: PlaybookRun[];
+    playbookRuns: PlaybookRun[];
 }
 
 export interface ReceivedTeamDisabled {

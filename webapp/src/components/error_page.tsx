@@ -38,7 +38,7 @@ const ErrorPage = () => {
     case ErrorPageTypes.PLAYBOOK_RUNS:
         title = 'Incident Not Found';
         message = "The incident you're requesting is private or does not exist. Please contact an Administrator to be added to the incident.";
-        returnTo = teamPluginUrl(currentTeam.name, '/incidents');
+        returnTo = teamPluginUrl(currentTeam.name, '/runs');
         returnToMsg = 'Back to Incidents';
         break;
     case ErrorPageTypes.PLAYBOOKS:

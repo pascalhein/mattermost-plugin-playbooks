@@ -10,16 +10,19 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import {UserProfile} from 'mattermost-redux/types/users';
 import {getUser} from 'mattermost-redux/selectors/entities/users';
 
-import {PlaybookRun} from 'src/types/incident';
 import ProfileWithPosition
-    from 'src/components/backstage/incidents/incident_backstage/overview/profile_w_position';
-import {useProfilesInChannel} from 'src/hooks';
+    from 'src/components/backstage/playbook_runs/playbook_run_backstage/overview/profile_w_position';
+
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {
     Content,
     SecondaryButtonRight,
     TabPageContainer,
     Title,
-} from 'src/components/backstage/incidents/shared';
+} from 'src/components/backstage/playbook_runs/shared';
+
+import {useProfilesInChannel} from 'src/hooks';
 import {navigateToUrl} from 'src/browser_routing';
 
 const StyledContent = styled(Content)`
@@ -38,13 +41,13 @@ const ParticipantRow = styled.div`
 `;
 
 interface Props {
-    incident: PlaybookRun;
+    playbookRun: PlaybookRun;
 }
 
 const Participants = (props: Props) => {
-    const profilesInChannel = useProfilesInChannel(props.incident.channel_id);
+    const profilesInChannel = useProfilesInChannel(props.playbookRun.channel_id);
 
-    const profilesExceptTwoMains = profilesInChannel.filter((u) => u.id !== props.incident.owner_user_id && u.id !== props.incident.reporter_user_id);
+    const profilesExceptTwoMains = profilesInChannel.filter((u) => u.id !== props.playbookRun.owner_user_id && u.id !== props.playbookRun.reporter_user_id);
 
     return (
         <TabPageContainer>
@@ -52,11 +55,11 @@ const Participants = (props: Props) => {
             <StyledContent>
                 <Heading>{'Owner'}</Heading>
                 <Participant
-                    userId={props.incident.owner_user_id}
+                    userId={props.playbookRun.owner_user_id}
                     isOwner={true}
                 />
                 <Heading>{'Reporter'}</Heading>
-                <Participant userId={props.incident.reporter_user_id}/>
+                <Participant userId={props.playbookRun.reporter_user_id}/>
                 {
                     profilesExceptTwoMains.length > 0 &&
                     <>

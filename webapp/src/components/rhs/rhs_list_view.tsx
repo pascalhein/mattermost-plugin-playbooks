@@ -11,6 +11,8 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import {Team} from 'mattermost-redux/types/teams';
 import {getCurrentChannelId} from 'mattermost-redux/selectors/entities/channels';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import {pluginId} from 'src/manifest';
 import RHSWelcomeView from 'src/components/rhs/rhs_welcome_view';
 import PlusIcon from 'src/components/assets/icons/plus_icon';
@@ -21,11 +23,10 @@ import {
 } from 'src/components/rhs/rhs_shared';
 import {setRHSViewingPlaybookRun, startPlaybookRun} from 'src/actions';
 import {navigateToTeamPluginUrl, navigateToUrl} from 'src/browser_routing';
-import {PlaybookRun} from 'src/types/incident';
 import DotMenu, {DropdownMenuItem} from 'src/components/dot_menu';
 import {myActivePlaybookRunsList} from 'src/selectors';
 import {HamburgerButton} from 'src/components/assets/icons/three_dots_icon';
-import RHSListPlaybookRun from 'src/components/rhs/rhs_list_incident';
+import RHSListPlaybookRun from 'src/components/rhs/rhs_list_playbook_run';
 
 const Header = styled.div`
     display: grid;
@@ -75,7 +76,7 @@ const RHSListView = () => {
     const dispatch = useDispatch();
     const currentTeam = useSelector<GlobalState, Team>(getCurrentTeam);
     const currentChannelId = useSelector<GlobalState, string>(getCurrentChannelId);
-    const incidentList = useSelector<GlobalState, PlaybookRun[]>(myActivePlaybookRunsList);
+    const playbookRunList = useSelector<GlobalState, PlaybookRun[]>(myActivePlaybookRunsList);
 
     const viewPlaybookRun = (channelId: string) => {
         dispatch(setRHSViewingPlaybookRun());
@@ -83,10 +84,10 @@ const RHSListView = () => {
     };
 
     const viewBackstagePlaybookRunList = () => {
-        navigateToUrl(`/${currentTeam.name}/${pluginId}/incidents`);
+        navigateToUrl(`/${currentTeam.name}/${pluginId}/runs`);
     };
 
-    if (incidentList.length === 0) {
+    if (playbookRunList.length === 0) {
         return <RHSWelcomeView/>;
     }
 
@@ -111,17 +112,17 @@ const RHSListView = () => {
                         <RightCell>
                             <ThreeDotMenu
                                 onCreatePlaybook={() => navigateToTeamPluginUrl(currentTeam.name, '/playbooks')}
-                                onSeeAllPlaybookRuns={() => navigateToTeamPluginUrl(currentTeam.name, '/incidents')}
+                                onSeeAllPlaybookRuns={() => navigateToTeamPluginUrl(currentTeam.name, '/runs')}
                             />
                         </RightCell>
                     </Header>
 
-                    {incidentList.map((incident) => {
+                    {playbookRunList.map((playbookRun) => {
                         return (
                             <RHSListPlaybookRun
-                                key={incident.id}
-                                incident={incident}
-                                active={currentChannelId === incident.channel_id}
+                                key={playbookRun.id}
+                                playbookRun={playbookRun}
+                                active={currentChannelId === playbookRun.channel_id}
                                 viewPlaybookRun={viewPlaybookRun}
                             />
                         );

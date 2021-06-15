@@ -7,12 +7,13 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getCurrentChannelId} from 'mattermost-redux/selectors/entities/channels';
 import {GlobalState} from 'mattermost-redux/types/store';
 
+import {PlaybookRun} from 'src/types/playbook_run';
+
 import UpgradeBadge from 'src/components/backstage/upgrade_badge';
 
 import {RHSTabState} from 'src/types/rhs';
 import {currentPlaybookRun, currentRHSTabState} from 'src/selectors';
 import {setRHSTabState} from 'src/actions';
-import {PlaybookRun} from 'src/types/incident';
 import {telemetryEventForPlaybookRun} from 'src/client';
 
 import {useAllowTimelineViewInCurrentTeam} from 'src/hooks';
@@ -46,7 +47,7 @@ const RHSTabView = () => {
     const dispatch = useDispatch();
     const currentTabState = useSelector<GlobalState, RHSTabState>(currentRHSTabState);
     const channelId = useSelector<GlobalState, string>(getCurrentChannelId);
-    const incident = useSelector<GlobalState, PlaybookRun>(currentPlaybookRun);
+    const playbookRun = useSelector<GlobalState, PlaybookRun>(currentPlaybookRun);
     const allowTimelineView = useAllowTimelineViewInCurrentTeam();
 
     const setTabState = (nextState: RHSTabState) => {
@@ -75,7 +76,7 @@ const RHSTabView = () => {
                 active={currentTabState === RHSTabState.ViewingTimeline}
                 onClick={() => {
                     setTabState(RHSTabState.ViewingTimeline);
-                    telemetryEventForPlaybookRun(incident.id, 'timeline_tab_clicked');
+                    telemetryEventForPlaybookRun(playbookRun.id, 'timeline_tab_clicked');
                 }}
                 data-testid='timeline'
             >

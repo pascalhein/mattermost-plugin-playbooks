@@ -3,8 +3,9 @@
 
 import styled, {css} from 'styled-components';
 
+import StatusBadge from 'src/components/backstage/playbook_runs/status_badge';
+
 import {PrimaryButton, TertiaryButton} from 'src/components/assets/buttons';
-import StatusBadge from 'src/components/backstage/incidents/status_badge';
 
 export const Container = styled.div`
     display: flex;
