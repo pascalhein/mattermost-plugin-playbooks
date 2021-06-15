@@ -143,7 +143,7 @@ const RHSPlaybookRunTasks = (props: Props) => {
                                                                 checklistNum={checklistIndex}
                                                                 itemNum={index}
                                                                 channelId={props.incident.channel_id}
-                                                                incidentId={props.incident.id}
+                                                                playbookRunId={props.incident.id}
                                                                 onChange={(newState: ChecklistItemState) => {
                                                                     setChecklistItemState(props.incident.id, checklistIndex, index, newState);
                                                                 }}

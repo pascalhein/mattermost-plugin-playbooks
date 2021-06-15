@@ -42,7 +42,7 @@ interface ChecklistItemDetailsProps {
     checklistNum: number;
     itemNum: number;
     channelId: string;
-    incidentId: string;
+    playbookRunId: string;
     onChange?: (item: ChecklistItemState) => void;
     onRedirect?: () => void;
     draggableProvided: DraggableProvided;
@@ -344,10 +344,10 @@ export const ChecklistItemDetails = (props: ChecklistItemDetailsProps): React.Re
     };
 
     const onAssigneeChange = async (userId?: string) => {
-        if (!props.incidentId) {
+        if (!props.playbookRunId) {
             return;
         }
-        const response = await setAssignee(props.incidentId, props.checklistNum, props.itemNum, userId);
+        const response = await setAssignee(props.playbookRunId, props.checklistNum, props.itemNum, userId);
         if (response.error) {
             // TODO: Should be presented to the user? https://mattermost.atlassian.net/browse/MM-24271
             console.log(response.error); // eslint-disable-line no-console
@@ -456,7 +456,7 @@ export const ChecklistItemDetails = (props: ChecklistItemDetailsProps): React.Re
                                 onClick={() => {
                                     if (!running) {
                                         setRunning(true);
-                                        clientRunChecklistItemSlashCommand(dispatch, props.incidentId, props.checklistNum, props.itemNum);
+                                        clientRunChecklistItemSlashCommand(dispatch, props.playbookRunId, props.checklistNum, props.itemNum);
                                     }
                                 }}
                             >
@@ -480,13 +480,13 @@ export const ChecklistItemDetails = (props: ChecklistItemDetailsProps): React.Re
                 message={'Are you sure you want to delete this task? Deleted tasks will be removed from this incident\'s task list.'}
                 confirmButtonText={'Delete Task'}
                 onConfirm={() =>
-                    clientRemoveChecklistItem(props.incidentId, props.checklistNum, props.itemNum)
+                    clientRemoveChecklistItem(props.playbookRunId, props.checklistNum, props.itemNum)
                 }
                 onCancel={() => setShowDeleteConfirm(false)}
             />
             <ChecklistItemEditModal
                 show={showEditDialog}
-                incidentId={props.incidentId}
+                playbookRunId={props.playbookRunId}
                 checklistNum={props.checklistNum}
                 itemNum={props.itemNum}
                 onDone={() => setShowEditDialog(false)}
@@ -508,7 +508,7 @@ interface ChecklistItemEditModalProps {
     show: boolean
     onDone: () => void
     checklistNum: number
-    incidentId: string
+    playbookRunId: string
     itemNum: number
     taskTitle: string
     taskDescription: string
@@ -535,7 +535,7 @@ const ChecklistItemEditModal = (props: ChecklistItemEditModalProps) => {
     const [command, setCommand] = useState(props.taskCommand);
 
     const submit = () => {
-        clientEditChecklistItem(props.incidentId, props.checklistNum, props.itemNum, {
+        clientEditChecklistItem(props.playbookRunId, props.checklistNum, props.itemNum, {
             title,
             command,
             description,

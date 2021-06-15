@@ -16,12 +16,12 @@ describe('myPlaybookRunsByTeam', () => {
         it('should ignore a channel not in the data structure', () => {
             const state = makeState({
                 teamId1: {
-                    channelId1: {id: 'incidentId1'},
-                    channelId2: {id: 'incidentId2'},
+                    channelId1: {id: 'playbookRunId1'},
+                    channelId2: {id: 'playbookRunId2'},
                 },
                 teamId2: {
-                    channelId3: {id: 'incidentId3'},
-                    channelId4: {id: 'incidentId4'},
+                    channelId3: {id: 'playbookRunId3'},
+                    channelId4: {id: 'playbookRunId4'},
                 },
             });
             const action = {
@@ -37,12 +37,12 @@ describe('myPlaybookRunsByTeam', () => {
         it('should remove a channel in the data structure', () => {
             const state = makeState({
                 teamId1: {
-                    channelId1: {id: 'incidentId1'},
-                    channelId2: {id: 'incidentId2'},
+                    channelId1: {id: 'playbookRunId1'},
+                    channelId2: {id: 'playbookRunId2'},
                 },
                 teamId2: {
-                    channelId3: {id: 'incidentId3'},
-                    channelId4: {id: 'incidentId4'},
+                    channelId3: {id: 'playbookRunId3'},
+                    channelId4: {id: 'playbookRunId4'},
                 },
             });
             const action = {
@@ -51,11 +51,11 @@ describe('myPlaybookRunsByTeam', () => {
             };
             const expectedState = makeState({
                 teamId1: {
-                    channelId1: {id: 'incidentId1'},
+                    channelId1: {id: 'playbookRunId1'},
                 },
                 teamId2: {
-                    channelId3: {id: 'incidentId3'},
-                    channelId4: {id: 'incidentId4'},
+                    channelId3: {id: 'playbookRunId3'},
+                    channelId4: {id: 'playbookRunId4'},
                 },
             });
 

@@ -122,9 +122,9 @@ export async function clientExecuteCommand(dispatch: Dispatch<AnyAction>, getSta
     }
 }
 
-export async function clientRunChecklistItemSlashCommand(dispatch: Dispatch, incidentId: string, checklistNumber: number, itemNumber: number) {
+export async function clientRunChecklistItemSlashCommand(dispatch: Dispatch, playbookRunId: string, checklistNumber: number, itemNumber: number) {
     try {
-        const data = await doPost(`${apiUrl}/incidents/${incidentId}/checklists/${checklistNumber}/item/${itemNumber}/run`);
+        const data = await doPost(`${apiUrl}/incidents/${playbookRunId}/checklists/${checklistNumber}/item/${itemNumber}/run`);
         if (data.trigger_id) {
             dispatch({type: IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID, data: data.trigger_id});
         }
@@ -201,20 +201,20 @@ export async function fetchOwnersInTeam(teamId: string): Promise<OwnerInfo[]> {
     return data as OwnerInfo[];
 }
 
-export async function setOwner(incidentId: string, ownerId: string) {
+export async function setOwner(playbookRunId: string, ownerId: string) {
     const body = `{"owner_id": "${ownerId}"}`;
     try {
-        const data = await doPost(`${apiUrl}/incidents/${incidentId}/owner`, body);
+        const data = await doPost(`${apiUrl}/incidents/${playbookRunId}/owner`, body);
         return data;
     } catch (error) {
         return {error};
     }
 }
 
-export async function setAssignee(incidentId: string, checklistNum: number, itemNum: number, assigneeId?: string) {
+export async function setAssignee(playbookRunId: string, checklistNum: number, itemNum: number, assigneeId?: string) {
     const body = JSON.stringify({assignee_id: assigneeId});
     try {
-        return await doPut(`${apiUrl}/incidents/${incidentId}/checklists/${checklistNum}/item/${itemNum}/assignee`, body);
+        return await doPut(`${apiUrl}/incidents/${playbookRunId}/checklists/${checklistNum}/item/${itemNum}/assignee`, body);
     } catch (error) {
         return {error};
     }

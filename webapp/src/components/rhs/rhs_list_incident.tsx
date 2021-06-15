@@ -84,7 +84,7 @@ const Button = styled.button`
 interface Props {
     incident: PlaybookRun;
     active: boolean;
-    viewPlaybookRun: (incidentId: string) => void;
+    viewPlaybookRun: (playbookRunId: string) => void;
 }
 
 const RHSListPlaybookRun = (props: Props) => {

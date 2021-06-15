@@ -113,7 +113,7 @@ const TabItem = styled(NavLink)`
 `;
 
 interface MatchParams {
-    incidentId: string
+    playbookRunId: string
 }
 
 const FetchingStateType = {
@@ -133,16 +133,16 @@ const PlaybookRunBackstage = () => {
     const [fetchingState, setFetchingState] = useState(FetchingStateType.loading);
 
     useEffect(() => {
-        const incidentId = match.params.incidentId;
+        const playbookRunId = match.params.playbookRunId;
 
-        Promise.all([fetchPlaybookRun(incidentId), fetchPlaybookRunMetadata(incidentId)]).then(([incidentResult, incidentMetadataResult]) => {
+        Promise.all([fetchPlaybookRun(playbookRunId), fetchPlaybookRunMetadata(playbookRunId)]).then(([incidentResult, incidentMetadataResult]) => {
             setPlaybookRun(incidentResult);
             setPlaybookRunMetadata(incidentMetadataResult);
             setFetchingState(FetchingStateType.fetched);
         }).catch(() => {
             setFetchingState(FetchingStateType.notFound);
         });
-    }, [match.params.incidentId]);
+    }, [match.params.playbookRunId]);
 
     if (fetchingState === FetchingStateType.loading) {
         return null;

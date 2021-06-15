@@ -197,7 +197,7 @@ const Backstage = () => {
                     <Route path={`${match.url}/playbooks`}>
                         <PlaybookList/>
                     </Route>
-                    <Route path={`${match.url}/incidents/:incidentId`}>
+                    <Route path={`${match.url}/incidents/:playbookRunId`}>
                         <PlaybookRunBackstage/>
                     </Route>
                     <Route path={`${match.url}/incidents`}>
