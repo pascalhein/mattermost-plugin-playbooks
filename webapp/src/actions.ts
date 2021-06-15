@@ -13,11 +13,11 @@ import {PlaybookRun} from 'src/types/incident';
 import {RHSState, RHSTabState, TimelineEventsFilter} from 'src/types/rhs';
 
 import {
-    INCIDENT_CREATED,
-    INCIDENT_UPDATED,
+    PLAYBOOK_RUN_CREATED,
+    PLAYBOOK_RUN_UPDATED,
     PlaybookRunCreated,
     PlaybookRunUpdated,
-    RECEIVED_TEAM_INCIDENTS,
+    RECEIVED_TEAM_PLAYBOOK_RUNS,
     RECEIVED_TOGGLE_RHS_ACTION,
     ReceivedTeamPlaybookRuns,
     ReceivedToggleRHSAction,
@@ -152,12 +152,12 @@ export function setClientId(clientId: string): SetClientId {
 }
 
 export const incidentCreated = (incident: PlaybookRun): PlaybookRunCreated => ({
-    type: INCIDENT_CREATED,
+    type: PLAYBOOK_RUN_CREATED,
     incident,
 });
 
 export const incidentUpdated = (incident: PlaybookRun): PlaybookRunUpdated => ({
-    type: INCIDENT_UPDATED,
+    type: PLAYBOOK_RUN_UPDATED,
     incident,
 });
 
@@ -178,7 +178,7 @@ export const receivedTeamNumPlaybooks = (teamID: string, numPlaybooks: number): 
 });
 
 export const receivedTeamPlaybookRuns = (incidents: PlaybookRun[]): ReceivedTeamPlaybookRuns => ({
-    type: RECEIVED_TEAM_INCIDENTS,
+    type: RECEIVED_TEAM_PLAYBOOK_RUNS,
     incidents,
 });
 

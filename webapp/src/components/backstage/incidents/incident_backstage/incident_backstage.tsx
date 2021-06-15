@@ -149,7 +149,7 @@ const PlaybookRunBackstage = () => {
     }
 
     if (fetchingState === FetchingStateType.notFound || incident === null || incidentMetadata === null) {
-        return <Redirect to={teamPluginErrorUrl(currentTeam.name, ErrorPageTypes.INCIDENTS)}/>;
+        return <Redirect to={teamPluginErrorUrl(currentTeam.name, ErrorPageTypes.PLAYBOOK_RUNS)}/>;
     }
 
     const goToChannel = () => {

@@ -12,15 +12,15 @@ import {
     SetRHSOpen,
     SET_CLIENT_ID,
     SetClientId,
-    INCIDENT_CREATED,
+    PLAYBOOK_RUN_CREATED,
     PlaybookRunCreated,
-    RECEIVED_TEAM_INCIDENTS,
+    RECEIVED_TEAM_PLAYBOOK_RUNS,
     ReceivedTeamPlaybookRuns,
     SetRHSState,
     SET_RHS_STATE,
     RemovedFromChannel,
     PlaybookRunUpdated,
-    INCIDENT_UPDATED,
+    PLAYBOOK_RUN_UPDATED,
     REMOVED_FROM_CHANNEL,
     SetRHSTabState,
     SET_RHS_TAB_STATE,
@@ -88,7 +88,7 @@ const myPlaybookRunsByTeam = (
     action: PlaybookRunCreated | PlaybookRunUpdated | ReceivedTeamPlaybookRuns | RemovedFromChannel | ReceivedTeamDisabled,
 ) => {
     switch (action.type) {
-    case INCIDENT_CREATED: {
+    case PLAYBOOK_RUN_CREATED: {
         const incidentCreatedAction = action as PlaybookRunCreated;
         const incident = incidentCreatedAction.incident;
         const teamId = incident.team_id;
@@ -100,7 +100,7 @@ const myPlaybookRunsByTeam = (
             },
         };
     }
-    case INCIDENT_UPDATED: {
+    case PLAYBOOK_RUN_UPDATED: {
         const incidentUpdated = action as PlaybookRunUpdated;
         const incident = incidentUpdated.incident;
         const teamId = incident.team_id;
@@ -112,7 +112,7 @@ const myPlaybookRunsByTeam = (
             },
         };
     }
-    case RECEIVED_TEAM_INCIDENTS: {
+    case RECEIVED_TEAM_PLAYBOOK_RUNS: {
         const receivedTeamPlaybookRunsAction = action as ReceivedTeamPlaybookRuns;
         const incidents = receivedTeamPlaybookRunsAction.incidents;
         if (incidents.length === 0) {

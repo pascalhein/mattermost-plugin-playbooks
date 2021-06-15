@@ -40,8 +40,8 @@ import {
     handleWebsocketChannelUpdated, handleWebsocketChannelViewed,
 } from './websocket_events';
 import {
-    WEBSOCKET_INCIDENT_UPDATED,
-    WEBSOCKET_INCIDENT_CREATED,
+    WEBSOCKET_PLAYBOOK_RUN_UPDATED,
+    WEBSOCKET_PLAYBOOK_RUN_CREATED,
     WEBSOCKET_PLAYBOOK_CREATED,
     WEBSOCKET_PLAYBOOK_DELETED,
 } from './types/websocket_events';
@@ -90,8 +90,8 @@ export default class Plugin {
             r.registerRootComponent(PostMenuModal);
 
             r.registerReconnectHandler(handleReconnect(store.getState, store.dispatch));
-            r.registerWebSocketEventHandler(WEBSOCKET_INCIDENT_UPDATED, handleWebsocketPlaybookRunUpdated(store.getState, store.dispatch));
-            r.registerWebSocketEventHandler(WEBSOCKET_INCIDENT_CREATED, handleWebsocketPlaybookRunCreated(store.getState, store.dispatch));
+            r.registerWebSocketEventHandler(WEBSOCKET_PLAYBOOK_RUN_UPDATED, handleWebsocketPlaybookRunUpdated(store.getState, store.dispatch));
+            r.registerWebSocketEventHandler(WEBSOCKET_PLAYBOOK_RUN_CREATED, handleWebsocketPlaybookRunCreated(store.getState, store.dispatch));
             r.registerWebSocketEventHandler(WEBSOCKET_PLAYBOOK_CREATED, handleWebsocketPlaybookCreated(store.getState, store.dispatch));
             r.registerWebSocketEventHandler(WEBSOCKET_PLAYBOOK_DELETED, handleWebsocketPlaybookDeleted(store.getState, store.dispatch));
             r.registerWebSocketEventHandler(WebsocketEvents.USER_ADDED, handleWebsocketUserAdded(store.getState, store.dispatch));

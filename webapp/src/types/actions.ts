@@ -13,12 +13,12 @@ import {GlobalSettings} from './settings';
 export const RECEIVED_TOGGLE_RHS_ACTION = pluginId + '_toggle_rhs';
 export const SET_RHS_OPEN = pluginId + '_set_rhs_open';
 export const SET_CLIENT_ID = pluginId + '_set_client_id';
-export const INCIDENT_CREATED = pluginId + '_incident_created';
-export const INCIDENT_UPDATED = pluginId + '_incident_updated';
+export const PLAYBOOK_RUN_CREATED = pluginId + '_incident_created';
+export const PLAYBOOK_RUN_UPDATED = pluginId + '_incident_updated';
 export const PLAYBOOK_CREATED = pluginId + '_playbook_created';
 export const PLAYBOOK_DELETED = pluginId + '_playbook_deleted';
 export const RECEIVED_TEAM_NUM_PLAYBOOKS = pluginId + '_received_team_num_playbooks';
-export const RECEIVED_TEAM_INCIDENTS = pluginId + '_received_team_incident_channels';
+export const RECEIVED_TEAM_PLAYBOOK_RUNS = pluginId + '_received_team_incident_channels';
 export const RECEIVED_TEAM_DISABLED = pluginId + '_received_team_disabled';
 export const REMOVED_FROM_CHANNEL = pluginId + '_removed_from_incident_channel';
 export const SET_RHS_STATE = pluginId + '_set_rhs_state';
@@ -50,12 +50,12 @@ export interface SetClientId {
 }
 
 export interface PlaybookRunCreated {
-    type: typeof INCIDENT_CREATED;
+    type: typeof PLAYBOOK_RUN_CREATED;
     incident: PlaybookRun;
 }
 
 export interface PlaybookRunUpdated {
-    type: typeof INCIDENT_UPDATED;
+    type: typeof PLAYBOOK_RUN_UPDATED;
     incident: PlaybookRun;
 }
 
@@ -76,7 +76,7 @@ export interface ReceivedTeamNumPlaybooks {
 }
 
 export interface ReceivedTeamPlaybookRuns {
-    type: typeof RECEIVED_TEAM_INCIDENTS;
+    type: typeof RECEIVED_TEAM_PLAYBOOK_RUNS;
     incidents: PlaybookRun[];
 }
 
