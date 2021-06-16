@@ -69,9 +69,9 @@ describe('playbook creation button', () => {
         verifyPlaybookCreationPageOpened(url, playbookName);
     });
 
-    it('opens Incident Collaboration Playbook page from its template option', () => {
-        const url = 'playbooks/new?template_title=Incident%20Collaboration%20Playbook';
-        const playbookName = 'Incident Collaboration Playbook';
+    it('opens Service Outage Incident page from its template option', () => {
+        const url = 'playbooks/new?template_title=Service%20Outage%20Incident';
+        const playbookName = 'Service Outage Incident';
 
         // # Open backstage
         cy.visit('/ad-1/com.mattermost.plugin-incident-management');
@@ -79,13 +79,13 @@ describe('playbook creation button', () => {
         // # Switch to playbooks backstage
         cy.findByTestId('playbooksLHSButton').click();
 
-        // # Click 'Incident Collaboration Playbook'
-        cy.findByText('Incident Collaboration Playbook')
+        // # Click 'Service Outage Incident'
+        cy.findByText('Service Outage Incident')
             .should('be.visible')
             .click()
             .wait(TIMEOUTS.TINY);
 
-        // * Verify a new 'Incident Response Playbook' creation page is opened
+        // * Verify a new 'Service Outage Incident' creation page is opened
         verifyPlaybookCreationPageOpened(url, playbookName);
     });
 

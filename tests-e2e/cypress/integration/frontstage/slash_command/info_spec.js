@@ -87,7 +87,7 @@ describe('slash command > info', () => {
             cy.executeSlashCommand('/playbook run info');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('You can only see the details of an incident from within the incident\'s channel.');
+            cy.verifyEphemeralMessage('You can only see the details of a playbook run from within its channel.');
         });
 
         it('should open the RHS when it is not open', () => {
@@ -118,7 +118,7 @@ describe('slash command > info', () => {
             cy.executeSlashCommand('/playbook run info');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('Your incident details are already open in the right hand side of the channel.');
+            cy.verifyEphemeralMessage('Your playbook run details are already open in the right hand side of the channel.');
         });
     });
 });

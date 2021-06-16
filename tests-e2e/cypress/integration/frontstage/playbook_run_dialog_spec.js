@@ -80,7 +80,7 @@ describe('playbook run creation dialog', () => {
             cy.findByText('Playbook').should('exist');
 
             // * Verify playbook run name prompt
-            cy.findByText('Incident Name').should('exist');
+            cy.findByText('Run name').should('exist');
         });
     });
 

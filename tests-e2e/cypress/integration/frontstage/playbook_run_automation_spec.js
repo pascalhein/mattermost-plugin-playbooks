@@ -204,7 +204,7 @@ describe('playbook run automation', () => {
                     // # Navigate to the playbook run channel
                     cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
-                    // * Verify that there is an error message from the incident bot
+                    // * Verify that there is an error message from the bot
                     cy.getNthPostId(1).then((id) => {
                         cy.get(`#postMessageText_${id}`)
                             .contains(`Failed to invite the following users: @${userToRemove.username}`);
@@ -549,10 +549,10 @@ describe('playbook run automation', () => {
                     // # Navigate to the playbook run channel
                     cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
-                    // * Verify that there is an error message from the incident bot
+                    // * Verify that there is an error message from the bot
                     cy.getLastPostId().then((id) => {
                         cy.get(`#postMessageText_${id}`)
-                            .contains('Failed to announce the creation of this incident in the configured channel.');
+                            .contains('Failed to announce the creation of this playbook run in the configured channel.');
                     });
                 });
             });
@@ -590,7 +590,7 @@ describe('playbook run automation', () => {
                     // * Verify that the bot has not posted a message informing of the failure to send the webhook
                     cy.getLastPostId().then((lastPostId) => {
                         cy.get(`#postMessageText_${lastPostId}`)
-                            .should('not.contain', 'Incident creation announcement through the outgoing webhook failed. Contact your System Admin for more information.');
+                            .should('not.contain', 'Playbook run creation announcement through the outgoing webhook failed. Contact your System Admin for more information.');
                     });
                 });
             });
@@ -623,7 +623,7 @@ describe('playbook run automation', () => {
                     cy.visit(`/ad-1/channels/${playbookRunChannelName}`);
 
                     // * Verify that the bot has posted a message informing of the failure to send the webhook
-                    cy.findByText('Incident creation announcement through the outgoing webhook failed. Contact your System Admin for more information.');
+                    cy.findByText('Playbook run creation announcement through the outgoing webhook failed. Contact your System Admin for more information.');
                 });
             });
         });

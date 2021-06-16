@@ -128,7 +128,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -162,7 +162,7 @@ describe('rhs playbook run list', () => {
                 // # Ensure the channel is loaded before continuing (allows redux to sync).
                 cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-                // # Click the incident icon
+                // # Click the icon
                 cy.get('#channel-header').within(() => {
                     cy.get('#incidentIcon').should('exist').click();
                 });
@@ -201,7 +201,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -281,14 +281,14 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        it('in incidents, closing the RHS, going to town-square, and clicking on the header icon', () => {
+        it('in playbook runs, closing the RHS, going to town-square, and clicking on the header icon', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -319,12 +319,12 @@ describe('rhs playbook run list', () => {
             // * Verify the rhs list is closed
             cy.get('#rhsContainer').should('not.exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -339,7 +339,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -367,7 +367,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -376,7 +376,7 @@ describe('rhs playbook run list', () => {
         });
 
         it('after going to a private channel and clicking on the header icon', () => {
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -396,12 +396,12 @@ describe('rhs playbook run list', () => {
             // * Verify the rhs list is closed
             cy.get('#rhsContainer').should('not.exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -410,7 +410,7 @@ describe('rhs playbook run list', () => {
         });
 
         it('of the current team, not another teams channels', () => {
-            // # Remove all active incidents so that we can verify the number of incidents in the rhs list later
+            // # Remove all active playbook runs so that we can verify the number of playbook runs in the rhs list later
             cy.endAllMyActivePlaybookRuns(teamId1);
             cy.endAllMyActivePlaybookRuns(teamId2);
 
@@ -420,12 +420,12 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // # start first incident
+            // # start first playbook run
             const now = Date.now();
             const playbookRunName1 = 'Private ' + now;
             cy.apiRunPlaybook({
@@ -453,12 +453,12 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // # start second incident
+            // # start second playbook run
             const now2 = Date.now();
             const playbookRunName2 = 'Private ' + now2;
             cy.apiRunPlaybook({
@@ -473,7 +473,7 @@ describe('rhs playbook run list', () => {
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
-                // * Verify incident2 is visible
+                // * Verify playbookRun2 is visible
                 cy.findByText(playbookRunName2).should('exist');
 
                 // * Verify only one playbook run is visible
@@ -486,7 +486,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -505,14 +505,14 @@ describe('rhs playbook run list', () => {
     });
 
     describe('should see playbook run details', () => {
-        it('after opening incidents list and clicking on the go to channel button', () => {
+        it('after opening playbook runs list and clicking on the go to channel button', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -523,7 +523,7 @@ describe('rhs playbook run list', () => {
             });
             cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -546,14 +546,14 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        it('after clicking back button then clicking on the go to channel button of same incident', () => {
+        it('after clicking back button then clicking on the go to channel button of same playbook run', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -608,7 +608,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start 2 new incidents
+            // # start 2 new playbook runs
             let now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
 
@@ -669,14 +669,14 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        it('highlights current incident', () => {
+        it('highlights current playbook run', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start 2 new incidents
+            // # start 2 new playbook runs
             let now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
 
@@ -731,14 +731,14 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        it('after going to incident, closing rhs, going to town-square, and clicking on same playbook run channel in LHS', () => {
+        it('after going to playbook run, closing rhs, going to town-square, and clicking on same playbook run channel in LHS', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -793,14 +793,14 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        it('after going to incident, go to town-square, then back', () => {
+        it('after going to playbook run, go to town-square, then back', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -830,7 +830,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -863,7 +863,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -871,7 +871,7 @@ describe('rhs playbook run list', () => {
             // # Login as user-2
             cy.apiLogin('user-2');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             const playbookRunChannelName = 'playbook-run-' + now;
@@ -883,14 +883,14 @@ describe('rhs playbook run list', () => {
             });
             cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-            // # add user-1 to the incident
+            // # add user-1 to the playbook run
             let channelId;
             cy.apiGetChannelByName(teamName1, playbookRunChannelName).then(({channel}) => {
                 channelId = channel.id;
                 cy.apiAddUserToChannel(channelId, userId);
             });
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -905,7 +905,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -935,7 +935,7 @@ describe('rhs playbook run list', () => {
                 cy.findByTestId('back-button').should('exist').click();
             });
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -958,7 +958,7 @@ describe('rhs playbook run list', () => {
             // # Login as user-2
             cy.apiLogin('user-2');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             const playbookRunChannelName = 'playbook-run-' + now;
@@ -970,19 +970,19 @@ describe('rhs playbook run list', () => {
             });
             cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-            // # add user-1 to the incident
+            // # add user-1 to the playbook run
             cy.apiGetChannelByName(teamName1, playbookRunChannelName).then(({channel}) => {
                 const channelId = channel.id;
                 cy.apiAddUserToChannel(channelId, userId);
 
-                // * Verify the rhs list is open and we can see the new incident
+                // * Verify the rhs list is open and we can see the new playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
 
-                // # remove user-1 from the incident
+                // # remove user-1 from the playbook run
                 cy.removeUserFromChannel(channelId, userId);
 
                 // * Verify the playbook run is not listed
@@ -1002,7 +1002,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             const playbookRunChannelName = 'playbook-run-' + now;
@@ -1027,11 +1027,11 @@ describe('rhs playbook run list', () => {
                 // # Select the tasks tab
                 cy.findByTestId('tasks').click();
 
-                // # End the incident
+                // # End the playbook run
                 cy.findByText('End Incident').click();
             });
 
-            // # Confirm ending the incident
+            // # Confirm ending the playbook run
             cy.get('.modal-dialog').should('exist').find('#interactiveDialogSubmit').click();
 
             cy.get('#rhsContainer').should('exist').within(() => {
@@ -1046,19 +1046,19 @@ describe('rhs playbook run list', () => {
                 // * Verify the rhs list is open
                 cy.findByText('Runs in progress').should('exist');
 
-                // * Verify we cannot see the ended incident
+                // * Verify we cannot see the ended playbook run
                 cy.findByText(playbookRunName).should('not.exist');
             });
         });*/
 
-        it('playbook run should be removed from list when another user closes incident', () => {
+        it('playbook run should be removed from list when another user closes playbook run', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -1066,7 +1066,7 @@ describe('rhs playbook run list', () => {
             // # Login as user-2
             cy.apiLogin('user-2');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             const playbookRunChannelName = 'playbook-run-' + now;
@@ -1076,23 +1076,23 @@ describe('rhs playbook run list', () => {
                 playbook2Id: playbookId2,
                 playbookRunName,
                 ownerUserId: user2Id
-            }).then((incident) => {
-                playbookRunId = incident.id;
+            }).then((playbookRun) => {
+                playbookRunId = playbookRun.id;
             });
             cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-            // # add user-1 to the incident
+            // # add user-1 to the playbook run
             cy.apiGetChannelByName(teamName1, playbookRunChannelName).then(({channel}) => {
                 cy.apiAddUserToChannel(channel.id, userId);
 
-                // * Verify the rhs list is open and we can see the new incident
+                // * Verify the rhs list is open and we can see the new playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
 
-                // # User-2 closes the incident
+                // # User-2 closes the playbook run
                 cy.apiUpdateStatus({
                     playbookRunId,
                     userId: user2Id,
@@ -1118,12 +1118,12 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             let playbookRunId;
@@ -1132,18 +1132,18 @@ describe('rhs playbook run list', () => {
                 playbookId: playbookId1,
                 playbookRunName,
                 ownerUserId: userId
-            }).then((incident) => {
-                playbookRunId = incident.id;
+            }).then((playbookRun) => {
+                playbookRunId = playbookRun.id;
                 cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-                // * Verify the rhs list is open and we can see the new incident
+                // * Verify the rhs list is open and we can see the new playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
 
-                // # User-1 closes the incident
+                // # User-1 closes the playbook run
                 // TODO: Waiting here because of https://mattermost.atlassian.net/browse/MM-29617
                 cy.wait(500).apiUpdateStatus({
                     playbookRunId,
@@ -1155,18 +1155,18 @@ describe('rhs playbook run list', () => {
                 });
                 cy.verifyPlaybookRunEnded(teamId1, playbookRunName);
 
-                // * Verify we cannot see the incident
+                // * Verify we cannot see the playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('not.exist');
                 });
 
-                // # User-1 restarts the incident
+                // # User-1 restarts the playbook run
                 cy.apiRestartPlaybookRun(playbookRunId);
                 cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-                // * Verify the rhs list is open and we can see the new incident
+                // * Verify the rhs list is open and we can see the new playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
@@ -1175,19 +1175,19 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        it('should see playbook run in list when another user restarts an incident', () => {
+        it('should see playbook run in list when another user restarts an playbook run', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // * Verify we can see the incidents list
+            // * Verify we can see the playbook runs list
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
             });
@@ -1195,7 +1195,7 @@ describe('rhs playbook run list', () => {
             // # Login as user-2
             cy.apiLogin('user-2');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             const playbookRunChannelName = 'playbook-run-' + now;
@@ -1204,25 +1204,25 @@ describe('rhs playbook run list', () => {
                 playbook2Id: playbookId2,
                 playbookRunName,
                 ownerUserId: user2Id
-            }).then((incident) => {
-                const playbookRunId = incident.id;
+            }).then((playbookRun) => {
+                const playbookRunId = playbookRun.id;
                 cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
-                // # add user-1 to the incident
+                // # add user-1 to the playbook run
                 cy.apiGetChannelByName(teamName1, playbookRunChannelName).then(({channel}) => {
                     cy.apiAddUserToChannel(channel.id, userId);
                 });
 
-                // * Verify the rhs list is open and we can see the new incident
+                // * Verify the rhs list is open and we can see the new playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
 
-                // # User-2 closes the incident
+                // # User-2 closes the playbook run
                 cy.apiUpdateStatus({
-                    playbookRunId: incident.id,
+                    playbookRunId: playbookRun.id,
                     userId: user2Id,
                     teamId: teamId1,
                     message: 'ending',
@@ -1230,17 +1230,17 @@ describe('rhs playbook run list', () => {
                     status: 'Archived',
                 });
 
-                // * Verify we cannot see the incident
+                // * Verify we cannot see the playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('not.exist');
                 });
 
-                // # User-2 restarts the incident
+                // # User-2 restarts the playbook run
                 cy.apiRestartPlaybookRun(playbookRunId);
 
-                // * Verify the rhs list is open and we can see the new incident
+                // * Verify the rhs list is open and we can see the new playbook run
                 cy.get('#rhsContainer').should('exist').within(() => {
                     cy.findByText('Runs in progress').should('exist');
 
@@ -1259,7 +1259,7 @@ describe('rhs playbook run list', () => {
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
             // In case we're running this test from scratch, the playbook run list should not be empty.
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -1283,16 +1283,16 @@ describe('rhs playbook run list', () => {
             // # Open town-square from the LHS.
             cy.get('#sidebarItem_town-square').click();
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
 
-            // # click the Start Incident link
+            // # click the Run playbook link
             cy.get('#rhsContainer').within(() => {
-                cy.findByText('Start Incident').click();
+                cy.findByText('Run playbook').click();
             });
 
             // * Verify the playbook run creation dialog has opened
@@ -1308,12 +1308,12 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // # click the Start Incident link
+            // # click the Run playbook link
             cy.get('#rhsContainer').find('.icon-dots-vertical').click();
 
             // # click the Create Playbook link
@@ -1333,12 +1333,12 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
 
-            // # click the Start Incident link
+            // # click the Run playbook link
             cy.get('#rhsContainer').find('.icon-dots-vertical').click();
 
             // # click the Create Playbook link
@@ -1351,14 +1351,14 @@ describe('rhs playbook run list', () => {
                 .should('include', `/${teamName1}/com.mattermost.plugin-incident-management/runs`);
         });
 
-        it('should be able to see all incidents (incidents backstage list)', () => {
+        it('should be able to see all playbook runs (runs backstage list)', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
 
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # Click the incident icon
+            // # Click the icon
             cy.get('#channel-header').within(() => {
                 cy.get('#incidentIcon').should('exist').click();
             });
@@ -1384,7 +1384,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             cy.apiRunPlaybook({
@@ -1411,7 +1411,7 @@ describe('rhs playbook run list', () => {
                 cy.findByTestId('back-button').should('exist').click();
             });
 
-            // * Verify the rhs list is open and we can see the new incident
+            // * Verify the rhs list is open and we can see the new playbook run
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText('Runs in progress').should('exist');
 
@@ -1448,7 +1448,7 @@ describe('rhs playbook run list', () => {
             // # Ensure the channel is loaded before continuing (allows redux to sync).
             cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
 
-            // # start new incident
+            // # start new playbook run
             const now = Date.now();
             const playbookRunName = 'Playbook Run (' + now + ')';
             const playbookRunChannelName = 'playbook-run-' + now;
@@ -1458,8 +1458,8 @@ describe('rhs playbook run list', () => {
                 playbookRunName,
                 ownerUserId: userId
             })
-                .then((incident) => {
-                    const playbookRunId = incident.id;
+                .then((playbookRun) => {
+                    const playbookRunId = playbookRun.id;
 
                     cy.verifyPlaybookRunActive(teamId1, playbookRunName);
 
@@ -1479,7 +1479,7 @@ describe('rhs playbook run list', () => {
                         cy.findByTestId('back-button').should('exist').click();
                     });
 
-                    // * Verify the rhs list is open and we can see the new incident
+                    // * Verify the rhs list is open and we can see the new playbook run
                     cy.get('#rhsContainer').should('exist').within(() => {
                         cy.findByText('Runs in progress').should('exist');
 

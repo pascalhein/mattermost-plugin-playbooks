@@ -69,7 +69,7 @@ describe('playbook run rhs > welcome', () => {
             cy.wait(1500);
 
             // * Verify there is no prompt to create a playbook run.
-            cy.get('#rhsContainer').findByText('Start Incident').should('not.exist');
+            cy.get('#rhsContainer').findByText('Run playbook').should('not.exist');
 
             // # Click the prompt to create a playbook.
             cy.get('#rhsContainer').findByText('Create Playbook').click();
@@ -101,7 +101,7 @@ describe('playbook run rhs > welcome', () => {
             });
 
             // # Click the prompt to create a playbook run.
-            cy.get('#rhsContainer').findByText('Start Incident').click({force: true});
+            cy.get('#rhsContainer').findByText('Run playbook').click({force: true});
 
             // * Verify the playbook run creation dialog has opened
             cy.get('#interactiveDialogModal').should('exist').within(() => {

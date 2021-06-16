@@ -87,7 +87,7 @@ describe('slash command > owner', () => {
             cy.executeSlashCommand('/playbook run owner');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('You can only see the owner from within the incident\'s channel.');
+            cy.verifyEphemeralMessage('You can only see the owner from within the playbook run\'s channel.');
         });
 
         it('should show the current owner', () => {
@@ -98,7 +98,7 @@ describe('slash command > owner', () => {
             cy.executeSlashCommand('/playbook run owner');
 
             // * Verify the expected owner.
-            cy.verifyEphemeralMessage('@user-1 is the current owner for this incident.');
+            cy.verifyEphemeralMessage('@user-1 is the current owner for this playbook run.');
         });
     });
 
@@ -111,7 +111,7 @@ describe('slash command > owner', () => {
             cy.executeSlashCommand('/playbook run owner user-2');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('You can only change the owner from within the incident\'s channel.');
+            cy.verifyEphemeralMessage('You can only change the owner from within the playbook run\'s channel.');
         });
 
         describe('should show an error when the user is not found', () => {
@@ -174,7 +174,7 @@ describe('slash command > owner', () => {
                 cy.executeSlashCommand('/playbook run owner user-1');
 
                 // * Verify the expected error message.
-                cy.verifyEphemeralMessage('User @user-1 is already owner of this incident.');
+                cy.verifyEphemeralMessage('User @user-1 is already owner of this playbook run.');
             });
 
             it('when the username has an @-prefix', () => {
@@ -182,7 +182,7 @@ describe('slash command > owner', () => {
                 cy.executeSlashCommand('/playbook run owner @user-1');
 
                 // * Verify the expected error message.
-                cy.verifyEphemeralMessage('User @user-1 is already owner of this incident.');
+                cy.verifyEphemeralMessage('User @user-1 is already owner of this playbook run.');
             });
         });
 
@@ -200,7 +200,7 @@ describe('slash command > owner', () => {
                 cy.executeSlashCommand('/playbook run owner sysadmin');
 
                 // # Verify the owner has changed.
-                cy.verifyPostedMessage('user-1 changed the incident owner from @user-1 to @sysadmin.');
+                cy.verifyPostedMessage('user-1 changed the owner from @user-1 to @sysadmin.');
             });
 
             it('when the username has an @-prefix', () => {
@@ -208,7 +208,7 @@ describe('slash command > owner', () => {
                 cy.executeSlashCommand('/playbook run owner @sysadmin');
 
                 // # Verify the owner has changed.
-                cy.verifyPostedMessage('user-1 changed the incident owner from @user-1 to @sysadmin.');
+                cy.verifyPostedMessage('user-1 changed the owner from @user-1 to @sysadmin.');
             });
         });
 

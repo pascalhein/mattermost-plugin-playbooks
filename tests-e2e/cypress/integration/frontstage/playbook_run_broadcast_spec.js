@@ -105,7 +105,7 @@ describe('playbook run broadcast', () => {
 
         // * Verify that the last post contains the expected header and the update message verbatim
         cy.getLastPostId().then((lastPostId) => {
-            cy.get(`#postMessageText_${lastPostId}`).contains(`Incident Update: ${playbookRunName}`);
+            cy.get(`#postMessageText_${lastPostId}`).contains(`Status Update: ${playbookRunName}`);
             cy.get(`#postMessageText_${lastPostId}`).contains('By @user-1 | Duration: < 1m | Status: Active');
             cy.get(`#postMessageText_${lastPostId}`).contains(updateMessage);
         });
@@ -140,7 +140,7 @@ describe('playbook run broadcast', () => {
 
         // * Verify that the last post contains the expected header and the update message verbatim
         cy.getLastPostId().then((lastPostId) => {
-            cy.get(`#postMessageText_${lastPostId}`).contains(`Incident Update: ${playbookRunName}`);
+            cy.get(`#postMessageText_${lastPostId}`).contains(`Status Update: ${playbookRunName}`);
             cy.get(`#postMessageText_${lastPostId}`).contains('By @user-1 | Duration: < 1m | Status: Active');
             cy.get(`#postMessageText_${lastPostId}`).contains(updateMessage);
         });

@@ -73,7 +73,7 @@ describe('playbook run rhs > latest update', () => {
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
                 cy.get('#interactiveDialogModalIntroductionText')
-                    .contains('Update your incident status. This post will be broadcasted to Town Square.');
+                    .contains('Provide an update to the stakeholders. This post will be broadcasted to Town Square.');
             });
         });
 
@@ -110,7 +110,7 @@ describe('playbook run rhs > latest update', () => {
                         // * Verify that the interactive dialog contains a generic message
                         cy.get('#interactiveDialogModal').within(() => {
                             cy.get('#interactiveDialogModalIntroductionText')
-                                .contains('Update your incident status. This post will be broadcasted to a private channel.');
+                                .contains('Provide an update to the stakeholders. This post will be broadcasted to a private channel.');
                         });
                     });
                 });
@@ -148,7 +148,7 @@ describe('playbook run rhs > latest update', () => {
                         // * Verify that the interactive dialog contains a generic message
                         cy.get('#interactiveDialogModal').within(() => {
                             cy.get('#interactiveDialogModalIntroductionText')
-                                .contains('Update your incident status. This post will be broadcasted to a private channel.');
+                                .contains('Provide an update to the stakeholders. This post will be broadcasted to a private channel.');
                         });
                     });
                 });
@@ -187,7 +187,7 @@ describe('playbook run rhs > latest update', () => {
                         // * Verify that the interactive dialog contains a generic message
                         cy.get('#interactiveDialogModal').within(() => {
                             cy.get('#interactiveDialogModalIntroductionText')
-                                .contains('Update your incident status. This post will be broadcasted to a private channel.');
+                                .contains('Provide an update to the stakeholders. This post will be broadcasted to a private channel.');
                         });
                     });
                 });
@@ -221,7 +221,7 @@ describe('playbook run rhs > latest update', () => {
                 // # Get the interactive dialog modal.
                 cy.get('#interactiveDialogModal').within(() => {
                     cy.get('#interactiveDialogModalIntroductionText')
-                        .contains('Update your incident status.');
+                        .contains('Provide an update to the stakeholders.');
                     cy.get('#interactiveDialogModalIntroductionText')
                         .should('not.contain', 'This post will be broadcasted');
                 });

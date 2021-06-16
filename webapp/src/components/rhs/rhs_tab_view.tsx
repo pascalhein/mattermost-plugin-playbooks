@@ -70,7 +70,7 @@ const RHSTabView = () => {
                 onClick={() => setTabState(RHSTabState.ViewingTasks)}
                 data-testid='checklists'
             >
-                {'Checklsits'}
+                {'Checklists'}
             </TabItem>
             <TabItem
                 active={currentTabState === RHSTabState.ViewingTimeline}
