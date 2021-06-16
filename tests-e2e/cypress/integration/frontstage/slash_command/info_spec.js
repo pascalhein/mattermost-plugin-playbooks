@@ -87,7 +87,7 @@ describe('slash command > info', () => {
             cy.executeSlashCommand('/playbook run info');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('You can only see the details of a playbook run from within its channel.');
+            cy.verifyEphemeralMessage('This command only works when run from a playbook run channel.');
         });
 
         it('should open the RHS when it is not open', () => {

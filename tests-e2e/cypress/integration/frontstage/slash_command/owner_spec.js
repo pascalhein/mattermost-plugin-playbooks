@@ -87,7 +87,7 @@ describe('slash command > owner', () => {
             cy.executeSlashCommand('/playbook run owner');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('You can only see the owner from within the playbook run\'s channel.');
+            cy.verifyEphemeralMessage('This command only works when run from a playbook run channel.');
         });
 
         it('should show the current owner', () => {
@@ -111,7 +111,7 @@ describe('slash command > owner', () => {
             cy.executeSlashCommand('/playbook run owner user-2');
 
             // * Verify the expected error message.
-            cy.verifyEphemeralMessage('You can only change the owner from within the playbook run\'s channel.');
+            cy.verifyEphemeralMessage('This command only works when run from a playbook run channel.');
         });
 
         describe('should show an error when the user is not found', () => {

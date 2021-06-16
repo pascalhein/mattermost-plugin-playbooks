@@ -257,7 +257,7 @@ func (r *Runner) actionCheck(args []string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only check/uncheck an item from within the playbook run's channel.")
+			r.postCommandResponse("This command only works when run from a playbook run channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -285,7 +285,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only add an item from within the playbook run's channel.")
+			r.postCommandResponse("This command only works when run from a playbook run channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -332,7 +332,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only remove an item from within the playbook run's channel.")
+			r.postCommandResponse("This command only works when run from a playbook run channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -359,7 +359,7 @@ func (r *Runner) actionOwner(args []string) {
 func (r *Runner) actionShowOwner([]string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
-		r.postCommandResponse("You can only see the owner from within the playbook run's channel.")
+		r.postCommandResponse("This command only works when run from a playbook run channel.")
 		return
 	} else if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving playbook run for channel %s: %v", r.args.ChannelId, err)
@@ -386,7 +386,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
-		r.postCommandResponse("You can only change the owner from within the playbook run's channel.")
+		r.postCommandResponse("This command only works when run from a playbook run channel.")
 		return
 	} else if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving playbook run for channel %s: %v", r.args.ChannelId, err)
@@ -511,7 +511,7 @@ func (r *Runner) actionList() {
 func (r *Runner) actionInfo() {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
-		r.postCommandResponse("You can only see the details of a playbook run from within the run's channel.")
+		r.postCommandResponse("This command only works when run from a playbook run channel.")
 		return
 	} else if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -580,7 +580,7 @@ func (r *Runner) actionUpdate() {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only update a playbook run from within its channel.")
+			r.postCommandResponse("This command only works when run from a playbook run channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -645,7 +645,7 @@ func (r *Runner) actionTimeline() {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only run the timeline command from within a playbook run channel.")
+			r.postCommandResponse("This command only works when run from a playbook run channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
