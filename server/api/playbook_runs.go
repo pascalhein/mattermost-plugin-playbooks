@@ -248,7 +248,7 @@ func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, 
 		var msg string
 
 		if errors.Is(err, app.ErrChannelDisplayNameInvalid) {
-			msg = "The incident name is invalid or too long. Please use a valid name with fewer than 64 characters."
+			msg = "The name is invalid or too long. Please use a valid name with fewer than 64 characters."
 		} else if errors.Is(err, app.ErrPermission) {
 			msg = err.Error()
 		}
@@ -281,8 +281,8 @@ func (h *PlaybookRunHandler) createPlaybookRunFromDialog(w http.ResponseWriter, 
 	w.WriteHeader(http.StatusCreated)
 }
 
-// addToTimelineDialog handles the interactive dialog submission when a user clicks the post action
-// menu option "Add to incident timeline".
+// addToTimelineDialog handles the interactive dialog submission when a user clicks the
+// corresponding post action.
 func (h *PlaybookRunHandler) addToTimelineDialog(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("Mattermost-User-ID")
 
@@ -1239,7 +1239,7 @@ func (h *PlaybookRunHandler) postPlaybookRunCreatedMessage(playbookRun *app.Play
 	}
 
 	post := &model.Post{
-		Message: fmt.Sprintf("Incident %s started in ~%s", playbookRun.Name, channel.Name),
+		Message: fmt.Sprintf("Playbook run %s started in ~%s", playbookRun.Name, channel.Name),
 	}
 	h.poster.EphemeralPost(playbookRun.OwnerUserID, channelID, post)
 

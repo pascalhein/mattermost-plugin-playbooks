@@ -488,7 +488,7 @@ func getSteps(playbook app.Playbook) int {
 func toSQLPlaybook(playbook app.Playbook) (*sqlPlaybook, error) {
 	checklistsJSON, err := json.Marshal(playbook.Checklists)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal checklist json for incident id: '%s'", playbook.ID)
+		return nil, errors.Wrapf(err, "failed to marshal checklist json for playbook id: '%s'", playbook.ID)
 	}
 
 	return &sqlPlaybook{

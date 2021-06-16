@@ -95,7 +95,7 @@ func (s *PlaybookRunServiceImpl) handleStatusUpdateReminder(playbookRunID string
 	}
 
 	post, err := s.poster.PostMessageWithAttachments(playbookRunToModify.ChannelID, attachments,
-		"@%s, please provide an update on this incident's progress.", owner.Username)
+		"@%s, please provide a status update.", owner.Username)
 	if err != nil {
 		s.logger.Errorf(errors.Wrap(err, "HandleReminder error posting reminder message").Error())
 		return
