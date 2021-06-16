@@ -994,63 +994,6 @@ describe('rhs playbook run list', () => {
             });
         });
 
-        /* TEMP disable, to be restored with alternate playbook run close method.
-         * it('playbook run should be removed from list when the user closes playbook run and presses back button', () => {
-            // # Navigate directly to a non-playbook run channel
-            cy.visit('/ad-1/channels/town-square');
-
-            // # Ensure the channel is loaded before continuing (allows redux to sync).
-            cy.get('#centerChannelFooter').findByTestId('post_textbox').should('exist');
-
-            // # start new playbook run
-            const now = Date.now();
-            const playbookRunName = 'Playbook Run (' + now + ')';
-            const playbookRunChannelName = 'playbook-run-' + now;
-            cy.apiRunPlaybook({teamId, playbookId, playbookRunName, ownerUserId: userId});
-            cy.verifyPlaybookRunActive(teamId, playbookRunName);
-
-            // # Open the playbook run channel from the LHS.
-            cy.get(`#sidebarItem_${playbookRunChannelName}`).click();
-
-            // * Verify the playbook run RHS is open.
-            cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByTestId('rhs-title').should('exist').within(() => {
-                    cy.findByText(playbookRunName).should('exist');
-                });
-
-                // * Verify the title shows "Reported"
-                cy.get('.sidebar--right__title').contains('Reported');
-            });
-
-            // # End playbook run and go to playbook run list
-            cy.get('#rhsContainer').should('exist').within(() => {
-                // # Select the tasks tab
-                cy.findByTestId('tasks').click();
-
-                // # End the playbook run
-                cy.findByText('End Incident').click();
-            });
-
-            // # Confirm ending the playbook run
-            cy.get('.modal-dialog').should('exist').find('#interactiveDialogSubmit').click();
-
-            cy.get('#rhsContainer').should('exist').within(() => {
-                // * Verify the title shows "Ended"
-                cy.get('.sidebar--right__title').contains('Ended');
-
-                // # Click the back button
-                cy.findByTestId('back-button').should('exist').click();
-            });
-
-            cy.get('#rhsContainer').should('exist').within(() => {
-                // * Verify the rhs list is open
-                cy.findByText('Runs in progress').should('exist');
-
-                // * Verify we cannot see the ended playbook run
-                cy.findByText(playbookRunName).should('not.exist');
-            });
-        });*/
-
         it('playbook run should be removed from list when another user closes playbook run', () => {
             // # Navigate directly to a non-playbook run channel
             cy.visit(`/${teamName1}/channels/town-square`);
