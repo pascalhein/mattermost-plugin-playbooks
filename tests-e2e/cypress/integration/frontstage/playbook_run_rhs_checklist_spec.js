@@ -122,8 +122,8 @@ describe('playbook run rhs checklist', () => {
             cy.get('#rhsContainer').should('exist').within(() => {
                 cy.findByText(playbookRunName).should('exist');
 
-                // # Select the tasks tab
-                cy.findByTestId('tasks').click();
+                // # Select the checklists tab
+                cy.findByTestId('checklists').click();
             });
         });
 
@@ -164,8 +164,8 @@ describe('playbook run rhs checklist', () => {
             cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
             cy.get('#rhsContainer').should('exist').within(() => {
-                // # Select the tasks tab
-                cy.findByTestId('tasks').click();
+                // # Select the checklists tab
+                cy.findByTestId('checklists').click();
 
                 // * Verify the invalid command still has not yet been run.
                 cy.findAllByTestId('run').eq(0).should('have.text', 'Run');
@@ -182,8 +182,8 @@ describe('playbook run rhs checklist', () => {
             // Click the trash
             cy.get('.icon-trash-can-outline').click();
 
-            // Press the delete task button
-            cy.findByText('Delete Task').click();
+            // Press the delete button
+            cy.findByText('Delete').click();
 
             // Verify the first task is gone
             cy.findByText('Step 1').should('not.exist');

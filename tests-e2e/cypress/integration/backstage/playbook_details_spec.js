@@ -27,7 +27,7 @@ describe('backstage playbook details', () => {
                 cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks');
 
                 // # Start a blank playbook
-                cy.get('#root').findByText('Blank Playbook').click();
+                cy.get('#root').findByText('Blank').click();
 
                 // # Add a slash command to a step
                 cy.get('#root').findByText('Add a slash command').click();
@@ -47,7 +47,7 @@ describe('backstage playbook details', () => {
                 cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks');
 
                 // # Start a blank playbook
-                cy.get('#root').findByText('Blank Playbook').click();
+                cy.get('#root').findByText('Blank').click();
 
                 // # Add a slash command to a step
                 cy.get('#root').findByText('Add a slash command').click();
@@ -70,7 +70,7 @@ describe('backstage playbook details', () => {
                 cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks');
 
                 // # Start a blank playbook
-                cy.get('#root').findByText('Blank Playbook').click();
+                cy.get('#root').findByText('Blank').click();
 
                 // # Add a slash command to a step
                 cy.get('#root').findByText('Add a slash command').click();
@@ -126,8 +126,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // * Verify placeholder text is present
             cy.get('#playbook-preferences-broadcast-channel').should('have.text', 'Select a channel');
@@ -137,8 +137,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // # Open the broadcast channel widget and select a public channel
             cy.get('#playbook-preferences-broadcast-channel').click().type('saepe-5{enter}', {delay: 200});
@@ -149,8 +149,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // * Verify placeholder text is present
             cy.get('#playbook-preferences-broadcast-channel').should('have.text', 'doloremque');
@@ -160,8 +160,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // # Open the broadcast channel widget and select a public channel
             cy.get('#playbook-preferences-broadcast-channel').click().type('autem-2{enter}', {delay: 200});
@@ -172,8 +172,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // * Verify placeholder text is present
             cy.get('#playbook-preferences-broadcast-channel').should('have.text', 'commodi');
@@ -183,8 +183,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // # Open the broadcast channel widget and select the private channel
             cy.get('#playbook-preferences-broadcast-channel').click().type(privateChannelId + '{enter}', {delay: 200});
@@ -202,8 +202,8 @@ describe('backstage playbook details', () => {
             // # Visit the selected playbook
             cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-            // # Switch to Preferences tab
-            cy.get('#root').findByText('Preferences').click();
+            // # Switch to Templates tab
+            cy.get('#root').findByText('Templates').click();
 
             // * Verify placeholder text is present
             cy.get('#playbook-preferences-broadcast-channel').should('have.text', 'Unknown Channel');
@@ -244,8 +244,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     // * Verify that the toggle is unchecked
                     cy.get('#invite-users label input').should('not.be.checked');
@@ -255,8 +255,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#invite-users').within(() => {
                         // * Verify that the toggle is unchecked
@@ -274,8 +274,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     // * Verify that the toggle is unchecked
                     cy.get('#invite-users label input').should('not.be.checked');
@@ -290,8 +290,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#invite-users').within(() => {
                         // * Verify that the toggle is unchecked
@@ -325,8 +325,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#invite-users').within(() => {
                         // * Verify that the toggle is unchecked
@@ -369,8 +369,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#invite-users').within(() => {
                         // * Verify that the toggle is unchecked
@@ -416,8 +416,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#invite-users').within(() => {
                         // * Verify that the toggle is unchecked
@@ -454,8 +454,8 @@ describe('backstage playbook details', () => {
                     // # Navigate again to the playbook
                     cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#invite-users').within(() => {
                         // * Verify that the toggle is unchecked
@@ -513,8 +513,8 @@ describe('backstage playbook details', () => {
                         // # Navigate again to the playbook
                         cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                        // # Switch to Automation tab
-                        cy.get('#root').findByText('Automation').click();
+                        // # Switch to Actions tab
+                        cy.get('#root').findByText('Actions').click();
 
                         // # Save the playbook
                         cy.findByTestId('save_playbook').click();
@@ -525,8 +525,8 @@ describe('backstage playbook details', () => {
                         // # Navigate again to the playbook
                         cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks/' + playbookId + '/edit');
 
-                        // # Switch to Automation tab
-                        cy.get('#root').findByText('Automation').click();
+                        // # Switch to Actions tab
+                        cy.get('#root').findByText('Actions').click();
 
                         // # Open the invited users selector
                         cy.get('#invite-users').within(() => {
@@ -544,8 +544,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     // * Verify that the toggle is unchecked
                     cy.get('#assign-owner label input').should('not.be.checked');
@@ -555,8 +555,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#assign-owner').within(() => {
                         // * Verify that the toggle is unchecked
@@ -574,8 +574,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     // * Verify that the toggle is unchecked
                     cy.get('#assign-owner label input').should('not.be.checked');
@@ -590,8 +590,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#assign-owner').within(() => {
                         // * Verify that the toggle is unchecked
@@ -618,8 +618,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#assign-owner').within(() => {
                         // * Verify that the toggle is unchecked
@@ -655,8 +655,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#assign-owner').within(() => {
                         // * Verify that the toggle is unchecked
@@ -690,8 +690,8 @@ describe('backstage playbook details', () => {
                     // # Navigate again to the playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#assign-owner').within(() => {
                         // * Verify that the toggle is unchecked
@@ -742,8 +742,8 @@ describe('backstage playbook details', () => {
                         // # Navigate again to the playbook
                         cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                        // # Switch to Automation tab
-                        cy.get('#root').findByText('Automation').click();
+                        // # Switch to Actions tab
+                        cy.get('#root').findByText('Actions').click();
 
                         // # Save the playbook
                         cy.findByTestId('save_playbook').click();
@@ -754,8 +754,8 @@ describe('backstage playbook details', () => {
                         // # Navigate again to the playbook
                         cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                        // # Switch to Automation tab
-                        cy.get('#root').findByText('Automation').click();
+                        // # Switch to Actions tab
+                        cy.get('#root').findByText('Actions').click();
 
                         cy.get('#assign-owner').within(() => {
                             // * Verify that the toggle is unchecked
@@ -778,8 +778,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     // * Verify that the toggle is unchecked
                     cy.get('#announcement-channel label input').should('not.be.checked');
@@ -789,8 +789,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#announcement-channel').within(() => {
                         // * Verify that the toggle is unchecked
@@ -808,8 +808,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     // * Verify that the toggle is unchecked
                     cy.get('#announcement-channel label input').should('not.be.checked');
@@ -824,8 +824,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#announcement-channel').within(() => {
                         // * Verify that the toggle is unchecked
@@ -852,8 +852,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#announcement-channel').within(() => {
                         // * Verify that the toggle is unchecked
@@ -889,8 +889,8 @@ describe('backstage playbook details', () => {
                     // # Visit the selected playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#announcement-channel').within(() => {
                         // * Verify that the toggle is unchecked
@@ -924,8 +924,8 @@ describe('backstage playbook details', () => {
                     // # Navigate again to the playbook
                     cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                    // # Switch to Automation tab
-                    cy.get('#root').findByText('Automation').click();
+                    // # Switch to Actions tab
+                    cy.get('#root').findByText('Actions').click();
 
                     cy.get('#announcement-channel').within(() => {
                         // * Verify that the toggle is unchecked
@@ -969,8 +969,8 @@ describe('backstage playbook details', () => {
                         // # Navigate again to the playbook
                         cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                        // # Switch to Automation tab
-                        cy.get('#root').findByText('Automation').click();
+                        // # Switch to Actions tab
+                        cy.get('#root').findByText('Actions').click();
 
                         // # Save the playbook
                         cy.findByTestId('save_playbook').click();
@@ -981,8 +981,8 @@ describe('backstage playbook details', () => {
                         // # Navigate again to the playbook
                         cy.visit(`/ad-1/com.mattermost.plugin-incident-management/playbooks/${playbookId}/edit`);
 
-                        // # Switch to Automation tab
-                        cy.get('#root').findByText('Automation').click();
+                        // # Switch to Actions tab
+                        cy.get('#root').findByText('Actions').click();
 
                         cy.get('#announcement-channel').within(() => {
                             // * Verify that the toggle is unchecked

@@ -1259,9 +1259,9 @@ describe('rhs playbook run list', () => {
             // # click the Run playbook link
             cy.get('#rhsContainer').find('.icon-dots-vertical').click();
 
-            // # click the Create Playbook link
+            // # click the Create playbook link
             cy.get('#rhsContainer').within(() => {
-                cy.findByText('Create Playbook').click();
+                cy.findByText('Create playbook').click();
             });
 
             // * Verify we reached the playbook backstage
@@ -1284,7 +1284,7 @@ describe('rhs playbook run list', () => {
             // # click the Run playbook link
             cy.get('#rhsContainer').find('.icon-dots-vertical').click();
 
-            // # click the Create Playbook link
+            // # click the Create playbook link
             cy.get('#rhsContainer').within(() => {
                 cy.findByText('See all runs').click();
             });

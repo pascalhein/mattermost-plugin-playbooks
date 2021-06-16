@@ -72,7 +72,7 @@ describe('playbook run rhs > welcome', () => {
             cy.get('#rhsContainer').findByText('Run playbook').should('not.exist');
 
             // # Click the prompt to create a playbook.
-            cy.get('#rhsContainer').findByText('Create Playbook').click();
+            cy.get('#rhsContainer').findByText('Create playbook').click();
 
             // * Verify we reached the playbook backstage
             cy.url().should('include', `/${newTeamName}/com.mattermost.plugin-incident-management/playbooks`);
@@ -115,7 +115,7 @@ describe('playbook run rhs > welcome', () => {
             cy.get('#interactiveDialogModal').should('not.exist');
 
             // # Click the prompt to create a playbook.
-            cy.get('#rhsContainer').findByText('Create Playbook').click();
+            cy.get('#rhsContainer').findByText('Create playbook').click();
 
             // * Verify we reached the playbook backstage
             cy.url().should('include', `/${newTeamName}/com.mattermost.plugin-incident-management/playbooks`);

@@ -64,7 +64,7 @@ describe('playbook run creation dialog', () => {
     it('shows create playbook link', () => {
         cy.get('#interactiveDialogModal').within(() => {
             // # Follow link
-            cy.findByText('Create a playbook.').click();
+            cy.findByText('Click here').click();
 
             // * Verify it's the new playbook page
             cy.url().should('include', '/com.mattermost.plugin-incident-management/playbooks/new');
@@ -86,7 +86,7 @@ describe('playbook run creation dialog', () => {
 
     it('is canceled when cancel is clicked', () => {
         // # Populate the interactive dialog
-        const playbookRunName = 'New Playbook Run' + Date.now();
+        const playbookRunName = 'New Run' + Date.now();
         cy.get('#interactiveDialogModal').within(() => {
             cy.findByTestId('playbookRunNameinput').type(playbookRunName, {force: true});
         });

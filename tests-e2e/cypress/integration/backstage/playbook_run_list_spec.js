@@ -87,7 +87,7 @@ describe('backstage playbook run list', () => {
         cy.findByTestId('playbookRunsLHSButton').click();
 
         // * Assert welcome page title text.
-        cy.get('#root').findByText('What are Runs?').should('be.visible');
+        cy.get('#root').findByText('What are playbook runs?').should('be.visible');
     });
 
     it('shows welcome page when no playbook runs, even when filtering', () => {
@@ -95,7 +95,7 @@ describe('backstage playbook run list', () => {
         cy.visit(`/${newTeam.name}/com.mattermost.plugin-incident-management/runs?status=Active`);
 
         // * Assert welcome page title text.
-        cy.get('#root').findByText('What are Runs?').should('be.visible');
+        cy.get('#root').findByText('What are playbook runs?').should('be.visible');
     });
 
     it('does not show welcome page when filtering yields no playbook runs', () => {
@@ -113,7 +113,7 @@ describe('backstage playbook run list', () => {
         cy.visit(`/${newTeamWithNoActivePlaybookRuns.name}/com.mattermost.plugin-incident-management/runs?status=Active`);
 
         // * Assert welcome page is not visible.
-        cy.get('#root').findByText('What are Runs?').should('not.be.visible');
+        cy.get('#root').findByText('What are playbook runs?').should('not.be.visible');
 
         // * Assert playbook run listing is visible.
         cy.findByTestId('titlePlaybookRun').should('exist').contains('Runs');

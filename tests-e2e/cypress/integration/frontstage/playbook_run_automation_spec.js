@@ -55,8 +55,8 @@ describe('playbook run automation', () => {
 
                 // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const playbookRunName = `Playbook Run (${now})`;
-                const playbookRunChannelName = `playbook-run-${now}`;
+                const playbookRunName = `Run (${now})`;
+                const playbookRunChannelName = `run-${now}`;
                 cy.apiRunPlaybook({
                     teamId,
                     playbookId,
@@ -93,8 +93,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -137,8 +137,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -191,8 +191,8 @@ describe('playbook run automation', () => {
 
                     // # Create a new playbook run with the playbook.
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -233,8 +233,8 @@ describe('playbook run automation', () => {
 
                 // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const playbookRunName = `Playbook Run (${now})`;
-                const playbookRunChannelName = `playbook-run-${now}`;
+                const playbookRunName = `Run (${now})`;
+                const playbookRunChannelName = `run-${now}`;
                 cy.apiRunPlaybook({
                     teamId,
                     playbookId,
@@ -272,8 +272,8 @@ describe('playbook run automation', () => {
 
                 // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const playbookRunName = `Playbook Run (${now})`;
-                const playbookRunChannelName = `playbook-run-${now}`;
+                const playbookRunName = `Run (${now})`;
+                const playbookRunChannelName = `run-${now}`;
                 cy.apiRunPlaybook({
                     teamId,
                     playbookId,
@@ -312,8 +312,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -354,8 +354,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -395,8 +395,8 @@ describe('playbook run automation', () => {
 
                 // # Create a new playbook run with that playbook
                 const now = Date.now();
-                const playbookRunName = `Playbook Run (${now})`;
-                const playbookRunChannelName = `playbook-run-${now}`;
+                const playbookRunName = `Run (${now})`;
+                const playbookRunChannelName = `run-${now}`;
                 cy.apiRunPlaybook({
                     teamId,
                     playbookId,
@@ -433,8 +433,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -457,7 +457,7 @@ describe('playbook run automation', () => {
                     cy.visit('/ad-1/channels/town-square');
 
                     cy.getLastPostId().then((lastPostId) => {
-                        cy.get(`#postMessageText_${lastPostId}`).contains(`New Playbook Run: ~${playbookRunName}`);
+                        cy.get(`#postMessageText_${lastPostId}`).contains(`New Run: ~${playbookRunName}`);
                         cy.get(`#postMessageText_${lastPostId}`).contains('Owner: @user-1');
                     });
                 });
@@ -479,8 +479,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -503,7 +503,7 @@ describe('playbook run automation', () => {
                     cy.visit('/ad-1/channels/town-square');
 
                     cy.getLastPostId().then((lastPostId) => {
-                        cy.get(`#postMessageText_${lastPostId}`).should('not.contain', `New Playbook Run: ~${playbookRunName}`);
+                        cy.get(`#postMessageText_${lastPostId}`).should('not.contain', `New Run: ~${playbookRunName}`);
                     });
                 });
             });
@@ -536,8 +536,8 @@ describe('playbook run automation', () => {
 
                     // # Create a new playbook run with the playbook.
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -573,8 +573,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,
@@ -608,8 +608,8 @@ describe('playbook run automation', () => {
                 }).then((playbook) => {
                     // # Create a new playbook run with that playbook
                     const now = Date.now();
-                    const playbookRunName = `Playbook Run (${now})`;
-                    const playbookRunChannelName = `playbook-run-${now}`;
+                    const playbookRunName = `Run (${now})`;
+                    const playbookRunChannelName = `run-${now}`;
 
                     cy.apiRunPlaybook({
                         teamId,

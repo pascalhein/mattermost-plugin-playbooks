@@ -127,8 +127,8 @@ describe('timeline', () => {
             // * Verify we can see the change owner in the timeline
             verifyTimelineEvent('owner_changed', 2, 1, 'Owner changed from @aaron.peterson to @user-1');
 
-            // # Select the tasks tab
-            cy.findByTestId('tasks').click();
+            // # Select the checklists tab
+            cy.findByTestId('checklists').click();
 
             // # Click the first task
             cy.get('[type="checkbox"]').first().check();
@@ -314,8 +314,8 @@ describe('timeline', () => {
             // # Change owner
             cy.executeSlashCommand('/playbook run owner @user-1');
 
-            // # Select the tasks tab
-            cy.findByTestId('tasks').click();
+            // # Select the checklists tab
+            cy.findByTestId('checklists').click();
 
             // # Click the first task
             cy.get('[type="checkbox"]').first().check();

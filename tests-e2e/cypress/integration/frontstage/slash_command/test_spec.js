@@ -72,7 +72,7 @@ describe('slash command > test', () => {
 
         it('fails to run subcommand bulk-data', () => {
             // # Execute the bulk-data command.
-            cy.executeSlashCommand('/playbook run test bulk-data');
+            cy.executeSlashCommand('/playbook test bulk-data');
 
             // * Verify the ephemeral message warns that the user is not admin.
             cy.verifyEphemeralMessage('Running the test command is restricted to system administrators.');

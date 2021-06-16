@@ -69,7 +69,7 @@ Cypress.Commands.add('addNewTaskFromPostMenu', (taskname) => {
     cy.findByTestId('nameinput').type(taskname);
 
     // Submit the dialog
-    cy.findByText('Add Task').click();
+    cy.findByText('Add task').click();
 });
 
 // Starts playbook run from the post menu
