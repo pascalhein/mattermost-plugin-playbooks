@@ -169,7 +169,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open the playbook run is visible.
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -228,7 +228,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is still open and two go-to-channel buttons are visible.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findAllByTestId('go-to-channel').should('have.length', 2);
             });
@@ -275,7 +275,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open playbook run is visible.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -326,7 +326,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -369,7 +369,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -403,7 +403,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -438,7 +438,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is still open and playbook run is visible.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 // * Verify playbook run is visible
                 cy.findByText(playbookRunName1).should('exist');
@@ -471,7 +471,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is still open and playbook run is visible.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 // * Verify incident2 is visible
                 cy.findByText(playbookRunName2).should('exist');
@@ -493,7 +493,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and only one playbook run is visible.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 // * Verify playbook run is visible
                 cy.findByText(playbookRunName1).should('exist');
@@ -530,7 +530,7 @@ describe('rhs playbook run list', () => {
 
             // * click on the first go-to-channel button.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findAllByTestId('go-to-channel').eq(0).click();
             });
@@ -585,7 +585,7 @@ describe('rhs playbook run list', () => {
 
             // * click on the first go-to-channel button.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findAllByTestId('go-to-channel').eq(0).click();
             });
@@ -832,7 +832,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -892,7 +892,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -937,7 +937,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -977,7 +977,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open and we can see the new incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -987,7 +987,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the playbook run is not listed
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('not.exist');
                 });
@@ -1044,7 +1044,7 @@ describe('rhs playbook run list', () => {
 
             cy.get('#rhsContainer').should('exist').within(() => {
                 // * Verify the rhs list is open
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 // * Verify we cannot see the ended incident
                 cy.findByText(playbookRunName).should('not.exist');
@@ -1087,7 +1087,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open and we can see the new incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -1104,7 +1104,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the playbook run is not listed
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('not.exist');
                 });
@@ -1138,7 +1138,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open and we can see the new incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -1157,7 +1157,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify we cannot see the incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('not.exist');
                 });
@@ -1168,7 +1168,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open and we can see the new incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -1189,7 +1189,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify we can see the incidents list
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
             });
 
             // # Login as user-2
@@ -1215,7 +1215,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open and we can see the new incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -1232,7 +1232,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify we cannot see the incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('not.exist');
                 });
@@ -1242,7 +1242,7 @@ describe('rhs playbook run list', () => {
 
                 // * Verify the rhs list is open and we can see the new incident
                 cy.get('#rhsContainer').should('exist').within(() => {
-                    cy.findByText('Your Ongoing Incidents').should('exist');
+                    cy.findByText('Runs in progress').should('exist');
 
                     cy.findByText(playbookRunName).should('exist');
                 });
@@ -1285,7 +1285,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.findByText(playbookRunName).should('exist');
             });
@@ -1413,7 +1413,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the rhs list is open and we can see the new incident
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.get('.scrollbar--view').scrollIntoView();
 
@@ -1429,7 +1429,7 @@ describe('rhs playbook run list', () => {
 
             // * verify the last updated time is updated
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
 
                 cy.get('.scrollbar--view').scrollIntoView();
 
@@ -1481,7 +1481,7 @@ describe('rhs playbook run list', () => {
 
                     // * Verify the rhs list is open and we can see the new incident
                     cy.get('#rhsContainer').should('exist').within(() => {
-                        cy.findByText('Your Ongoing Incidents').should('exist');
+                        cy.findByText('Runs in progress').should('exist');
 
                         cy.get('.scrollbar--view').scrollIntoView();
 
@@ -1508,7 +1508,7 @@ describe('rhs playbook run list', () => {
 
                         // * verify the last updated time is updated
                         cy.get('#rhsContainer').should('exist').within(() => {
-                            cy.findByText('Your Ongoing Incidents').should('exist');
+                            cy.findByText('Runs in progress').should('exist');
 
                             cy.get('.scrollbar--view').scrollIntoView();
 

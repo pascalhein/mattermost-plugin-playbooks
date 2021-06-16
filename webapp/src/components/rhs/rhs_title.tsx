@@ -62,7 +62,7 @@ const RHSTitle = () => {
 
     return (
         <RHSTitleText>
-            {'Your Ongoing Incidents'}
+            {'Runs in progress'}
         </RHSTitleText>
     );
 };

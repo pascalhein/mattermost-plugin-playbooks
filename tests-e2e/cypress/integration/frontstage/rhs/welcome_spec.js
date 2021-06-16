@@ -62,7 +62,7 @@ describe('playbook run rhs > welcome', () => {
 
             // * Verify the playbook run RHS is open.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
             });
 
             // # Wait for background request fetching playbooks to finish.
@@ -97,7 +97,7 @@ describe('playbook run rhs > welcome', () => {
 
             // * Verify the playbook run RHS is open.
             cy.get('#rhsContainer').should('exist').within(() => {
-                cy.findByText('Your Ongoing Incidents').should('exist');
+                cy.findByText('Runs in progress').should('exist');
             });
 
             // # Click the prompt to create a playbook run.
