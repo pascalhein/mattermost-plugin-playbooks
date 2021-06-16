@@ -110,7 +110,7 @@ describe('timeline', () => {
             verifyTimelineEvent('status_updated', 1, 0, 'user-1 posted a status update');
 
             // # Change owner
-            cy.executeSlashCommand('/incident owner @aaron.peterson');
+            cy.executeSlashCommand('/playbook run owner @aaron.peterson');
 
             // * Verify we can see the change owner in the timeline
             verifyTimelineEvent('owner_changed', 1, 0, 'Owner changed from @user-1 to @aaron.peterson');
@@ -122,7 +122,7 @@ describe('timeline', () => {
             verifyTimelineEvent('status_updated', 2, 1, 'user-1 changed status from Reported to Active');
 
             // # Change owner
-            cy.executeSlashCommand('/incident owner @user-1');
+            cy.executeSlashCommand('/playbook run owner @user-1');
 
             // * Verify we can see the change owner in the timeline
             verifyTimelineEvent('owner_changed', 2, 1, 'Owner changed from @aaron.peterson to @user-1');
@@ -147,7 +147,7 @@ describe('timeline', () => {
             // # Post the first message we'll click on
             cy.apiCreatePost(channelId, 'this is the first post').then(({post}) => {
                 // # Change owner, to create a timeline event
-                cy.executeSlashCommand('/incident owner @aaron.peterson');
+                cy.executeSlashCommand('/playbook run owner @aaron.peterson');
 
                 // * Verify we can see the change owner in the timeline
                 verifyTimelineEvent('owner_changed', 1, 0, 'Owner changed from @user-1 to @aaron.peterson');
@@ -224,7 +224,7 @@ describe('timeline', () => {
             verifyTimelineEvent('status_updated', 1, 0, 'user-1 posted a status update');
 
             // # Change owner
-            cy.executeSlashCommand('/incident owner @aaron.peterson');
+            cy.executeSlashCommand('/playbook run owner @aaron.peterson');
 
             // * Verify we can see the change owner in the timeline
             verifyTimelineEvent('owner_changed', 1, 0, 'Owner changed from @user-1 to @aaron.peterson');
@@ -236,7 +236,7 @@ describe('timeline', () => {
             verifyTimelineEvent('status_updated', 2, 1, 'user-1 changed status from Reported to Active');
 
             // # Change owner
-            cy.executeSlashCommand('/incident owner @user-1');
+            cy.executeSlashCommand('/playbook run owner @user-1');
 
             // * Verify we can see the change owner in the timeline
             verifyTimelineEvent('owner_changed', 2, 1, 'Owner changed from @aaron.peterson to @user-1');
@@ -299,7 +299,7 @@ describe('timeline', () => {
             cy.updateStatus('this is a status update');
 
             // # Change owner
-            cy.executeSlashCommand('/incident owner @aaron.peterson');
+            cy.executeSlashCommand('/playbook run owner @aaron.peterson');
 
             // # Post an update that changes the playbook run status
             cy.updateStatus('this is a status update', 0, 'Active');
@@ -312,7 +312,7 @@ describe('timeline', () => {
             cy.addPostToTimelineUsingPostMenu(playbookRunName, summary1);
 
             // # Change owner
-            cy.executeSlashCommand('/incident owner @user-1');
+            cy.executeSlashCommand('/playbook run owner @user-1');
 
             // # Select the tasks tab
             cy.findByTestId('tasks').click();

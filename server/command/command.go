@@ -21,23 +21,22 @@ import (
 )
 
 const helpText = "###### Mattermost Incident Collaboration Plugin - Slash Command Help\n" +
-	"* `/incident start` - Start a new incident. \n" +
-	"* `/incident end` - Close the incident of that channel. \n" +
-	"* `/incident update` - Update the incident's status and (if enabled) post the status update to the broadcast channel. \n" +
-	"* `/incident check [checklist #] [item #]` - check/uncheck the checklist item. \n" +
-	"* `/incident checkadd [checklist #] [item text]` - add a checklist item. \n" +
-	"* `/incident checkremove [checklist #] [item #]` - remove a checklist item. \n" +
-	"* `/incident owner [@username]` - Show or change the current owner. \n" +
-	"* `/incident announce ~[channels]` - Announce the current incident in other channels. \n" +
-	"* `/incident list` - List all your incidents. \n" +
-	"* `/incident info` - Show a summary of the current incident. \n" +
-	"* `/incident timeline` - Show the timeline for the current incident. \n" +
+	"* `/playbook run start` - Run a playbook. \n" +
+	"* `/playbook run end` - Close the playbook run in this channel. \n" +
+	"* `/playbook run update` - Provide a status update. \n" +
+	"* `/playbook run check [checklist #] [item #]` - check/uncheck the checklist item. \n" +
+	"* `/playbook run checkadd [checklist #] [item text]` - add a checklist item. \n" +
+	"* `/playbook run checkremove [checklist #] [item #]` - remove a checklist item. \n" +
+	"* `/playbook run owner [@username]` - Show or change the current owner. \n" +
+	"* `/playbook run list` - List all your playbook runs. \n" +
+	"* `/playbook run info` - Show a summary of the current playbook run. \n" +
+	"* `/playbook run timeline` - Show the timeline for the current playbook run. \n" +
 	"\n" +
 	"Learn more [in our documentation](https://mattermost.com/pl/default-incident-response-app-documentation). \n" +
 	""
 
 const confirmPrompt = "CONFIRM"
-const maxIncidentsToList = 10
+const maxPlaybookRunsToList = 10
 
 // Register is a function that allows the runner to register commands with the mattermost server.
 type Register func(*model.Command) error
@@ -49,100 +48,98 @@ func RegisterCommands(registerFunc Register, addTestCommands bool) error {
 
 func getCommand(addTestCommands bool) *model.Command {
 	return &model.Command{
-		Trigger:          "incident",
-		DisplayName:      "Incident",
+		Trigger:          "playbook",
+		DisplayName:      "Playbook",
 		Description:      "Incident Collaboration Plugin",
 		AutoComplete:     true,
-		AutoCompleteDesc: "Available commands: start, end, update, restart, check, announce, list, owner, info",
+		AutoCompleteDesc: "Available commands: start, end, update, restart, check, list, owner, info",
 		AutoCompleteHint: "[command]",
 		AutocompleteData: getAutocompleteData(addTestCommands),
 	}
 }
 
 func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
-	slashPlaybookRun := model.NewAutocompleteData("incident", "[command]",
-		"Available commands: start, end, update, restart, check, checkadd, checkremove, announce, list, owner, info, timeline")
+	command := model.NewAutocompleteData("playbook", "[command]", "Available commands: run")
+
+	commandRun := model.NewAutocompleteData("run", "[command]",
+		"Available commands: start, end, update, restart, check, checkadd, checkremove, list, owner, info, timeline")
 
 	start := model.NewAutocompleteData("start", "", "Starts a new incident")
-	slashPlaybookRun.AddCommand(start)
+	commandRun.AddCommand(start)
 
 	end := model.NewAutocompleteData("end", "",
-		"Ends the incident associated with the current channel")
-	slashPlaybookRun.AddCommand(end)
+		"Ends the playbook run associated with the current channel")
+	commandRun.AddCommand(end)
 
 	update := model.NewAutocompleteData("update", "",
-		"Update the current incident's status.")
-	slashPlaybookRun.AddCommand(update)
+		"Provide a status update.")
+	commandRun.AddCommand(update)
 
 	restart := model.NewAutocompleteData("restart", "",
-		"Restarts the incident associated with the current channel")
-	slashPlaybookRun.AddCommand(restart)
+		"Restarts the playbook run associated with the current channel")
+	commandRun.AddCommand(restart)
 
 	checklist := model.NewAutocompleteData("check", "[checklist item]",
 		"Checks or unchecks a checklist item.")
 	checklist.AddDynamicListArgument(
-		"List of checklist items is downloading from your Incident Collaboration plugin",
+		"List of checklist items is loading",
 		"api/v0/runs/checklist-autocomplete-item", true)
-	slashPlaybookRun.AddCommand(checklist)
+	commandRun.AddCommand(checklist)
 
 	itemAdd := model.NewAutocompleteData("checkadd", "[checklist]",
 		"Add a checklist item")
 	itemAdd.AddDynamicListArgument(
-		"List of checklist items is downloading from your Incident Collaboration plugin",
+		"List of checklist items is loading",
 		"api/v0/runs/checklist-autocomplete", true)
 
 	itemRemove := model.NewAutocompleteData("checkremove", "[checklist item]",
 		"Remove a checklist item")
 	itemRemove.AddDynamicListArgument(
-		"List of checklist items is downloading from your Incident Collaboration plugin",
+		"List of checklist items is loading",
 		"api/v0/runs/checklist-autocomplete-item", true)
 
-	slashPlaybookRun.AddCommand(itemAdd)
-	slashPlaybookRun.AddCommand(itemRemove)
+	commandRun.AddCommand(itemAdd)
+	commandRun.AddCommand(itemRemove)
 
-	announce := model.NewAutocompleteData("announce", "~[channels]",
-		"Announce the current incident in other channels.")
-	announce.AddNamedTextArgument("channel",
-		"Channel to announce incident in", "~[channel]", "", true)
-	slashPlaybookRun.AddCommand(announce)
-
-	list := model.NewAutocompleteData("list", "", "Lists all your incidents")
-	slashPlaybookRun.AddCommand(list)
+	list := model.NewAutocompleteData("list", "", "Lists all your playbook runs")
+	commandRun.AddCommand(list)
 
 	owner := model.NewAutocompleteData("owner", "[@username]",
 		"Show or change the current owner")
 	owner.AddTextArgument("The desired new owner.", "[@username]", "")
-	slashPlaybookRun.AddCommand(owner)
+	commandRun.AddCommand(owner)
 
-	info := model.NewAutocompleteData("info", "", "Shows a summary of the current incident")
-	slashPlaybookRun.AddCommand(info)
+	info := model.NewAutocompleteData("info", "", "Shows a summary of the current playbook run")
+	commandRun.AddCommand(info)
 
-	timeline := model.NewAutocompleteData("timeline", "", "Shows the timeline for the current incident")
-	slashPlaybookRun.AddCommand(timeline)
+	timeline := model.NewAutocompleteData("timeline", "", "Shows the timeline for the current playbook run")
+	commandRun.AddCommand(timeline)
+
+	command.AddCommand(commandRun)
 
 	if addTestCommands {
 		test := model.NewAutocompleteData("test", "", "Commands for testing and debugging.")
 
-		testCreate := model.NewAutocompleteData("create-incident", "[playbook ID] [timestamp] [incident name]", "Create an incident with a specific creation date")
-		testCreate.AddDynamicListArgument("List of playbooks is downloading from your incident response plugin", "api/v0/playbooks/autocomplete", true)
+		testCreate := model.NewAutocompleteData("create-playbook-run", "[playbook ID] [timestamp] [name]", "Run a playbook with a specific creation date")
+		testCreate.AddDynamicListArgument("List of playbooks is loading", "api/v0/playbooks/autocomplete", true)
 		testCreate.AddTextArgument("Date in format 2020-01-31", "Creation timestamp", `/[0-9]{4}-[0-9]{2}-[0-9]{2}/`)
-		testCreate.AddTextArgument("Name of the incident", "Incident name", "")
+		testCreate.AddTextArgument("Name of the playbook run", "Name", "")
 		test.AddCommand(testCreate)
 
 		testData := model.NewAutocompleteData("bulk-data", "[ongoing] [ended] [days] [seed]", "Generate random test data in bulk")
-		testData.AddTextArgument("An integer indicating how many ongoing incidents will be generated.", "Number of ongoing incidents", "")
-		testData.AddTextArgument("An integer indicating how many ended incidents will be generated.", "Number of ended incidents", "")
-		testData.AddTextArgument("An integer n. The incidents generated will have a start date between n days ago and today.", "Range of days for the incident start date", "")
+		testData.AddTextArgument("An integer indicating how many ongoing playbook runs will be generated.", "Number of ongoing playbook runs", "")
+		testData.AddTextArgument("An integer indicating how many ended playbook runs will be generated.", "Number of ended playbook runs", "")
+		testData.AddTextArgument("An integer n. The playbook runs generated will have a start date between n days ago and today.", "Range of days for the start date", "")
 		testData.AddTextArgument("An integer in case you need random, but reproducible, results", "Random seed (optional)", "")
 		test.AddCommand(testData)
 
 		testSelf := model.NewAutocompleteData("self", "", "DESTRUCTIVE ACTION - Perform a series of self tests to ensure everything works as expected.")
 		test.AddCommand(testSelf)
 
-		slashPlaybookRun.AddCommand(test)
+		command.AddCommand(test)
 	}
 
-	return slashPlaybookRun
+	return command
 }
 
 // Runner handles commands.
@@ -205,7 +202,7 @@ func (r *Runner) actionStart(args []string) {
 	}
 
 	if !app.CanViewTeam(r.args.UserId, r.args.TeamId, r.pluginAPI) {
-		r.postCommandResponse("Must be a member of the team to start incidents.")
+		r.postCommandResponse("Must be a member of the team to run playbooks.")
 		return
 	}
 
@@ -260,7 +257,7 @@ func (r *Runner) actionCheck(args []string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only check/uncheck an item from within the incident's channel.")
+			r.postCommandResponse("You can only check/uncheck an item from within the playbook run's channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -288,7 +285,7 @@ func (r *Runner) actionAddChecklistItem(args []string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only add an item from within the incident's channel.")
+			r.postCommandResponse("You can only add an item from within the playbook run's channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -335,7 +332,7 @@ func (r *Runner) actionRemoveChecklistItem(args []string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only remove an item from within the incident's channel.")
+			r.postCommandResponse("You can only remove an item from within the playbook run's channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -355,14 +352,14 @@ func (r *Runner) actionOwner(args []string) {
 	case 1:
 		r.actionChangeOwner(args)
 	default:
-		r.postCommandResponse("/incident owner expects at most one argument.")
+		r.postCommandResponse("/playbook run owner expects at most one argument.")
 	}
 }
 
 func (r *Runner) actionShowOwner([]string) {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
-		r.postCommandResponse("You can only see the owner from within the incident's channel.")
+		r.postCommandResponse("You can only see the owner from within the playbook run's channel.")
 		return
 	} else if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving playbook run for channel %s: %v", r.args.ChannelId, err)
@@ -381,7 +378,7 @@ func (r *Runner) actionShowOwner([]string) {
 		return
 	}
 
-	r.postCommandResponse(fmt.Sprintf("**@%s** is the current owner for this incident.", ownerUser.Username))
+	r.postCommandResponse(fmt.Sprintf("**@%s** is the current owner for this playbook run.", ownerUser.Username))
 }
 
 func (r *Runner) actionChangeOwner(args []string) {
@@ -389,7 +386,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
-		r.postCommandResponse("You can only change the owner from within the incident's channel.")
+		r.postCommandResponse("You can only change the owner from within the playbook run's channel.")
 		return
 	} else if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving playbook run for channel %s: %v", r.args.ChannelId, err)
@@ -412,7 +409,7 @@ func (r *Runner) actionChangeOwner(args []string) {
 	}
 
 	if currentPlaybookRun.OwnerUserID == targetOwnerUser.Id {
-		r.postCommandResponse(fmt.Sprintf("User @%s is already owner of this incident.", targetOwnerUsername))
+		r.postCommandResponse(fmt.Sprintf("User @%s is already owner of this playbook run.", targetOwnerUsername))
 		return
 	}
 
@@ -432,57 +429,6 @@ func (r *Runner) actionChangeOwner(args []string) {
 	}
 }
 
-func (r *Runner) actionAnnounce(args []string) {
-	if len(args) < 1 {
-		r.postCommandResponse(helpText)
-		return
-	}
-
-	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
-	if err != nil {
-		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only announce from within the incident's channel.")
-			return
-		}
-		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
-		return
-	}
-
-	currentPlaybookRun, err := r.playbookRunService.GetPlaybookRun(playbookRunID)
-	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
-		return
-	}
-
-	ownerUser, err := r.pluginAPI.User.Get(currentPlaybookRun.OwnerUserID)
-	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving owner user: %v", err)
-		return
-	}
-
-	playbookRunChannel, err := r.pluginAPI.Channel.Get(currentPlaybookRun.ChannelID)
-	if err != nil {
-		r.warnUserAndLogErrorf("Error retrieving playbook run channel: %v", err)
-		return
-	}
-
-	for _, channelarg := range args {
-		targetChannelName := strings.TrimPrefix(channelarg, "~")
-		targetChannel, err := r.pluginAPI.Channel.GetByName(r.args.TeamId, targetChannelName, false)
-		if err != nil {
-			r.postCommandResponse("Channel not found: " + channelarg)
-			continue
-		}
-		if !app.CanPostToChannel(r.args.UserId, targetChannel.Id, r.pluginAPI) {
-			r.postCommandResponse("Cannot post to: " + channelarg)
-			continue
-		}
-		if err := r.announceChannel(targetChannel.Id, ownerUser.Username, playbookRunChannel.Name); err != nil {
-			r.postCommandResponse("Error announcing to: " + channelarg)
-		}
-	}
-}
-
 func (r *Runner) actionList() {
 	team, err := r.pluginAPI.Team.Get(r.args.TeamId)
 	if err != nil {
@@ -498,7 +444,7 @@ func (r *Runner) actionList() {
 
 	if !session.IsMobileApp() {
 		// The RHS was opened by the webapp, so inform the user
-		r.postCommandResponse("The list of your incidents is open in the right hand side of the channel.")
+		r.postCommandResponse("The list of your playbook runs is open in the right hand side of the channel.")
 		return
 	}
 
@@ -512,7 +458,7 @@ func (r *Runner) actionList() {
 		TeamID:    r.args.TeamId,
 		MemberID:  r.args.UserId,
 		Page:      0,
-		PerPage:   maxIncidentsToList,
+		PerPage:   maxPlaybookRunsToList,
 		Sort:      app.SortByCreateAt,
 		Direction: app.DirectionDesc,
 		Statuses:  []string{app.StatusReported, app.StatusActive, app.StatusResolved},
@@ -526,7 +472,7 @@ func (r *Runner) actionList() {
 
 	message := "Ongoing Runs in **" + team.DisplayName + "** Team:\n"
 	if len(result.Items) == 0 {
-		message = "There are no ongoing incidents in **" + team.DisplayName + "** team."
+		message = "There are no ongoing playbook runs in **" + team.DisplayName + "** team."
 	}
 
 	now := time.Now()
@@ -565,7 +511,7 @@ func (r *Runner) actionList() {
 func (r *Runner) actionInfo() {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if errors.Is(err, app.ErrNotFound) {
-		r.postCommandResponse("You can only see the details of an incident from within the incident's channel.")
+		r.postCommandResponse("You can only see the details of a playbook run from within the run's channel.")
 		return
 	} else if err != nil {
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -580,7 +526,7 @@ func (r *Runner) actionInfo() {
 
 	if !session.IsMobileApp() {
 		// The RHS was opened by the webapp, so inform the user
-		r.postCommandResponse("Your incident details are already open in the right hand side of the channel.")
+		r.postCommandResponse("Your playbook run details are already open in the right hand side of the channel.")
 		return
 	}
 
@@ -611,7 +557,7 @@ func (r *Runner) actionInfo() {
 	}
 	attachment := &model.SlackAttachment{
 		Fields: []*model.SlackAttachmentField{
-			{Title: "Incident Name:", Value: fmt.Sprintf("**%s**", strings.Trim(playbookRun.Name, " "))},
+			{Title: "Name:", Value: fmt.Sprintf("**%s**", strings.Trim(playbookRun.Name, " "))},
 			{Title: "Duration:", Value: timeutils.DurationString(timeutils.GetTimeForMillis(playbookRun.CreateAt), time.Now())},
 			{Title: "Owner:", Value: fmt.Sprintf("@%s", owner.Username)},
 			{Title: "Tasks:", Value: tasks},
@@ -626,14 +572,6 @@ func (r *Runner) actionInfo() {
 	r.poster.EphemeralPost(r.args.UserId, r.args.ChannelId, post)
 }
 
-func (r *Runner) announceChannel(targetChannelID, ownerUsername, playbookRunChannelName string) error {
-	if _, err := r.poster.PostMessage(targetChannelID, "@%v started an incident in ~%v", ownerUsername, playbookRunChannelName); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (r *Runner) actionEnd() {
 	r.actionUpdate()
 }
@@ -642,7 +580,7 @@ func (r *Runner) actionUpdate() {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only update an incident from within the incident's channel.")
+			r.postCommandResponse("You can only update a playbook run from within its channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -661,7 +599,7 @@ func (r *Runner) actionUpdate() {
 	err = r.playbookRunService.OpenUpdateStatusDialog(playbookRunID, r.args.TriggerId)
 	switch {
 	case errors.Is(err, app.ErrPlaybookRunNotActive):
-		r.postCommandResponse("This incident has already been closed.")
+		r.postCommandResponse("This playbook run has already been closed.")
 		return
 	case err != nil:
 		r.warnUserAndLogErrorf("Error: %v", err)
@@ -707,7 +645,7 @@ func (r *Runner) actionTimeline() {
 	playbookRunID, err := r.playbookRunService.GetPlaybookRunIDForChannel(r.args.ChannelId)
 	if err != nil {
 		if errors.Is(err, app.ErrNotFound) {
-			r.postCommandResponse("You can only run the timeline command from within an incident channel.")
+			r.postCommandResponse("You can only run the timeline command from within a playbook run channel.")
 			return
 		}
 		r.warnUserAndLogErrorf("Error retrieving playbook run: %v", err)
@@ -817,7 +755,7 @@ func (r *Runner) actionTestSelf(args []string) {
 
 	if len(args) != 3 || args[0] != confirmPrompt || args[1] != "TEST" || args[2] != "SELF" {
 		r.postCommandResponse("Are you sure you want to self-test (which will nuke the database and delete all data -- instances, configuration)? " +
-			"All incident data will be lost. To self-test, type `/incident test self CONFIRM TEST SELF`")
+			"All data will be lost. To self-test, type `/playbook test self CONFIRM TEST SELF`")
 		return
 	}
 
@@ -975,7 +913,7 @@ And... yes, of course, we have emojis
 		BroadcastChannelID: gotplaybook.BroadcastChannelID,
 	}, &gotplaybook, r.args.UserId, true)
 	if err != nil {
-		r.postCommandResponse("Unable to create test incident: " + err.Error())
+		r.postCommandResponse("Unable to create test playbook run: " + err.Error())
 		return
 	}
 
@@ -1043,7 +981,7 @@ func (r *Runner) actionTest(args []string) {
 	}
 
 	if len(args) < 1 {
-		r.postCommandResponse("The `/incident test` command needs at least one command.")
+		r.postCommandResponse("The `/playbook test` command needs at least one command.")
 		return
 	}
 
@@ -1054,7 +992,7 @@ func (r *Runner) actionTest(args []string) {
 	}
 
 	switch command {
-	case "create-incident":
+	case "create-playbook-run":
 		r.actionTestCreate(params)
 		return
 	case "bulk-data":
@@ -1069,7 +1007,7 @@ func (r *Runner) actionTest(args []string) {
 
 func (r *Runner) actionTestCreate(params []string) {
 	if len(params) < 3 {
-		r.postCommandResponse("The command expects three parameters: <playbook_id> <timestamp> <incident name>")
+		r.postCommandResponse("The command expects three parameters: <playbook_id> <timestamp> <name>")
 		return
 	}
 
@@ -1086,7 +1024,7 @@ func (r *Runner) actionTestCreate(params []string) {
 
 	creationTimestamp, err := time.ParseInLocation("2006-01-02", params[1], time.Now().Location())
 	if err != nil {
-		r.postCommandResponse(fmt.Sprintf("Timestamp '%s' could not be parsed as a date. If you want the incident to start on January 2, 2006, the timestamp should be '2006-01-02'.", params[1]))
+		r.postCommandResponse(fmt.Sprintf("Timestamp '%s' could not be parsed as a date. If you want the playbook run to start on January 2, 2006, the timestamp should be '2006-01-02'.", params[1]))
 		return
 	}
 
@@ -1126,19 +1064,19 @@ func (r *Runner) actionTestCreate(params []string) {
 
 func (r *Runner) actionTestData(params []string) {
 	if len(params) < 3 {
-		r.postCommandResponse("`/incident test bulk-data` expects at least 3 arguments: [ongoing] [ended] [days]. Optionally, a fourth argument can be added: [seed].")
+		r.postCommandResponse("`/playbook test bulk-data` expects at least 3 arguments: [ongoing] [ended] [days]. Optionally, a fourth argument can be added: [seed].")
 		return
 	}
 
 	ongoing, err := strconv.Atoi(params[0])
 	if err != nil {
-		r.postCommandResponse(fmt.Sprintf("The provided value for ongoing incidents, '%s', is not an integer.", params[0]))
+		r.postCommandResponse(fmt.Sprintf("The provided value for ongoing playbook runs, '%s', is not an integer.", params[0]))
 		return
 	}
 
 	ended, err := strconv.Atoi(params[1])
 	if err != nil {
-		r.postCommandResponse(fmt.Sprintf("The provided value for ended incidents, '%s', is not an integer.", params[1]))
+		r.postCommandResponse(fmt.Sprintf("The provided value for ended playbook runs, '%s', is not an integer.", params[1]))
 		return
 	}
 
@@ -1271,7 +1209,7 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 	numPlaybookRuns := numActivePlaybookRuns + numEndedPlaybookRuns
 
 	if numPlaybookRuns == 0 {
-		r.postCommandResponse("Zero incidents created.")
+		r.postCommandResponse("Zero playbook runs created.")
 		return
 	}
 
@@ -1312,7 +1250,7 @@ func (r *Runner) generateTestData(numActivePlaybookRuns, numEndedPlaybookRuns in
 		playbooks = append(playbooks, wholePlaybook)
 	}
 
-	tableMsg := "| Incident name | Created at | Status |\n|-	|-	|-	|\n"
+	tableMsg := "| Run name | Created at | Status |\n|-	|-	|-	|\n"
 	playbookRuns := make([]*app.PlaybookRun, 0, numPlaybookRuns)
 	for i := 0; i < numPlaybookRuns; i++ {
 		playbook := playbooks[rand.Intn(len(playbooks))]
@@ -1392,7 +1330,7 @@ func (r *Runner) actionNukeDB(args []string) {
 
 	if len(args) != 2 || args[0] != "CONFIRM" || args[1] != "NUKE" {
 		r.postCommandResponse("Are you sure you want to nuke the database (delete all data -- instances, configuration)?" +
-			"All incident data will be lost. To nuke database, type `/incident nuke-db CONFIRM NUKE`")
+			"All data will be lost. To nuke database, type `/playbook nuke-db CONFIRM NUKE`")
 		return
 	}
 
@@ -1420,7 +1358,7 @@ func (r *Runner) Execute() error {
 		parameters = split[2:]
 	}
 
-	if command != "/incident" {
+	if command != "/playbook" {
 		return nil
 	}
 
@@ -1430,36 +1368,57 @@ func (r *Runner) Execute() error {
 	}
 
 	switch cmd {
-	case "start":
-		r.actionStart(parameters)
+	case "run":
+		return r.executeRun(parameters)
+	case "nuke-db":
+		r.actionNukeDB(parameters)
+	case "test":
+		r.actionTest(parameters)
+	default:
+		r.postCommandResponse(helpText)
+	}
+
+	return nil
+}
+
+func (r *Runner) executeRun(args []string) error {
+	if err := r.isValid(); err != nil {
+		return err
+	}
+
+	if len(args) == 0 {
+		r.postCommandResponse(helpText)
+		return nil
+	}
+
+	cmd := args[0]
+	args = args[1:]
+
+	switch cmd {
+	case "", "start":
+		r.actionStart(args)
 	case "end":
 		r.actionEnd()
 	case "update":
 		r.actionUpdate()
 	case "check":
-		r.actionCheck(parameters)
+		r.actionCheck(args)
 	case "checkadd":
-		r.actionAddChecklistItem(parameters)
+		r.actionAddChecklistItem(args)
 	case "checkremove":
-		r.actionRemoveChecklistItem(parameters)
+		r.actionRemoveChecklistItem(args)
 	case "restart":
 		r.actionRestart()
 	case "owner":
-		r.actionOwner(parameters)
-	case "announce":
-		r.actionAnnounce(parameters)
+		r.actionOwner(args)
 	case "list":
 		r.actionList()
 	case "info":
 		r.actionInfo()
 	case "add":
-		r.actionAdd(parameters)
+		r.actionAdd(args)
 	case "timeline":
 		r.actionTimeline()
-	case "nuke-db":
-		r.actionNukeDB(parameters)
-	case "test":
-		r.actionTest(parameters)
 	default:
 		r.postCommandResponse(helpText)
 	}

@@ -67,8 +67,8 @@ describe('playbook run rhs > latest update', () => {
 
     describe('status update interactive dialog', () => {
         it('shows the broadcast channel when it is public', () => {
-            // # Run the /incident status slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -104,8 +104,8 @@ describe('playbook run rhs > latest update', () => {
                         // # Navigate to the playbook run channel
                         cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-                        // # Run the /incident status slash command.
-                        cy.executeSlashCommand('/incident update');
+                        // # Run the `/playbook run update` slash command.
+                        cy.executeSlashCommand('/playbook run update');
 
                         // * Verify that the interactive dialog contains a generic message
                         cy.get('#interactiveDialogModal').within(() => {
@@ -142,8 +142,8 @@ describe('playbook run rhs > latest update', () => {
                         // # Navigate to the playbook run channel
                         cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-                        // # Run the /incident status slash command.
-                        cy.executeSlashCommand('/incident update');
+                        // # Run the `/playbook run update` slash command.
+                        cy.executeSlashCommand('/playbook run update');
 
                         // * Verify that the interactive dialog contains a generic message
                         cy.get('#interactiveDialogModal').within(() => {
@@ -181,8 +181,8 @@ describe('playbook run rhs > latest update', () => {
                         // # Navigate to the playbook run channel
                         cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-                        // # Run the /incident status slash command.
-                        cy.executeSlashCommand('/incident update');
+                        // # Run the `/playbook run update` slash command.
+                        cy.executeSlashCommand('/playbook run update');
 
                         // * Verify that the interactive dialog contains a generic message
                         cy.get('#interactiveDialogModal').within(() => {
@@ -215,8 +215,8 @@ describe('playbook run rhs > latest update', () => {
                 // # Navigate to the playbook run channel
                 cy.visit('/ad-1/channels/' + playbookRunChannelName);
 
-                // # Run the /incident status slash command.
-                cy.executeSlashCommand('/incident update');
+                // # Run the `/playbook run update` slash command.
+                cy.executeSlashCommand('/playbook run update');
 
                 // # Get the interactive dialog modal.
                 cy.get('#interactiveDialogModal').within(() => {
@@ -229,8 +229,8 @@ describe('playbook run rhs > latest update', () => {
         });
 
         it('shows an error when entering an update message with whitespace', () => {
-            // # Run the /incident status slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -264,8 +264,8 @@ describe('playbook run rhs > latest update', () => {
 
     describe('shows the last update in update message', () => {
         it('shows the default when we have not made an update before', () => {
-            // # Run the /incident status slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -282,8 +282,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage);
 
-            // # Run the /incident status slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -297,8 +297,8 @@ describe('playbook run rhs > latest update', () => {
 
     describe('the default reminder', () => {
         it('shows the configured default when we have not made a previous update', () => {
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -316,8 +316,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage, 'none');
 
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -335,8 +335,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage, '15');
 
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -354,8 +354,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage, '30');
 
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -373,8 +373,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage, '60');
 
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -392,8 +392,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage, '4');
 
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {
@@ -411,8 +411,8 @@ describe('playbook run rhs > latest update', () => {
             // # Create a first status update
             cy.updateStatus(firstMessage, '24');
 
-            // # Run the /incident update slash command.
-            cy.executeSlashCommand('/incident update');
+            // # Run the `/playbook run update` slash command.
+            cy.executeSlashCommand('/playbook run update');
 
             // # Get the interactive dialog modal.
             cy.get('#interactiveDialogModal').within(() => {

@@ -78,13 +78,13 @@ describe('slash command > info', () => {
         cy.apiChangePlaybookRunOwner(playbookRunId, userId);
     });
 
-    describe('/incident info', () => {
+    describe('/playbook run info', () => {
         it('should show an error when not in an playbook run channel', () => {
             // # Navigate to a non-playbook run channel.
             cy.visit('/ad-1/channels/town-square');
 
             // # Run a slash command to show the playbook run's info.
-            cy.executeSlashCommand('/incident info');
+            cy.executeSlashCommand('/playbook run info');
 
             // * Verify the expected error message.
             cy.verifyEphemeralMessage('You can only see the details of an incident from within the incident\'s channel.');
@@ -101,7 +101,7 @@ describe('slash command > info', () => {
             cy.get('#rhsContainer').should('not.exist');
 
             // # Run a slash command to show the playbook run's info.
-            cy.executeSlashCommand('/incident info');
+            cy.executeSlashCommand('/playbook run info');
 
             // * Verify that the RHS is now open.
             cy.get('#rhsContainer').should('be.visible');
@@ -115,7 +115,7 @@ describe('slash command > info', () => {
             cy.get('#rhsContainer').should('be.visible');
 
             // # Run a slash command to show the playbook run's info.
-            cy.executeSlashCommand('/incident info');
+            cy.executeSlashCommand('/playbook run info');
 
             // * Verify the expected error message.
             cy.verifyEphemeralMessage('Your incident details are already open in the right hand side of the channel.');

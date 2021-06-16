@@ -201,7 +201,7 @@ describe('playbook run rhs checklist', () => {
         it('add new task slash command', () => {
             const newTasktext = 'Task from slash command' + Date.now();
 
-            cy.executeSlashCommand(`/incident checkadd 0 ${newTasktext}`);
+            cy.executeSlashCommand(`/playbook run checkadd 0 ${newTasktext}`);
 
             // Check that it was created
             cy.findByText(newTasktext).should('exist');
