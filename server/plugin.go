@@ -52,14 +52,14 @@ func (p *Plugin) OnActivate() error {
 	pluginapi.ConfigureLogrus(logrus.New(), pluginAPIClient)
 
 	botID, err := pluginAPIClient.Bot.EnsureBot(&model.Bot{
-		Username:    "incident",
-		DisplayName: "Incident Bot",
+		Username:    "playbook",
+		DisplayName: "Playbook Bot",
 		Description: "Incident Collaboration plugin's bot.",
 	},
 		pluginapi.ProfileImagePath("assets/incident_plugin_icon.png"),
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to ensure incident bot")
+		return errors.Wrapf(err, "failed to ensure bot")
 	}
 
 	err = p.config.UpdateConfiguration(func(c *config.Configuration) {

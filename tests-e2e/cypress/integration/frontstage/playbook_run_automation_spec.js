@@ -70,7 +70,7 @@ describe('playbook run automation', () => {
                 // * Verify that no users were invited
                 cy.getFirstPostId().then((id) => {
                     cy.get(`#postMessageText_${id}`)
-                        .contains('You were added to the channel by @incident.')
+                        .contains('You were added to the channel by @playbook.')
                         .should('not.contain', 'joined the channel');
                 });
             });
@@ -114,7 +114,7 @@ describe('playbook run automation', () => {
 
                         cy.get(`#postMessageText_${id}`).contains('@aaron.medina');
                         cy.get(`#postMessageText_${id}`).contains('@alice.johnston');
-                        cy.get(`#postMessageText_${id}`).contains('added to the channel by @incident.');
+                        cy.get(`#postMessageText_${id}`).contains('added to the channel by @playbook.');
                     });
                 });
             });
@@ -153,7 +153,7 @@ describe('playbook run automation', () => {
                     // * Verify that no users were invited
                     cy.getFirstPostId().then((id) => {
                         cy.get(`#postMessageText_${id}`)
-                            .contains('You were added to the channel by @incident.')
+                            .contains('You were added to the channel by @playbook.')
                             .should('not.contain', 'joined the channel');
                     });
                 });
@@ -449,7 +449,7 @@ describe('playbook run automation', () => {
                     // * Verify that the channel is created and that the first post exists.
                     cy.getFirstPostId().then((id) => {
                         cy.get(`#postMessageText_${id}`)
-                            .contains('You were added to the channel by @incident.')
+                            .contains('You were added to the channel by @playbook.')
                             .should('not.contain', 'joined the channel');
                     });
 
@@ -495,7 +495,7 @@ describe('playbook run automation', () => {
                     // * Verify that the channel is created and that the first post exists.
                     cy.getFirstPostId().then((id) => {
                         cy.get(`#postMessageText_${id}`)
-                            .contains('You were added to the channel by @incident.')
+                            .contains('You were added to the channel by @playbook.')
                             .should('not.contain', 'joined the channel');
                     });
 
