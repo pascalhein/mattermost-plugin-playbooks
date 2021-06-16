@@ -101,7 +101,7 @@ describe('timeline', () => {
     describe('timeline updates', () => {
         it('show the playbook run created, status updated, owner changed, and checklist events', () => {
             // * Verify playbook run created message is visible in the timeline
-            verifyTimelineEvent('incident_created', 1, 0, 'Incident Reported by user-1');
+            verifyTimelineEvent('incident_created', 1, 0, 'Run started by user-1');
 
             // # Post an update that doesn't change the playbook run status
             cy.updateStatus('this is a status update');
@@ -215,7 +215,7 @@ describe('timeline', () => {
     describe('timeline updates', () => {
         it('can be deleted (both standard events and events from posts)', () => {
             // * Verify playbook run created message is visible in the timeline
-            verifyTimelineEvent('incident_created', 1, 0, 'Incident Reported by user-1');
+            verifyTimelineEvent('incident_created', 1, 0, 'Run started by user-1');
 
             // # Post an update that doesn't change the playbook run status
             cy.updateStatus('this is a status update');
@@ -252,7 +252,7 @@ describe('timeline', () => {
             removeTimelineEvent('event_from_post', 1, 0, summary1);
 
             // * Delete the playbook run created event
-            removeTimelineEvent('incident_created', 1, 0, 'Incident Reported by user-1');
+            removeTimelineEvent('incident_created', 1, 0, 'Run started by user-1');
 
             // * Delete the second status update
             removeTimelineEvent('status_updated', 2, 1, 'user-1 changed status from Reported to Active');
@@ -274,10 +274,10 @@ describe('timeline', () => {
             clickOnFilterOption('All events');
 
             // * Verify playbook run created message is visible in the timeline
-            verifyTimelineEvent('incident_created', 1, 0, 'Incident Reported by user-1');
+            verifyTimelineEvent('incident_created', 1, 0, 'Run started by user-1');
 
             // * Delete the playbook run created event
-            removeTimelineEvent('incident_created', 1, 0, 'Incident Reported by user-1');
+            removeTimelineEvent('incident_created', 1, 0, 'Run started by user-1');
 
             // * Verify user joined message is visible in the timeline
             verifyTimelineEvent('user_joined_left', 1, 0, '@aaron.peterson joined the channel');

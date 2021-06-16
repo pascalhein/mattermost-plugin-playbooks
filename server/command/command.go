@@ -524,7 +524,7 @@ func (r *Runner) actionList() {
 		return
 	}
 
-	message := "Ongoing Incidents in **" + team.DisplayName + "** Team:\n"
+	message := "Ongoing Runs in **" + team.DisplayName + "** Team:\n"
 	if len(result.Items) == 0 {
 		message = "There are no ongoing incidents in **" + team.DisplayName + "** team."
 	}
@@ -769,7 +769,7 @@ func (r *Runner) summaryMessage(event app.TimelineEvent) string {
 
 	switch event.EventType {
 	case app.PlaybookRunCreated:
-		return "Incident Reported by @" + username
+		return "Run started by @" + username
 	case app.StatusUpdated:
 		if event.Summary == "" {
 			return "@" + username + " posted a status update"

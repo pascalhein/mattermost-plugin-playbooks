@@ -170,6 +170,12 @@ const PlaybookRunList = (props: Props) => {
         setProfileSelectorToggle(!profileSelectorToggle);
     };
 
+    const isFiltering = (
+        (fetchParams?.search_term?.length ?? 0) > 0 ||
+        (fetchParams?.status?.length ?? 0) > 0 ||
+        (fetchParams?.owner_user_id?.length ?? 0) > 0
+    );
+
     // Show nothing until after we've completed fetching playbook runs.
     if (playbookRuns === null) {
         return null;
@@ -211,7 +217,7 @@ const PlaybookRunList = (props: Props) => {
                     <div className='row'>
                         <div className='col-sm-3'>
                             <SortableColHeader
-                                name={'Name'}
+                                name={'Run name'}
                                 direction={fetchParams.direction ? fetchParams.direction : 'desc'}
                                 active={fetchParams.sort ? fetchParams.sort === 'name' : false}
                                 onClick={() => colHeaderClicked('name')}
@@ -227,7 +233,7 @@ const PlaybookRunList = (props: Props) => {
                         </div>
                         <div className='col-sm-2'>
                             <SortableColHeader
-                                name={'Start Time'}
+                                name={'Start time'}
                                 direction={fetchParams.direction ? fetchParams.direction : 'desc'}
                                 active={fetchParams.sort ? fetchParams.sort === 'create_at' : false}
                                 onClick={() => colHeaderClicked('create_at')}
@@ -235,7 +241,7 @@ const PlaybookRunList = (props: Props) => {
                         </div>
                         <div className='col-sm-2'>
                             <SortableColHeader
-                                name={'End Time'}
+                                name={'End time'}
                                 direction={fetchParams.direction ? fetchParams.direction : 'desc'}
                                 active={fetchParams.sort ? fetchParams.sort === 'end_at' : false}
                                 onClick={() => colHeaderClicked('end_at')}
@@ -245,10 +251,15 @@ const PlaybookRunList = (props: Props) => {
                     </div>
                 </BackstageListHeader>
 
-                {playbookRuns.length === 0 &&
-                <div className='text-center pt-8'>
-                    {'There are no incidents for this playbook.'}
-                </div>
+                {playbookRuns.length === 0 && !isFiltering &&
+                    <div className='text-center pt-8'>
+                        {'There are no runs for this playbook.'}
+                    </div>
+                }
+                {playbookRuns.length === 0 && isFiltering &&
+                    <div className='text-center pt-8'>
+                        {'There are no runs for this playbook matching those filters.'}
+                    </div>
                 }
                 {playbookRuns.map((playbookRun) => (
                     <div

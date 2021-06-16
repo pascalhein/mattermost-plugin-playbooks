@@ -115,7 +115,7 @@ const RHSAbout = (props: Props) => {
                 </Row>
                 <div id={'playbookRunRHSUpdates'}>
                     <div className='title'>
-                        {'Recent Update:'}
+                        {'Recent update:'}
                     </div>
                     <PostCard post={latestUpdatePost}/>
                 </div>

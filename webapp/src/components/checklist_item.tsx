@@ -476,9 +476,9 @@ export const ChecklistItemDetails = (props: ChecklistItemDetailsProps): React.Re
             </ItemContainer>
             <ConfirmModal
                 show={showDeleteConfirm}
-                title={'Confirm Task Delete'}
-                message={'Are you sure you want to delete this task? Deleted tasks will be removed from this incident\'s task list.'}
-                confirmButtonText={'Delete Task'}
+                title={'Delete Task'}
+                message={'Are you sure you want to delete this task? This will be removed from this run but will not affect the playbook.'}
+                confirmButtonText={'Delete'}
                 onConfirm={() =>
                     clientRemoveChecklistItem(props.playbookRunId, props.checklistNum, props.itemNum)
                 }
@@ -547,9 +547,9 @@ const ChecklistItemEditModal = (props: ChecklistItemEditModalProps) => {
         <GenericModal
             id={'taskEditModalc' + props.checklistNum + 'i' + props.itemNum}
             show={props.show}
-            modalHeaderText={'Edit Task'}
+            modalHeaderText={'Edit task'}
             onHide={props.onDone}
-            confirmButtonText={'Edit Task'}
+            confirmButtonText={'Edit task'}
             cancelButtonText={'Cancel'}
             handleCancel={props.onDone}
             handleConfirm={submit}

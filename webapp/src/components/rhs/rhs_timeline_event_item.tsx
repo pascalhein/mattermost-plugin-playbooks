@@ -123,7 +123,7 @@ const RHSTimelineEventItem = (props: Props) => {
     switch (props.event.event_type) {
     case TimelineEventType.PlaybookRunCreated:
         iconClass = 'icon icon-shield-alert-outline';
-        summaryTitle = 'Incident Reported by ' + props.event.subject_display_name;
+        summaryTitle = 'Run started by ' + props.event.subject_display_name;
         timeSince = null;
         testid = TimelineEventType.PlaybookRunCreated;
         break;

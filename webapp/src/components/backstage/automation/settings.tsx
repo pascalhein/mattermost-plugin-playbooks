@@ -58,7 +58,7 @@ export const AutomationSettings = (props: Props) => {
             </BackstageSubheaderDescription>
             <Section>
                 <SectionTitle>
-                    {'When an incident starts'}
+                    {'When a run starts'}
                 </SectionTitle>
                 <Setting id={'invite-users'}>
                     <InviteUsers
@@ -101,7 +101,7 @@ export const AutomationSettings = (props: Props) => {
             </Section>
             <Section>
                 <SectionTitle>
-                    {'When an incident status is updated'}
+                    {'When a status updated is posted'}
                 </SectionTitle>
                 <Setting id={'playbook-run-status-update__outgoing-webhook'}>
                     <Webhook
@@ -114,7 +114,7 @@ export const AutomationSettings = (props: Props) => {
             </Section>
             <Section>
                 <SectionTitle>
-                    {'When a new member joins'}
+                    {'When a new member joins the channel'}
                 </SectionTitle>
                 <Setting id={'user-joins-message'}>
                     <MessageOnJoin

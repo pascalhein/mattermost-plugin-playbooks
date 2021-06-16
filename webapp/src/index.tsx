@@ -84,7 +84,7 @@ export default class Plugin {
             // Store the toggleRHS action to use later
             store.dispatch(setToggleRHSAction(boundToggleRHSAction));
 
-            r.registerChannelHeaderButtonAction(ChannelHeaderButton, boundToggleRHSAction, 'Incidents', 'Incidents');
+            r.registerChannelHeaderButtonAction(ChannelHeaderButton, boundToggleRHSAction, 'Playbook', 'Playbook');
             r.registerPostDropdownMenuComponent(StartPlaybookRunPostMenu);
             r.registerPostDropdownMenuComponent(AttachToPlaybookRunPostMenu);
             r.registerRootComponent(PostMenuModal);

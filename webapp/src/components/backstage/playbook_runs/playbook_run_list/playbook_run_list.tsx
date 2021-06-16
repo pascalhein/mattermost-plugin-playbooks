@@ -137,14 +137,14 @@ const NoContentPage = (props: {onNewPlaybookRun: () => void}) => {
     return (
         <NoContentContainer>
             <NoContentTextContainer>
-                <NoContentTitle>{'What are Incidents?'}</NoContentTitle>
-                <NoContentDescription>{'Incidents are unexpected situations which impact business operations; require an immediate, multi-disciplinary, response; and benefit from a clearly defined process. When the situation is resolved, the incident is ended, and the playbook can be updated to improve the response to similar incidents in the future.'}</NoContentDescription>
+                <NoContentTitle>{'What are playbook runs?'}</NoContentTitle>
+                <NoContentDescription>{'Running a playbook orchestrates workflows for your team and tools.'}</NoContentDescription>
                 <NoContentButton
                     className='mt-6'
                     onClick={props.onNewPlaybookRun}
                 >
                     <i className='icon-plus mr-2'/>
-                    {'New Incident'}
+                    {'Run playbook'}
                 </NoContentButton>
             </NoContentTextContainer>
             <NoContentPlaybookRunSvgContainer>
@@ -304,7 +304,7 @@ const BackstagePlaybookRunList = () => {
                     className='title'
                     data-testid='titlePlaybookRun'
                 >
-                    {'Incidents'}
+                    {'Runs'}
                     <div className='light'>
                         {'(' + currentTeam.display_name + ')'}
                     </div>
@@ -344,7 +344,7 @@ const BackstagePlaybookRunList = () => {
                     <div className='row'>
                         <div className='col-sm-3'>
                             <SortableColHeader
-                                name={'Name'}
+                                name={'Run name'}
                                 direction={fetchParams.direction ? fetchParams.direction : 'desc'}
                                 active={fetchParams.sort ? fetchParams.sort === 'name' : false}
                                 onClick={() => colHeaderClicked('name')}
@@ -360,7 +360,7 @@ const BackstagePlaybookRunList = () => {
                         </div>
                         <div className='col-sm-2'>
                             <SortableColHeader
-                                name={'Start Time'}
+                                name={'Start time'}
                                 direction={fetchParams.direction ? fetchParams.direction : 'desc'}
                                 active={fetchParams.sort ? fetchParams.sort === 'create_at' : false}
                                 onClick={() => colHeaderClicked('create_at')}
@@ -368,7 +368,7 @@ const BackstagePlaybookRunList = () => {
                         </div>
                         <div className='col-sm-2'>
                             <SortableColHeader
-                                name={'End Time'}
+                                name={'End time'}
                                 direction={fetchParams.direction ? fetchParams.direction : 'desc'}
                                 active={fetchParams.sort ? fetchParams.sort === 'end_at' : false}
                                 onClick={() => colHeaderClicked('end_at')}
@@ -380,7 +380,7 @@ const BackstagePlaybookRunList = () => {
 
                 {playbookRuns.length === 0 &&
                     <div className='text-center pt-8'>
-                        {'There are no incidents for '}
+                        {'There are no runs for '}
                         <i>{currentTeam.display_name}</i>
                         {' matching those filters.'}
                     </div>

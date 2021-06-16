@@ -1297,7 +1297,7 @@ describe('rhs playbook run list', () => {
 
             // * Verify the playbook run creation dialog has opened
             cy.get('#interactiveDialogModal').should('exist').within(() => {
-                cy.findByText('Incident Details').should('exist');
+                cy.findByText('Run details').should('exist');
             });
         });
 
@@ -1343,7 +1343,7 @@ describe('rhs playbook run list', () => {
 
             // # click the Create Playbook link
             cy.get('#rhsContainer').within(() => {
-                cy.findByText('See all Incidents').click();
+                cy.findByText('See all runs').click();
             });
 
             // * Verify we reached the playbook backstage

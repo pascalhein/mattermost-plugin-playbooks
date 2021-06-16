@@ -106,7 +106,7 @@ const RHSListView = () => {
                     <Header>
                         <CenterCell>
                             <Link onClick={() => dispatch(startPlaybookRun())}>
-                                <PlusIcon/>{'Start Incident'}
+                                <PlusIcon/>{'Run playbook'}
                             </Link>
                         </CenterCell>
                         <RightCell>
@@ -129,9 +129,8 @@ const RHSListView = () => {
                     })}
 
                     <Footer>
-                        {'Looking for closed incidents? '}
                         <a onClick={viewBackstagePlaybookRunList}>{'Click here'}</a>
-                        {' to see all incidents.'}
+                        {' to see all runs in the team.'}
                     </Footer>
                 </Scrollbars>
             </RHSContent>
@@ -150,11 +149,11 @@ const ThreeDotMenu = (props: ThreeDotMenuProps) => (
         left={true}
     >
         <DropdownMenuItem
-            text='Create Playbook'
+            text='Create playbook'
             onClick={props.onCreatePlaybook}
         />
         <DropdownMenuItem
-            text='See all Incidents'
+            text='See all runs'
             onClick={props.onSeeAllPlaybookRuns}
         />
     </DotMenu>

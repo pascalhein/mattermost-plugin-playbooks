@@ -154,7 +154,7 @@ const Backstage = () => {
                         <span className='mr-3 d-flex items-center'>
                             <IncidentIcon/>
                         </span>
-                        {'Incidents'}
+                        {'Runs'}
                     </BackstageTitlebarItem>
                     <BackstageTitlebarItem
                         to={`${match.url}/playbooks`}

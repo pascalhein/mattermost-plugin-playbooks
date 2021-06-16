@@ -63,7 +63,7 @@ const Participants = (props: Props) => {
                 {
                     profilesExceptTwoMains.length > 0 &&
                     <>
-                        <Heading>{'Channel Members'}</Heading>
+                        <Heading>{'Channel members'}</Heading>
                         {profilesExceptTwoMains.map((o) => (
                             <Participant
                                 key={o.id}

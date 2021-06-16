@@ -60,10 +60,10 @@ const RHSWelcomeView = () => {
                     <NoContentPlaybookSvgRhs/>
                     <NoPlaybookRunsItem>
                         <h1>
-                            {'Take action now with Incident Collaboration.'}
+                            {'Take action now using playbooks'}
                         </h1>
                         <p className='mt-3 mb-4 light'>
-                            {'You don’t have any active incidents at the moment. Start an incident immediately with an existing playbook.'}
+                            {'There are no runs in progress at the moment. Run a playbook to start orchestrating workflows for your team and tools.'}
                         </p>
                         <div className='header-button-div mb-4'>
                             <PrimaryButton
@@ -71,7 +71,7 @@ const RHSWelcomeView = () => {
                             >
                                 <SideBySide>
                                     <i className='icon-plus icon--no-spacing mr-2'/>
-                                    {'Start Incident'}
+                                    {'Run playbook'}
                                 </SideBySide>
                             </PrimaryButton>
                         </div>
@@ -81,7 +81,7 @@ const RHSWelcomeView = () => {
                         <TertiaryButton
                             onClick={() => navigateToTeamPluginUrl(currentTeam.name, '/playbooks')}
                         >
-                            {'Create Playbook'}
+                            {'Create playbook'}
                         </TertiaryButton>
                     </NoPlaybookRunsItem>
                 </NoPlaybookRunsContainer>
@@ -95,16 +95,16 @@ const RHSWelcomeView = () => {
                 <NoContentPlaybookSvgRhs/>
                 <NoPlaybookRunsItem>
                     <h1>
-                        {'Simplify your processes with Incident Collaboration'}
+                        {'Streamline your processes with playbooks'}
                     </h1>
                     <p className='mt-3 mb-8 light'>
-                        {'Create a playbook to define your incident collaboration workflow. Select a template or create your playbook from scratch.'}
+                        {'Create a playbook to prescribe the workflow that your teams and tools should follow, including everything from checklists, actions, templates, and retrospectives.'}
                     </p>
                     <div className='header-button-div mb-4'>
                         <PrimaryButton
                             onClick={() => navigateToTeamPluginUrl(currentTeam.name, '/playbooks')}
                         >
-                            {'Create Playbook'}
+                            {'Create playbook'}
                         </PrimaryButton>
                     </div>
                 </NoPlaybookRunsItem>

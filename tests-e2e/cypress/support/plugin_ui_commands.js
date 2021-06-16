@@ -54,7 +54,7 @@ Cypress.Commands.add('startPlaybookRunFromRHS', (playbookName, playbookRunName) 
     });
 
     cy.get('#rhsContainer').should('exist').within(() => {
-        cy.findByText('Start Incident').click();
+        cy.findByText('Run playbook').click();
     });
 
     cy.startPlaybookRun(playbookName, playbookRunName);

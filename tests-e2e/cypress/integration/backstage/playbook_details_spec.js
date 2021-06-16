@@ -22,7 +22,7 @@ describe('backstage playbook details', () => {
 
     describe('tasks', () => {
         describe('slash command', () => {
-            it('autocompletes after clicking Add a Slash Command', () => {
+            it('autocompletes after clicking Add a slash command', () => {
                 // # Visit the playbook backstage
                 cy.visit('/ad-1/com.mattermost.plugin-incident-management/playbooks');
 
@@ -30,7 +30,7 @@ describe('backstage playbook details', () => {
                 cy.get('#root').findByText('Blank Playbook').click();
 
                 // # Add a slash command to a step
-                cy.get('#root').findByText('Add a Slash Command').click();
+                cy.get('#root').findByText('Add a slash command').click();
 
                 // * Verify the slash command input field now has focus
                 cy.get('#root').findByPlaceholderText('Slash Command').should('have.focus');
@@ -50,7 +50,7 @@ describe('backstage playbook details', () => {
                 cy.get('#root').findByText('Blank Playbook').click();
 
                 // # Add a slash command to a step
-                cy.get('#root').findByText('Add a Slash Command').click();
+                cy.get('#root').findByText('Add a slash command').click();
 
                 // * Verify only the leading slash is in the input field.
                 cy.get('#root').findByPlaceholderText('Slash Command').should('have.value', '/');
@@ -61,8 +61,8 @@ describe('backstage playbook details', () => {
                 // # Blur the slash command input field
                 cy.get('#root').findByPlaceholderText('Slash Command').blur();
 
-                // # Verify the Add a Slash Command button returns
-                cy.get('#root').findByText('Add a Slash Command').should('exist');
+                // # Verify the Add a slash command button returns
+                cy.get('#root').findByText('Add a slash command').should('exist');
             });
 
             it('removes the input prompt when blurring with an invalid slash command', () => {
@@ -73,7 +73,7 @@ describe('backstage playbook details', () => {
                 cy.get('#root').findByText('Blank Playbook').click();
 
                 // # Add a slash command to a step
-                cy.get('#root').findByText('Add a Slash Command').click();
+                cy.get('#root').findByText('Add a slash command').click();
 
                 // * Verify only the leading slash is in the input field.
                 cy.get('#root').findByPlaceholderText('Slash Command').should('have.value', '/');
@@ -81,8 +81,8 @@ describe('backstage playbook details', () => {
                 // # Blur the slash command without having typed anything more
                 cy.get('#root').findByPlaceholderText('Slash Command').blur();
 
-                // * Verify the Add a Slash Command button returns
-                cy.get('#root').findByText('Add a Slash Command').should('exist');
+                // * Verify the Add a slash command button returns
+                cy.get('#root').findByText('Add a slash command').should('exist');
             });
         });
     });

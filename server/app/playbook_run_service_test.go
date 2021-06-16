@@ -477,7 +477,7 @@ func TestOpenCreatePlaybookRunDialog(t *testing.T) {
 				configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "pluginId"}).Times(2)
 				api.On("OpenInteractiveDialog", mock.AnythingOfType("model.OpenDialogRequest")).Return(nil).Run(func(args mock.Arguments) {
 					dialogRequest := args.Get(0).(model.OpenDialogRequest)
-					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "Create a playbook")
+					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "create your own playbook")
 				})
 			},
 			wantErr: false,
@@ -507,7 +507,7 @@ func TestOpenCreatePlaybookRunDialog(t *testing.T) {
 				configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "pluginId"}).Times(2)
 				api.On("OpenInteractiveDialog", mock.AnythingOfType("model.OpenDialogRequest")).Return(nil).Run(func(args mock.Arguments) {
 					dialogRequest := args.Get(0).(model.OpenDialogRequest)
-					assert.Contains(t, dialogRequest.Dialog.IntroductionText, "Create a playbook")
+					assert.Contains(t, dialogRequest.Dialog.IntroductionText, "create your own playbook")
 				})
 			},
 			wantErr: false,
@@ -537,7 +537,7 @@ func TestOpenCreatePlaybookRunDialog(t *testing.T) {
 				configService.EXPECT().GetManifest().Return(&model.Manifest{Id: "pluginId"}).Times(2)
 				api.On("OpenInteractiveDialog", mock.AnythingOfType("model.OpenDialogRequest")).Return(nil).Run(func(args mock.Arguments) {
 					dialogRequest := args.Get(0).(model.OpenDialogRequest)
-					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "Create a playbook")
+					assert.NotContains(t, dialogRequest.Dialog.IntroductionText, "create your own playbook")
 				})
 			},
 			wantErr: false,

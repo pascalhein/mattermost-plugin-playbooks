@@ -49,7 +49,7 @@ const RHSTitle = () => {
                     data-testid='back-button'
                 >
                     <LeftChevron/>
-                </Button><RHSTitleText data-testid='rhs-title'>{playbookRun?.name || 'Incidents'}</RHSTitleText>
+                </Button><RHSTitleText data-testid='rhs-title'>{playbookRun?.name || 'Runs'}</RHSTitleText>
                 {playbookRun && (
                     <StatusBadge
                         status={playbookRunCurrentStatus(playbookRun)}

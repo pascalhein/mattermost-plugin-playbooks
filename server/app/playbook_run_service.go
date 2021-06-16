@@ -478,7 +478,7 @@ func (s *PlaybookRunServiceImpl) OpenAddToTimelineDialog(requesterInfo Requester
 
 func (s *PlaybookRunServiceImpl) OpenAddChecklistItemDialog(triggerID, playbookRunID string, checklist int) error {
 	dialog := &model.Dialog{
-		Title: "Add New Task",
+		Title: "Add new task",
 		Elements: []model.DialogElement{
 			{
 				DisplayName: "Name",
@@ -494,7 +494,7 @@ func (s *PlaybookRunServiceImpl) OpenAddChecklistItemDialog(triggerID, playbookR
 				Optional:    true,
 			},
 		},
-		SubmitLabel:    "Add Task",
+		SubmitLabel:    "Add task",
 		NotifyOnCancel: false,
 	}
 
@@ -1598,13 +1598,13 @@ func (s *PlaybookRunServiceImpl) newPlaybookRunDialog(teamID, ownerID, postID, c
 	newPlaybookMarkdown := ""
 	if siteURL != "" && !isMobileApp {
 		url := fmt.Sprintf("%s/%s/%s/playbooks/new", siteURL, team.Name, s.configService.GetManifest().Id)
-		newPlaybookMarkdown = fmt.Sprintf(" [Create a playbook.](%s)", url)
+		newPlaybookMarkdown = fmt.Sprintf("[Click here](%s) to create your own playbook.", url)
 	}
 
-	introText := fmt.Sprintf("**Owner:** %v\n\nPlaybooks are necessary to start an incident.%s", getUserDisplayName(user), newPlaybookMarkdown)
+	introText := fmt.Sprintf("**Owner:** %v\n\n%s", getUserDisplayName(user), newPlaybookMarkdown)
 
 	return &model.Dialog{
-		Title:            "Incident Details",
+		Title:            "Run details",
 		IntroductionText: introText,
 		Elements: []model.DialogElement{
 			{
@@ -1614,21 +1614,21 @@ func (s *PlaybookRunServiceImpl) newPlaybookRunDialog(teamID, ownerID, postID, c
 				Options:     options,
 			},
 			{
-				DisplayName: "Incident Name",
+				DisplayName: "Run name",
 				Name:        DialogFieldNameKey,
 				Type:        "text",
 				MinLength:   2,
 				MaxLength:   64,
 			},
 		},
-		SubmitLabel:    "Start Incident",
+		SubmitLabel:    "Run playbook",
 		NotifyOnCancel: false,
 		State:          string(state),
 	}, nil
 }
 
 func (s *PlaybookRunServiceImpl) newUpdatePlaybookRunDialog(description, message, broadcastChannelID, status string, reminderTimer time.Duration) (*model.Dialog, error) {
-	introductionText := "Update your incident status."
+	introductionText := "Provide an update to the stakeholders."
 
 	broadcastChannel, err := s.pluginAPI.Channel.Get(broadcastChannelID)
 	if err == nil {
@@ -1701,7 +1701,7 @@ func (s *PlaybookRunServiceImpl) newUpdatePlaybookRunDialog(description, message
 	}
 
 	return &model.Dialog{
-		Title:            "Update Incident Status",
+		Title:            "Status update",
 		IntroductionText: introductionText,
 		Elements: []model.DialogElement{
 			{
@@ -1733,7 +1733,7 @@ func (s *PlaybookRunServiceImpl) newUpdatePlaybookRunDialog(description, message
 				Default:     fmt.Sprintf("%d", reminderTimer/time.Second),
 			},
 		},
-		SubmitLabel:    "Update Status",
+		SubmitLabel:    "Update status",
 		NotifyOnCancel: false,
 	}, nil
 }

@@ -131,7 +131,7 @@ const RHSListPlaybookRun = (props: Props) => {
                 onClick={() => props.viewPlaybookRun(props.playbookRun.channel_id)}
                 data-testid='go-to-channel'
             >
-                {'Go to Incident Channel'}
+                {'Go to channel'}
             </Button>
         </PlaybookRunContainer>
     );

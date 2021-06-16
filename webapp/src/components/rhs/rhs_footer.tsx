@@ -28,9 +28,9 @@ const RHSFooter = (props: Props) => {
     const currentTeam = useSelector(getCurrentTeam);
     const playbookRun = useSelector(currentPlaybookRun);
 
-    let text = 'Update Status';
+    let text = 'Update status';
     if (playbookRunCurrentStatus(props.playbookRun) === 'Archived') {
-        text = 'Reopen Incident';
+        text = 'Reopen';
     }
 
     return (

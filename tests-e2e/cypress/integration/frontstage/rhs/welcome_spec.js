@@ -105,7 +105,7 @@ describe('playbook run rhs > welcome', () => {
 
             // * Verify the playbook run creation dialog has opened
             cy.get('#interactiveDialogModal').should('exist').within(() => {
-                cy.findByText('Incident Details').should('exist');
+                cy.findByText('Run details').should('exist');
             });
 
             // # Cancel the interactive dialog

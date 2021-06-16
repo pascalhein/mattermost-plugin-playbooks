@@ -62,7 +62,7 @@ const ExportLink = (props: ExportLinkProps) => {
     const linkText = (
         <>
             <i className='icon icon-download-outline export-icon'/>
-            {'Export Channel Log'}
+            {'Export channel log'}
         </>
     );
 
@@ -81,20 +81,20 @@ const ExportLink = (props: ExportLinkProps) => {
 
     let tooltip = (
         <Tooltip id='export'>
-            {'Download a CSV containing all messages from the incident channel'}
+            {'Download a CSV containing all messages from the channel'}
         </Tooltip>
     );
 
     if (!exportAvailable) {
         tooltip = (
             <Tooltip id='exportUnavailable'>
-                {'Install and enable the Channel Export plugin to support exporting this incident'}
+                {'Install and enable the Channel Export plugin to support exporting the channel'}
             </Tooltip>
         );
     } else if (!exportLicensed) {
         tooltip = (
             <Tooltip id='exportUnlicensed'>
-                {'Exporting an incident channel requires a Mattermost Enterprise license'}
+                {'Exporting a channel requires a Mattermost Enterprise license'}
             </Tooltip>
         );
     }

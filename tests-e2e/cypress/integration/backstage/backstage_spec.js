@@ -72,6 +72,6 @@ describe('backstage', () => {
         cy.findByTestId('playbookRunsLHSButton').click();
 
         // * Verify that playbook runs are shown
-        cy.findByTestId('titlePlaybookRun').should('exist').contains('Incidents');
+        cy.findByTestId('titlePlaybookRun').should('exist').contains('Runs');
     });
 });
