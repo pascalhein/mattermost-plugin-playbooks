@@ -127,7 +127,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("playbook_run_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
-		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
+		poster.EXPECT().PostMessage("channel_id", "This run has been started by @username.").
 			Return(&model.Post{Id: "testId"}, nil)
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
@@ -201,7 +201,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("playbook_run_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
-		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
+		poster.EXPECT().PostMessage("channel_id", "This run has been started by @username.").
 			Return(&model.Post{Id: "testid"}, nil)
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)
@@ -246,7 +246,7 @@ func TestCreatePlaybookRun(t *testing.T) {
 		store.EXPECT().UpdatePlaybookRun(gomock.Any()).Return(nil)
 		poster.EXPECT().PublishWebsocketEventToChannel("playbook_run_updated", gomock.Any(), "channel_id")
 		pluginAPI.On("GetUser", "user_id").Return(&model.User{Id: "user_id", Username: "username"}, nil)
-		poster.EXPECT().PostMessage("channel_id", "This incident has been started and is commanded by @username.").
+		poster.EXPECT().PostMessage("channel_id", "This run has been started by @username.").
 			Return(&model.Post{Id: "testId"}, nil)
 
 		s := app.NewPlaybookRunService(client, store, poster, logger, configService, scheduler, telemetryService)

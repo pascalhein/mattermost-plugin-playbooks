@@ -94,18 +94,46 @@ func (s *PlaybookRunServiceImpl) GetPlaybookRuns(requesterInfo RequesterInfo, op
 	return s.store.GetPlaybookRuns(requesterInfo, options)
 }
 
-func (s *PlaybookRunServiceImpl) broadcastPlaybookRunCreation(playbookRun *PlaybookRun, owner *model.User) error {
+func (s *PlaybookRunServiceImpl) broadcastPlaybookRunCreation(playbook *Playbook, playbookRun *PlaybookRun, owner *model.User) error {
+	if err := IsChannelActiveInTeam(playbookRun.AnnouncementChannelID, playbookRun.TeamID, s.pluginAPI); err != nil {
+		return errors.Wrap(err, "announcement channel is not active")
+	}
+
+	siteURL := s.pluginAPI.Configuration.GetConfig().ServiceSettings.SiteURL
+	if siteURL == nil {
+		return errors.New("SiteURL not set")
+	}
+
+	team, err := s.pluginAPI.Team.Get(playbookRun.TeamID)
+	if err != nil {
+		return errors.Wrap(err, "failed to get playbook run team")
+	}
+
 	playbookRunChannel, err := s.pluginAPI.Channel.Get(playbookRun.ChannelID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get playbook run channel")
 	}
 
-	if err := IsChannelActiveInTeam(playbookRun.AnnouncementChannelID, playbookRun.TeamID, s.pluginAPI); err != nil {
-		return err
-	}
+	announcementMsg := fmt.Sprintf(
+		"### New run started: [%s](%s)\n",
+		playbookRun.Name,
+		getDetailsURL(*siteURL, team.Name, s.configService.GetManifest().Id, playbookRun.ID),
+	)
+	announcementMsg += fmt.Sprintf(
+		"@%s just ran the [%s](%s) playbook.",
+		owner.Username,
+		playbook.Title,
+		getPlaybookDetailsURL(*siteURL, team.Name, s.configService.GetManifest().Id, playbook.ID),
+	)
 
-	announcementMsg := fmt.Sprintf("#### New Incident: ~%s\n", playbookRunChannel.Name)
-	announcementMsg += fmt.Sprintf("**Owner**: @%s\n", owner.Username)
+	if playbookRunChannel.Type == model.CHANNEL_OPEN {
+		announcementMsg += fmt.Sprintf(
+			" Visit the link above for more information or join ~%v to participate.",
+			playbookRunChannel.Name,
+		)
+	} else {
+		announcementMsg += " Visit the link above for more information."
+	}
 
 	if _, err := s.poster.PostMessage(playbookRun.AnnouncementChannelID, announcementMsg); err != nil {
 		return err
@@ -199,7 +227,7 @@ func (s *PlaybookRunServiceImpl) CreatePlaybookRun(playbookRun *PlaybookRun, pb 
 	overviewURL := ""
 	playbookURL := ""
 
-	header := "This is an incident channel. To view more information, select the shield icon then select *Tasks* or *Overview*."
+	header := "This channel was created as part of a playbook run. To view more information, select the shield icon then select *Tasks* or *Overview*."
 	if siteURL != "" && pb != nil {
 		overviewURL = fmt.Sprintf("%s/%s/%s/runs/%s", siteURL, team.Name, s.configService.GetManifest().Id, playbookRun.ID)
 		playbookURL = fmt.Sprintf("%s/%s/%s/playbooks/%s", siteURL, team.Name, s.configService.GetManifest().Id, pb.ID)
@@ -317,9 +345,9 @@ func (s *PlaybookRunServiceImpl) CreatePlaybookRun(playbookRun *PlaybookRun, pb 
 		return nil, errors.Wrapf(err, "failed to resolve user %s", playbookRun.OwnerUserID)
 	}
 
-	startMessage := fmt.Sprintf("This incident has been started and is commanded by @%s.", reporter.Username)
+	startMessage := fmt.Sprintf("This run has been started by @%s.", reporter.Username)
 	if playbookRun.OwnerUserID != playbookRun.ReporterUserID {
-		startMessage = fmt.Sprintf("This incident has been started by @%s and is commanded by @%s.", reporter.Username, owner.Username)
+		startMessage = fmt.Sprintf("This run has been started by @%s and is commanded by @%s.", reporter.Username, owner.Username)
 	}
 
 	newPost, err := s.poster.PostMessage(channel.Id, startMessage)
@@ -328,10 +356,10 @@ func (s *PlaybookRunServiceImpl) CreatePlaybookRun(playbookRun *PlaybookRun, pb 
 	}
 
 	if playbookRun.AnnouncementChannelID != "" {
-		if err2 := s.broadcastPlaybookRunCreation(playbookRun, owner); err2 != nil {
+		if err2 := s.broadcastPlaybookRunCreation(pb, playbookRun, owner); err2 != nil {
 			s.pluginAPI.Log.Warn("failed to broadcast the playbook run creation to channel", "ChannelID", playbookRun.AnnouncementChannelID)
 
-			if _, err = s.poster.PostMessage(channel.Id, "Failed to announce the creation of this incident in the configured channel."); err != nil {
+			if _, err = s.poster.PostMessage(channel.Id, "Failed to announce the creation of this playbook run in the configured channel."); err != nil {
 				return nil, errors.Wrapf(err, "failed to post to channel")
 			}
 		}
@@ -355,7 +383,7 @@ func (s *PlaybookRunServiceImpl) CreatePlaybookRun(playbookRun *PlaybookRun, pb 
 		go func() {
 			if err = s.sendWebhookOnCreation(*playbookRun); err != nil {
 				s.pluginAPI.Log.Warn("failed to send a POST request to the creation webhook URL", "webhook URL", playbookRun.WebhookOnCreationURL, "error", err)
-				_, _ = s.poster.PostMessage(channel.Id, "Incident creation announcement through the outgoing webhook failed. Contact your System Admin for more information.")
+				_, _ = s.poster.PostMessage(channel.Id, "Playbook run creation announcement through the outgoing webhook failed. Contact your System Admin for more information.")
 			}
 		}()
 	}
@@ -593,7 +621,7 @@ func (s *PlaybookRunServiceImpl) broadcastStatusUpdate(statusUpdate string, play
 
 	duration := timeutils.DurationString(timeutils.GetTimeForMillis(playbookRun.CreateAt), time.Now())
 
-	broadcastedMsg := fmt.Sprintf("# Incident Update: [%s](/%s/pl/%s)\n", playbookRunChannel.DisplayName, playbookRunTeam.Name, originalPostID)
+	broadcastedMsg := fmt.Sprintf("# Status Update: [%s](/%s/pl/%s)\n", playbookRunChannel.DisplayName, playbookRunTeam.Name, originalPostID)
 	broadcastedMsg += fmt.Sprintf("By @%s | Duration: %s | Status: %s\n", author.Username, duration, playbookRun.CurrentStatus)
 	broadcastedMsg += "***\n"
 	broadcastedMsg += statusUpdate
@@ -770,7 +798,7 @@ func (s *PlaybookRunServiceImpl) UpdateStatus(playbookRunID, userID string, opti
 		go func() {
 			if err := s.sendWebhookOnUpdateStatus(*playbookRunToModify); err != nil {
 				s.pluginAPI.Log.Warn("failed to send a POST request to the update status webhook URL", "webhook URL", playbookRunToModify.WebhookOnStatusUpdateURL, "error", err)
-				_, _ = s.poster.PostMessage(playbookRunToModify.ChannelID, "Incident update announcement through the outgoing webhook failed. Contact your System Admin for more information.")
+				_, _ = s.poster.PostMessage(playbookRunToModify.ChannelID, "Playbook run update announcement through the outgoing webhook failed. Contact your System Admin for more information.")
 			}
 		}()
 	}
@@ -905,7 +933,7 @@ func (s *PlaybookRunServiceImpl) ChangeOwner(playbookRunID, userID, ownerID stri
 	}
 
 	mainChannelID := playbookRunToModify.ChannelID
-	modifyMessage := fmt.Sprintf("changed the incident owner from **@%s** to **@%s**.",
+	modifyMessage := fmt.Sprintf("changed the owner from **@%s** to **@%s**.",
 		oldOwner.Username, newOwner.Username)
 	post, err := s.modificationMessage(userID, mainChannelID, modifyMessage)
 	if err != nil {
@@ -1773,10 +1801,10 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(playbookRuns []PlaybookR
 	}
 
 	return &model.Dialog{
-		Title: "Add to Incident Timeline",
+		Title: "Add to run timeline",
 		Elements: []model.DialogElement{
 			{
-				DisplayName: "Incident",
+				DisplayName: "Playbook Run",
 				Name:        DialogFieldPlaybookRunKey,
 				Type:        "select",
 				Options:     options,
@@ -1792,7 +1820,7 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(playbookRuns []PlaybookR
 				HelpText:    "Max 64 chars",
 			},
 		},
-		SubmitLabel:    "Add to Timeline",
+		SubmitLabel:    "Add to run timeline",
 		NotifyOnCancel: false,
 		State:          string(state),
 	}, nil
@@ -1891,7 +1919,7 @@ func (s *PlaybookRunServiceImpl) CancelRetrospective(playbookRunID, cancelerID s
 	now := model.GetMillis()
 
 	// Update the text to keep syncronized
-	playbookRunToCancel.Retrospective = "No retrospective for this incident."
+	playbookRunToCancel.Retrospective = "No retrospective for this run."
 	playbookRunToCancel.RetrospectivePublishedAt = now
 	playbookRunToCancel.RetrospectiveWasCanceled = true
 	if err = s.store.UpdatePlaybookRun(playbookRunToCancel); err != nil {
@@ -1952,6 +1980,15 @@ func getDetailsURL(siteURL string, teamName string, manifestID string, playbookR
 		teamName,
 		manifestID,
 		playbookRunID,
+	)
+}
+
+func getPlaybookDetailsURL(siteURL string, teamName string, manifestID string, playbookID string) string {
+	return fmt.Sprintf("%s/%s/%s/playbooks/%s",
+		siteURL,
+		teamName,
+		manifestID,
+		playbookID,
 	)
 }
 
