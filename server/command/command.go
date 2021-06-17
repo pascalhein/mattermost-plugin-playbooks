@@ -21,16 +21,16 @@ import (
 )
 
 const helpText = "###### Mattermost Incident Collaboration Plugin - Slash Command Help\n" +
-	"* `/playbook run start` - Run a playbook. \n" +
-	"* `/playbook run end` - Close the playbook run in this channel. \n" +
-	"* `/playbook run update` - Provide a status update. \n" +
-	"* `/playbook run check [checklist #] [item #]` - check/uncheck the checklist item. \n" +
-	"* `/playbook run checkadd [checklist #] [item text]` - add a checklist item. \n" +
-	"* `/playbook run checkremove [checklist #] [item #]` - remove a checklist item. \n" +
-	"* `/playbook run owner [@username]` - Show or change the current owner. \n" +
-	"* `/playbook run list` - List all your playbook runs. \n" +
-	"* `/playbook run info` - Show a summary of the current playbook run. \n" +
-	"* `/playbook run timeline` - Show the timeline for the current playbook run. \n" +
+	"* `/playbook start` - Run a playbook. \n" +
+	"* `/playbook end` - Close the playbook run in this channel. \n" +
+	"* `/playbook update` - Provide a status update. \n" +
+	"* `/playbook check [checklist #] [item #]` - check/uncheck the checklist item. \n" +
+	"* `/playbook checkadd [checklist #] [item text]` - add a checklist item. \n" +
+	"* `/playbook checkremove [checklist #] [item #]` - remove a checklist item. \n" +
+	"* `/playbook owner [@username]` - Show or change the current owner. \n" +
+	"* `/playbook list` - List all your playbook runs. \n" +
+	"* `/playbook info` - Show a summary of the current playbook run. \n" +
+	"* `/playbook timeline` - Show the timeline for the current playbook run. \n" +
 	"\n" +
 	"Learn more [in our documentation](https://mattermost.com/pl/default-incident-response-app-documentation). \n" +
 	""
@@ -59,32 +59,30 @@ func getCommand(addTestCommands bool) *model.Command {
 }
 
 func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
-	command := model.NewAutocompleteData("playbook", "[command]", "Available commands: run")
-
-	commandRun := model.NewAutocompleteData("run", "[command]",
+	command := model.NewAutocompleteData("incident", "[command]",
 		"Available commands: start, end, update, restart, check, checkadd, checkremove, list, owner, info, timeline")
 
 	start := model.NewAutocompleteData("start", "", "Starts a new incident")
-	commandRun.AddCommand(start)
+	command.AddCommand(start)
 
 	end := model.NewAutocompleteData("end", "",
 		"Ends the playbook run associated with the current channel")
-	commandRun.AddCommand(end)
+	command.AddCommand(end)
 
 	update := model.NewAutocompleteData("update", "",
 		"Provide a status update.")
-	commandRun.AddCommand(update)
+	command.AddCommand(update)
 
 	restart := model.NewAutocompleteData("restart", "",
 		"Restarts the playbook run associated with the current channel")
-	commandRun.AddCommand(restart)
+	command.AddCommand(restart)
 
 	checklist := model.NewAutocompleteData("check", "[checklist item]",
 		"Checks or unchecks a checklist item.")
 	checklist.AddDynamicListArgument(
 		"List of checklist items is loading",
 		"api/v0/runs/checklist-autocomplete-item", true)
-	commandRun.AddCommand(checklist)
+	command.AddCommand(checklist)
 
 	itemAdd := model.NewAutocompleteData("checkadd", "[checklist]",
 		"Add a checklist item")
@@ -98,24 +96,22 @@ func getAutocompleteData(addTestCommands bool) *model.AutocompleteData {
 		"List of checklist items is loading",
 		"api/v0/runs/checklist-autocomplete-item", true)
 
-	commandRun.AddCommand(itemAdd)
-	commandRun.AddCommand(itemRemove)
+	command.AddCommand(itemAdd)
+	command.AddCommand(itemRemove)
 
 	list := model.NewAutocompleteData("list", "", "Lists all your playbook runs")
-	commandRun.AddCommand(list)
+	command.AddCommand(list)
 
 	owner := model.NewAutocompleteData("owner", "[@username]",
 		"Show or change the current owner")
 	owner.AddTextArgument("The desired new owner.", "[@username]", "")
-	commandRun.AddCommand(owner)
+	command.AddCommand(owner)
 
 	info := model.NewAutocompleteData("info", "", "Shows a summary of the current playbook run")
-	commandRun.AddCommand(info)
+	command.AddCommand(info)
 
 	timeline := model.NewAutocompleteData("timeline", "", "Shows the timeline for the current playbook run")
-	commandRun.AddCommand(timeline)
-
-	command.AddCommand(commandRun)
+	command.AddCommand(timeline)
 
 	if addTestCommands {
 		test := model.NewAutocompleteData("test", "", "Commands for testing and debugging.")
@@ -352,7 +348,7 @@ func (r *Runner) actionOwner(args []string) {
 	case 1:
 		r.actionChangeOwner(args)
 	default:
-		r.postCommandResponse("/playbook run owner expects at most one argument.")
+		r.postCommandResponse("/playbook owner expects at most one argument.")
 	}
 }
 
@@ -1368,57 +1364,34 @@ func (r *Runner) Execute() error {
 	}
 
 	switch cmd {
-	case "run":
-		return r.executeRun(parameters)
-	case "nuke-db":
-		r.actionNukeDB(parameters)
-	case "test":
-		r.actionTest(parameters)
-	default:
-		r.postCommandResponse(helpText)
-	}
-
-	return nil
-}
-
-func (r *Runner) executeRun(args []string) error {
-	if err := r.isValid(); err != nil {
-		return err
-	}
-
-	if len(args) == 0 {
-		r.postCommandResponse(helpText)
-		return nil
-	}
-
-	cmd := args[0]
-	args = args[1:]
-
-	switch cmd {
-	case "", "start":
-		r.actionStart(args)
+	case "start":
+		r.actionStart(parameters)
 	case "end":
 		r.actionEnd()
 	case "update":
 		r.actionUpdate()
 	case "check":
-		r.actionCheck(args)
+		r.actionCheck(parameters)
 	case "checkadd":
-		r.actionAddChecklistItem(args)
+		r.actionAddChecklistItem(parameters)
 	case "checkremove":
-		r.actionRemoveChecklistItem(args)
+		r.actionRemoveChecklistItem(parameters)
 	case "restart":
 		r.actionRestart()
 	case "owner":
-		r.actionOwner(args)
+		r.actionOwner(parameters)
 	case "list":
 		r.actionList()
 	case "info":
 		r.actionInfo()
 	case "add":
-		r.actionAdd(args)
+		r.actionAdd(parameters)
 	case "timeline":
 		r.actionTimeline()
+	case "nuke-db":
+		r.actionNukeDB(parameters)
+	case "test":
+		r.actionTest(parameters)
 	default:
 		r.postCommandResponse(helpText)
 	}

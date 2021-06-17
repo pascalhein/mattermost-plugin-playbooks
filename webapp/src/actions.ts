@@ -61,7 +61,7 @@ export function startPlaybookRun(postId?: string) {
         const clientId = generateId();
         dispatch(setClientId(clientId));
 
-        let command = `/playbook run start ${clientId}`;
+        let command = `/playbook start ${clientId}`;
         if (postId) {
             command = `${command} ${postId}`;
         }
@@ -72,31 +72,31 @@ export function startPlaybookRun(postId?: string) {
 
 export function endPlaybookRun() {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
-        await clientExecuteCommand(dispatch, getState, '/playbook run end');
+        await clientExecuteCommand(dispatch, getState, '/playbook end');
     };
 }
 
 export function restartPlaybookRun() {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
-        await clientExecuteCommand(dispatch, getState, '/playbook run restart');
+        await clientExecuteCommand(dispatch, getState, '/playbook restart');
     };
 }
 
 export function updateStatus() {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
-        await clientExecuteCommand(dispatch, getState, '/playbook run update');
+        await clientExecuteCommand(dispatch, getState, '/playbook update');
     };
 }
 
 export function addToTimeline(postId: string) {
     return async (dispatch: Dispatch, getState: GetStateFunc) => {
-        await clientExecuteCommand(dispatch, getState, `/playbook run add ${postId}`);
+        await clientExecuteCommand(dispatch, getState, `/playbook add ${postId}`);
     };
 }
 
 export function addNewTask(checklist: number) {
     return async (dispatch: Dispatch<AnyAction>, getState: GetStateFunc) => {
-        await clientExecuteCommand(dispatch, getState, `/playbook run checkadd ${checklist}`);
+        await clientExecuteCommand(dispatch, getState, `/playbook checkadd ${checklist}`);
     };
 }
 

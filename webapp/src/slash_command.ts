@@ -14,16 +14,16 @@ export function makeSlashCommandHook(store: Store<GlobalState>) {
             messageTrimmed = message.trim();
         }
 
-        if (messageTrimmed && messageTrimmed.startsWith('/playbook run start')) {
+        if (messageTrimmed && messageTrimmed.startsWith('/playbook start')) {
             const clientId = generateId();
             store.dispatch(setClientId(clientId));
 
-            messageTrimmed = `/playbook run start ${clientId}`;
+            messageTrimmed = `/playbook start ${clientId}`;
 
             return Promise.resolve({message: messageTrimmed, args});
         }
 
-        if (messageTrimmed && messageTrimmed.startsWith('/playbook run info')) {
+        if (messageTrimmed && messageTrimmed.startsWith('/playbook info')) {
             const state = store.getState();
 
             if (inPlaybookRunChannel(state) && !isPlaybookRunRHSOpen(state)) {
@@ -38,7 +38,7 @@ export function makeSlashCommandHook(store: Store<GlobalState>) {
             return Promise.resolve({message: messageTrimmed, args});
         }
 
-        if (messageTrimmed && messageTrimmed.startsWith('/playbook run list')) {
+        if (messageTrimmed && messageTrimmed.startsWith('/playbook list')) {
             const state = store.getState();
 
             if (!isPlaybookRunRHSOpen(state)) {

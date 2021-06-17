@@ -62,7 +62,7 @@ export const PresetTemplates: PresetTemplate[] = [
                     title: 'Resolution',
                     items: [
                         newChecklistItem('Close alert'),
-                        newChecklistItem('End the incident', '', '/playbook run end'),
+                        newChecklistItem('End the incident', '', '/playbook end'),
                         newChecklistItem('Schedule a post-mortem'),
                         newChecklistItem('Record post-mortem action items'),
                         newChecklistItem('Update playbook with learnings'),
