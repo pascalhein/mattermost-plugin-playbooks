@@ -5,7 +5,7 @@
     "integrationFolder": "..",
     "taskTimeout": 20000,
     "testFiles": "**/*_spec.js",
-    "video": false,
+    "video": true,
     "viewportWidth": 1300,
     "env": {
         "adminEmail": "sysadmin@sample.mattermost.com",
