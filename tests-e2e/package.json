@@ -29,7 +29,7 @@
     "cypress:run:electron": "cross-env TZ=Etc/UTC cypress run --browser electron",
     "clean": "rm cypress/results/* || true",
     "pretest": "npm run clean",
-    "test": "npm run cypress:run",
+    "test": "cross-env TZ=Etc/UTC cypress run",
     "check": "eslint --ext .js . --quiet --cache",
     "fix": "eslint --ext .js . --quiet --fix --cache"
   }
