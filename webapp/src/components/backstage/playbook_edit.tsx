@@ -123,7 +123,7 @@ const OuterContainer = styled.div`
     background: var(center-channel-bg);
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: calc(100vh - 80px);
 `;
 
 interface Props {
