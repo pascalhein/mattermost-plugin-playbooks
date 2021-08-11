@@ -980,4 +980,20 @@ var migrations = []Migration{
 			return nil
 		},
 	},
+	{
+		fromVersion: semver.MustParse("0.24.0"),
+		toVersion:   semver.MustParse("0.25.0"),
+		migrationFunc: func(e sqlx.Ext, sqlStore *SQLStore) error {
+			if e.DriverName() == model.DATABASE_DRIVER_MYSQL {
+				if err := addColumnToMySQLTable(e, "IR_Playbook", "ChannelNameTemplate", "TEXT"); err != nil {
+					return errors.Wrapf(err, "failed adding column ChannelNameTemplate to table IR_Playbook")
+				}
+			} else {
+				if err := addColumnToPGTable(e, "IR_Playbook", "ChannelNameTemplate", "TEXT DEFAULT ''"); err != nil {
+					return errors.Wrapf(err, "failed adding column ChannelNameTemplate to table IR_Playbook")
+				}
+			}
+			return nil
+		},
+	},
 }

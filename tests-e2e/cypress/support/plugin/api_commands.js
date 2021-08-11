@@ -221,6 +221,7 @@ Cypress.Commands.add('apiCreatePlaybook', ({
     messageOnJoinEnabled,
     signalAnyKeywords,
     signalAnyKeywordsEnabled,
+    channelNameTemplate,
 }) => {
     return cy.request({
         headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -249,10 +250,18 @@ Cypress.Commands.add('apiCreatePlaybook', ({
             message_on_join_enabled: messageOnJoinEnabled,
             signal_any_keywords: signalAnyKeywords,
             signal_any_keywords_enabled: signalAnyKeywordsEnabled,
+            channel_name_template: channelNameTemplate,
         },
     }).then((response) => {
         expect(response.status).to.equal(201);
-        cy.wrap(response.body);
+        cy.wrap(response.headers.location);
+    }).then((location) => {
+        cy.request({
+            url: location,
+            method: 'GET',
+        }).then((response) => {
+            cy.wrap(response.body);
+        });
     });
 });
 
@@ -263,7 +272,8 @@ Cypress.Commands.add('apiCreateTestPlaybook', ({
     userId,
     broadcastChannelId,
     reminderMessageTemplate,
-    reminderTimerDefaultSeconds
+    reminderTimerDefaultSeconds,
+    channelNameTemplate,
 }) => (
     cy.apiCreatePlaybook({
         teamId,
@@ -281,6 +291,7 @@ Cypress.Commands.add('apiCreateTestPlaybook', ({
         broadcastChannelId,
         reminderMessageTemplate,
         reminderTimerDefaultSeconds,
+        channelNameTemplate,
     })
 ));
 

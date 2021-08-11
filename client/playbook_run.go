@@ -28,6 +28,7 @@ type PlaybookRun struct {
 	InvitedGroupIDs               []string        `json:"invited_group_ids"`
 	TimelineEvents                []TimelineEvent `json:"timeline_events"`
 	ExportChannelOnArchiveEnabled bool            `json:"export_channel_on_archive_enabled"`
+	CategorizeChannelEnabled      bool            `json:"categorize_channel_enabled"`
 }
 
 // StatusPost is information added to the playbook run when selecting from the db and sent to the

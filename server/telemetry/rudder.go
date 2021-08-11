@@ -314,6 +314,7 @@ func playbookProperties(playbook app.Playbook, userID string) map[string]interfa
 		"WebhookOnCreationEnabled":    playbook.WebhookOnCreationEnabled,
 		"SignalAnyKeywordsEnabled":    playbook.SignalAnyKeywordsEnabled,
 		"NumSignalAnyKeywords":        len(playbook.SignalAnyKeywords),
+		"HasChannelNameTemplate":      playbook.ChannelNameTemplate != "",
 	}
 }
 

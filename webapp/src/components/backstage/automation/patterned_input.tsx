@@ -10,6 +10,7 @@ import {Toggle} from 'src/components/backstage/automation/toggle';
 
 interface Props {
     enabled: boolean;
+    disableToggle?: boolean;
     onToggle: () => void;
     textOnToggle: string;
     placeholderText: string;
@@ -25,6 +26,7 @@ export const PatternedInput: FC<Props> = (props: Props) => (
         <AutomationTitle>
             <Toggle
                 isChecked={props.enabled}
+                disabled={props.disableToggle}
                 onChange={props.onToggle}
             />
             <div>{props.textOnToggle}</div>
