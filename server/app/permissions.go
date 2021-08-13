@@ -174,12 +174,13 @@ func isPlaybookCreator(userID string, cfgService config.Service) error {
 func PlaybookAccess(userID string, playbook Playbook, pluginAPI *pluginapi.Client) error {
 	noAccessErr := errors.Wrapf(
 		ErrNoPermissions,
-		"userID %s to access playbook",
+		"userID %s to access playbook %s",
 		userID,
+		playbook.ID,
 	)
 
 	if !CanViewTeam(userID, playbook.TeamID, pluginAPI) {
-		return errors.Wrap(noAccessErr, "no team view permission")
+		return errors.Wrapf(noAccessErr, "no team view permission for %s", playbook.TeamID)
 	}
 
 	// If the list of members is empty then the playbook is open for all.
