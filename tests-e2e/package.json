@@ -33,15 +33,15 @@
     "eslint-plugin-react": "7.24.0"
   },
   "scripts": {
-    "cypress:open": "cross-env TZ=Etc/UTC cypress open",
-    "cypress:run": "cross-env TZ=Etc/UTC cypress run",
-    "cypress:run:chrome": "cross-env TZ=Etc/UTC cypress run --browser chrome",
-    "cypress:run:firefox": "cross-env TZ=Etc/UTC cypress run --browser firefox",
-    "cypress:run:edge": "cross-env TZ=Etc/UTC cypress run --browser edge",
-    "cypress:run:electron": "cross-env TZ=Etc/UTC cypress run --browser electron",
+    "cypress:open": "cross-env TZ=Etc/UTC cy2 open",
+    "cypress:run": "cross-env TZ=Etc/UTC cy2 run",
+    "cypress:run:chrome": "cross-env TZ=Etc/UTC cy2 run --browser chrome",
+    "cypress:run:firefox": "cross-env TZ=Etc/UTC cy2 run --browser firefox",
+    "cypress:run:edge": "cross-env TZ=Etc/UTC cy2 run --browser edge",
+    "cypress:run:electron": "cross-env TZ=Etc/UTC cy2 run --browser electron",
     "clean": "rm cypress/results/* || true",
     "pretest": "npm run clean",
-    "test": "cross-env TZ=Etc/UTC cypress run",
+    "test": "cross-env TZ=Etc/UTC cy2 run",
     "check": "eslint --ext .js . --quiet --cache",
     "fix": "eslint --ext .js . --quiet --fix --cache"
   }
