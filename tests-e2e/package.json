@@ -4,6 +4,7 @@
     "authenticator": "^1.1.5",
     "axios": "^0.21.1",
     "axios-retry": "^3.1.9",
+    "cy2": "^1.2.1",
     "cypress": "7.7.0",
     "cypress-file-upload": "5.0.8",
     "cypress-multi-reporters": "1.5.0",
