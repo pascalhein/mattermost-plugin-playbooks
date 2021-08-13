@@ -120,7 +120,7 @@ commands:
             NODE_ENV=development npm install --ignore-scripts --no-save
             cd ../tests-e2e
             NODE_ENV=development npm install --ignore-scripts --no-save
-            npx cypress install
+            npx cy2 install
       - run:
           name: Install Incident Collaboration plugin
           command: |
@@ -131,7 +131,21 @@ commands:
           command: |
             export FAILURE_MESSAGE="At least one test has failed."
             export RESULTS_OUTPUT="results-output.txt"
-            cd tests-e2e && npm run test |& tee $RESULTS_OUTPUT; if grep "$FAILURE_MESSAGE" "$RESULTS_OUTPUT"; then exit 1; fi
+            cd tests-e2e && npm run test:parallel |& tee $RESULTS_OUTPUT; if grep "$FAILURE_MESSAGE" "$RESULTS_OUTPUT"; then exit 1; fi
+      - run:
+          name: Run Cypress Tests (2)
+          no_output_timeout: 30m
+          command: |
+            export FAILURE_MESSAGE="At least one test has failed."
+            export RESULTS_OUTPUT="results-output-2.txt"
+            cd tests-e2e && npm run test:parallel |& tee $RESULTS_OUTPUT; if grep "$FAILURE_MESSAGE" "$RESULTS_OUTPUT"; then exit 1; fi
+      - run:
+          name: Run Cypress Tests (3)
+          no_output_timeout: 30m
+          command: |
+            export FAILURE_MESSAGE="At least one test has failed."
+            export RESULTS_OUTPUT="results-output-3.txt"
+            cd tests-e2e && npm run test:parallel |& tee $RESULTS_OUTPUT; if grep "$FAILURE_MESSAGE" "$RESULTS_OUTPUT"; then exit 1; fi
       - *save_cypress_cache
       - store_test_results:
           path: tests-e2e/cypress/results
@@ -305,6 +319,7 @@ jobs:
   e2e-cypress-tests-cloud:
     resource_class: xlarge
     docker:
+      - image: agoldis/sorry-cypress-director
       - image: docker.io/mattermost/builder:go-1.16.5-node-16.4.0
         environment:
           TEST_DATABASE_URL: postgres://mmuser:mostest@localhost:5432/mattermost_test
@@ -371,12 +386,14 @@ jobs:
       MM_SERVICESETTINGS_SITEURL: http://localhost:8065
       MM_ADMIN_USERNAME: sysadmin
       MM_ADMIN_PASSWORD: Sys@dmin-sample1
+      CYPRESS_API_URL: http://localhost:1234/
     steps:
       - run-e2e-tests
 
   e2e-cypress-tests-master:
     resource_class: xlarge
     docker:
+      - image: agoldis/sorry-cypress-director
       - image: docker.io/mattermost/builder:go-1.16.5-node-16.4.0
         environment:
           TEST_DATABASE_URL: postgres://mmuser:mostest@localhost:5432/mattermost_test
@@ -443,6 +460,7 @@ jobs:
       MM_SERVICESETTINGS_SITEURL: http://localhost:8065
       MM_ADMIN_USERNAME: sysadmin
       MM_ADMIN_PASSWORD: Sys@dmin-sample1
+      CYPRESS_API_URL: http://localhost:1234/
     steps:
       - run-e2e-tests
 

@@ -42,6 +42,7 @@
     "clean": "rm cypress/results/* || true",
     "pretest": "npm run clean",
     "test": "cross-env TZ=Etc/UTC cy2 run",
+    "test:parallel": "cross-env TZ=Etc/UTC cy2 run --parallel --record --key somekey --ci-build-id hello-cypress",
     "check": "eslint --ext .js . --quiet --cache",
     "fix": "eslint --ext .js . --quiet --fix --cache"
   }
