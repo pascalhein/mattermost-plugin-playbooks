@@ -105,3 +105,25 @@ export const Rest = styled.div<{sizeInPx: number}>`
         mask-image: url('${({sizeInPx}) => leftHoleSvg(sizeInPx)}');
     }
 `;
+
+export const UserList = ({userIds, sizeInPx}: {userIds: string[], sizeInPx: number}) => {
+    return (
+        <UserListWrapper>
+            {userIds.slice(0, 6).map((userId: string) => (
+                <RHSParticipant
+                    key={userId}
+                    userId={userId}
+                    sizeInPx={sizeInPx}
+                />
+            ))}
+            {userIds.length > 6 &&
+            <Rest sizeInPx={sizeInPx}>{'+' + (userIds.length - 6)}</Rest>
+            }
+        </UserListWrapper>
+    );
+};
+
+const UserListWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+`;

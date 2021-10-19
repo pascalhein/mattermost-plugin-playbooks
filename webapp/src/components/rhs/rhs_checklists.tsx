@@ -245,7 +245,7 @@ const MainTitle = styled.div`
     margin: 0 0 0 8px;
 `;
 
-const ChecklistContainer = styled.div`
+export const ChecklistContainer = styled.div`
     background-color: var(--center-channel-bg);
     padding: 16px 12px;
 `;

@@ -159,25 +159,31 @@ const Playbook = () => {
                             {formatMessage({defaultMessage: 'Usage'})}
                         </NavItem>
                     </Navbar>
-                    <Switch>
-                        <Route
-                            exact={true}
-                            path={`${match.path}`}
-                        >
-                            <Redirect to={`${match.url}/usage`}/>
-                        </Route>
-                        <Route path={`${match.path}/preview`}>
-                            <PlaybookPreview playbook={playbook}/>
-                        </Route>
-                        <Route path={`${match.path}/usage`}>
-                            <PlaybookUsage playbook={playbook}/>
-                        </Route>
-                    </Switch>
+                    <Content>
+                        <Switch>
+                            <Route
+                                exact={true}
+                                path={`${match.path}`}
+                            >
+                                <Redirect to={`${match.url}/usage`}/>
+                            </Route>
+                            <Route path={`${match.path}/preview`}>
+                                <PlaybookPreview playbook={playbook}/>
+                            </Route>
+                            <Route path={`${match.path}/usage`}>
+                                <PlaybookUsage playbook={playbook}/>
+                            </Route>
+                        </Switch>
+                    </Content>
                 </>
             }
         </>
     );
 };
+
+const Content = styled.div`
+    background: rgba(var(--center-channel-color-rgb), 0.04);
+`;
 
 const TopContainer = styled.div`
     position: sticky;
